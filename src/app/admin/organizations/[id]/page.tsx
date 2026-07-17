@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { ComingSoon } from "@/components/coming-soon";
 import { AddMemberForm } from "./add-member-form";
+import { OrgTierForm } from "./tier-form";
 import { removeOrgMember } from "../actions";
 
 export default async function OrganizationDetailPage({
@@ -24,7 +25,7 @@ export default async function OrganizationDetailPage({
 
   const { data: org } = await supabase
     .from("organizations")
-    .select("id, name, seats, status")
+    .select("id, name, seats, status, tier_id, tiers(name)")
     .eq("id", id)
     .single();
 
@@ -33,6 +34,8 @@ export default async function OrganizationDetailPage({
     .select("id, org_role, profiles(full_name, email)")
     .eq("org_id", id)
     .order("org_role");
+
+  const { data: tiers } = await supabase.from("tiers").select("id, name").order("name");
 
   if (!org) {
     return <p className="text-sm text-neutral-500">Organization not found.</p>;
@@ -43,8 +46,21 @@ export default async function OrganizationDetailPage({
       <h1 className="text-xl font-semibold">{org.name}</h1>
       <p className="mt-1 text-sm text-neutral-500">
         {(members ?? []).length} member{(members ?? []).length === 1 ? "" : "s"}
-        {org.seats ? ` of ${org.seats} seats` : " — unlimited seats"} · {org.status}
+        {org.seats ? ` of ${org.seats} seats` : " — unlimited seats"} · {org.status} ·{" "}
+        {org.tiers?.name ?? "No tier"}
       </p>
+
+      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+        <h2 className="text-sm font-medium">Tier & seats</h2>
+        <div className="mt-3">
+          <OrgTierForm
+            orgId={org.id}
+            tiers={tiers ?? []}
+            currentTierId={org.tier_id}
+            currentSeats={org.seats}
+          />
+        </div>
+      </div>
 
       <div className="mt-6 rounded-lg border border-neutral-200 p-4">
         <AddMemberForm orgId={org.id} />

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/slugify";
+import { isOrgAtSeatLimit } from "@/lib/org/check-seat-limit";
 
 export type FormState = { error?: string } | undefined;
 
@@ -49,6 +50,10 @@ export async function addOrgMember(
 
   const supabase = await createClient();
 
+  if (await isOrgAtSeatLimit(supabase, orgId)) {
+    return { error: "This organization has no seats left. Raise its seat count first." };
+  }
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, role")
@@ -78,6 +83,33 @@ export async function addOrgMember(
   }
 
   revalidatePath(`/admin/organizations/${orgId}`);
+  return undefined;
+}
+
+export async function updateOrgTier(
+  _prevState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const orgId = String(formData.get("org_id") ?? "");
+  const tierIdRaw = String(formData.get("tier_id") ?? "").trim();
+  const seatsRaw = String(formData.get("seats") ?? "").trim();
+  const seats = seatsRaw ? Number(seatsRaw) : null;
+
+  if (!orgId) return { error: "Missing organization." };
+  if (seats !== null && (!Number.isFinite(seats) || seats < 1)) {
+    return { error: "Seats must be a positive number." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("organizations")
+    .update({ tier_id: tierIdRaw || null, seats })
+    .eq("id", orgId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/admin/organizations/${orgId}`);
+  revalidatePath("/admin/organizations");
   return undefined;
 }
 

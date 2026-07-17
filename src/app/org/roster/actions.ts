@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isOrgAtSeatLimit } from "@/lib/org/check-seat-limit";
 
 export type FormState = { error?: string } | undefined;
 
@@ -15,6 +16,10 @@ export async function addMember(
   if (!orgId || !email) return { error: "Email is required." };
 
   const supabase = await createClient();
+
+  if (await isOrgAtSeatLimit(supabase, orgId)) {
+    return { error: "Your organization has no seats left. Contact HemoEdge to add more." };
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
