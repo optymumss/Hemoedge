@@ -1,5 +1,30 @@
-import { ComingSoon } from "@/components/coming-soon";
+import { getLearnerOrgId } from "@/lib/learner/get-learner-org";
+import { getPublishedContent } from "@/lib/learner/published-content";
 
-export default function Page() {
-  return <ComingSoon title="Cases" description="Real-world haematology cases for clinical learning." />;
+export default async function LearnerCasesPage() {
+  const orgId = await getLearnerOrgId();
+  const cases = await getPublishedContent("cases", "case", orgId);
+
+  return (
+    <div>
+      <h1 className="text-xl font-semibold">Cases</h1>
+      <p className="mt-1 text-sm text-neutral-500">
+        Real-world haematology cases for clinical learning.
+      </p>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {cases.map((c) => (
+          <div key={c.id} className="rounded-lg border border-neutral-200 p-4">
+            <span className="text-xs uppercase text-neutral-400">{c.level}</span>
+            <h2 className="mt-1 font-medium">{c.title}</h2>
+          </div>
+        ))}
+        {cases.length === 0 && (
+          <p className="col-span-full py-8 text-center text-sm text-neutral-400">
+            No cases assigned yet.
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
