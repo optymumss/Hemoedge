@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      associates: {
+        Row: {
+          bio: string | null
+          created_at: string
+          id: string
+          name: string
+          title: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          title?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          title?: string | null
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          content: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          published_at: string | null
+          slug: string
+          status: string
+          title: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug: string
+          status?: string
+          title: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       cases: {
         Row: {
           created_at: string
@@ -202,6 +259,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      enquiries: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+        }
+        Relationships: []
       }
       features: {
         Row: {
@@ -408,6 +489,39 @@ export type Database = {
           },
         ]
       }
+      pages: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          slug: string
+          status: string
+          title: string
+          type: Database["public"]["Enums"]["page_type"]
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          slug: string
+          status?: string
+          title: string
+          type?: Database["public"]["Enums"]["page_type"]
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          slug?: string
+          status?: string
+          title?: string
+          type?: Database["public"]["Enums"]["page_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -518,6 +632,33 @@ export type Database = {
           },
         ]
       }
+      testimonials: {
+        Row: {
+          author_name: string
+          author_title: string | null
+          created_at: string
+          id: string
+          published: boolean
+          quote: string
+        }
+        Insert: {
+          author_name: string
+          author_title?: string | null
+          created_at?: string
+          id?: string
+          published?: boolean
+          quote: string
+        }
+        Update: {
+          author_name?: string
+          author_title?: string | null
+          created_at?: string
+          id?: string
+          published?: boolean
+          quote?: string
+        }
+        Relationships: []
+      }
       tiers: {
         Row: {
           created_at: string
@@ -565,6 +706,7 @@ export type Database = {
       app_role: "super_admin" | "content_manager" | "org_admin" | "member"
       content_level: "beginner" | "intermediate" | "advanced"
       content_status: "draft" | "in_review" | "changes_requested" | "published"
+      page_type: "homepage" | "about" | "contact" | "pilot" | "custom"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -695,6 +837,7 @@ export const Constants = {
       app_role: ["super_admin", "content_manager", "org_admin", "member"],
       content_level: ["beginner", "intermediate", "advanced"],
       content_status: ["draft", "in_review", "changes_requested", "published"],
+      page_type: ["homepage", "about", "contact", "pilot", "custom"],
     },
   },
 } as const
