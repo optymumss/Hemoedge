@@ -56,6 +56,7 @@ export const orgNav: NavSection[] = [
       { label: "Catalog", href: "/org/catalog" },
       { label: "Analytics", href: "/org/analytics" },
       { label: "Reports", href: "/org/reports" },
+      { label: "Billing", href: "/org/billing" },
     ],
   },
 ];

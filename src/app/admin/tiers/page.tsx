@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { ComingSoon } from "@/components/coming-soon";
 import { TierForm } from "./tier-form";
+import { StripePriceForm } from "./stripe-price-form";
 
 function formatPrice(cents: number) {
   return `£${(cents / 100).toFixed(2)}`;
@@ -21,7 +22,9 @@ export default async function TiersPage() {
   const supabase = await createClient();
   const { data: tiers } = await supabase
     .from("tiers")
-    .select("id, name, identifier, monthly_price_cents, yearly_price_cents")
+    .select(
+      "id, name, identifier, monthly_price_cents, yearly_price_cents, stripe_price_id_monthly, stripe_price_id_yearly",
+    )
     .order("monthly_price_cents");
 
   return (
@@ -41,6 +44,7 @@ export default async function TiersPage() {
               <th className="px-4 py-2">Identifier</th>
               <th className="px-4 py-2">Monthly</th>
               <th className="px-4 py-2">Yearly</th>
+              <th className="px-4 py-2">Stripe prices</th>
             </tr>
           </thead>
           <tbody>
@@ -56,11 +60,18 @@ export default async function TiersPage() {
                 <td className="px-4 py-2 text-neutral-500">
                   {formatPrice(t.yearly_price_cents)}
                 </td>
+                <td className="px-4 py-2">
+                  <StripePriceForm
+                    tierId={t.id}
+                    monthlyPriceId={t.stripe_price_id_monthly}
+                    yearlyPriceId={t.stripe_price_id_yearly}
+                  />
+                </td>
               </tr>
             ))}
             {(tiers ?? []).length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={5} className="px-4 py-6 text-center text-neutral-400">
                   No tiers yet.
                 </td>
               </tr>

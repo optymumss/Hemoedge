@@ -540,6 +540,7 @@ export type Database = {
           seats: number | null
           slug: string
           status: string
+          stripe_customer_id: string | null
           tier_id: string | null
         }
         Insert: {
@@ -549,6 +550,7 @@ export type Database = {
           seats?: number | null
           slug: string
           status?: string
+          stripe_customer_id?: string | null
           tier_id?: string | null
         }
         Update: {
@@ -558,6 +560,7 @@ export type Database = {
           seats?: number | null
           slug?: string
           status?: string
+          stripe_customer_id?: string | null
           tier_id?: string | null
         }
         Relationships: [
@@ -840,6 +843,8 @@ export type Database = {
           identifier: string
           monthly_price_cents: number
           name: string
+          stripe_price_id_monthly: string | null
+          stripe_price_id_yearly: string | null
           yearly_price_cents: number
         }
         Insert: {
@@ -848,6 +853,8 @@ export type Database = {
           identifier: string
           monthly_price_cents: number
           name: string
+          stripe_price_id_monthly?: string | null
+          stripe_price_id_yearly?: string | null
           yearly_price_cents: number
         }
         Update: {
@@ -856,6 +863,8 @@ export type Database = {
           identifier?: string
           monthly_price_cents?: number
           name?: string
+          stripe_price_id_monthly?: string | null
+          stripe_price_id_yearly?: string | null
           yearly_price_cents?: number
         }
         Relationships: []

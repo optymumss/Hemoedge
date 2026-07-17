@@ -39,3 +39,28 @@ export async function createTier(
   revalidatePath("/admin/tiers");
   return undefined;
 }
+
+export async function updateTierStripePrices(
+  _prevState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const tierId = String(formData.get("tier_id") ?? "");
+  const monthlyPriceId = String(formData.get("stripe_price_id_monthly") ?? "").trim() || null;
+  const yearlyPriceId = String(formData.get("stripe_price_id_yearly") ?? "").trim() || null;
+
+  if (!tierId) return { error: "Missing tier." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("tiers")
+    .update({
+      stripe_price_id_monthly: monthlyPriceId,
+      stripe_price_id_yearly: yearlyPriceId,
+    })
+    .eq("id", tierId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/tiers");
+  return undefined;
+}
