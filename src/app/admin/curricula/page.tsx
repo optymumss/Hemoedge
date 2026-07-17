@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitForReviewButton } from "@/components/submit-for-review-button";
@@ -35,7 +36,11 @@ export default async function CurriculaPage() {
           <tbody>
             {(curricula ?? []).map((c) => (
               <tr key={c.id} className="border-t border-neutral-200">
-                <td className="px-4 py-2 font-medium">{c.title}</td>
+                <td className="px-4 py-2 font-medium">
+                  <Link href={`/admin/curricula/${c.id}`} className="hover:underline">
+                    {c.title}
+                  </Link>
+                </td>
                 <td className="px-4 py-2 capitalize text-neutral-500">{c.level}</td>
                 <td className="px-4 py-2 text-neutral-500">{c.pass_threshold}%</td>
                 <td className="px-4 py-2">

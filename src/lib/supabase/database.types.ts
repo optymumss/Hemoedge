@@ -136,6 +136,45 @@ export type Database = {
         }
         Relationships: []
       }
+      certificates: {
+        Row: {
+          curriculum_id: string
+          id: string
+          issued_at: string
+          user_id: string
+          verification_code: string
+        }
+        Insert: {
+          curriculum_id: string
+          id?: string
+          issued_at?: string
+          user_id: string
+          verification_code: string
+        }
+        Update: {
+          curriculum_id?: string
+          id?: string
+          issued_at?: string
+          user_id?: string
+          verification_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_curriculum_id_fkey"
+            columns: ["curriculum_id"]
+            isOneToOne: false
+            referencedRelation: "curricula"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_reviews: {
         Row: {
           content_id: string
@@ -256,6 +295,42 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      curriculum_modules: {
+        Row: {
+          curriculum_id: string
+          id: string
+          module_id: string
+          position: number
+        }
+        Insert: {
+          curriculum_id: string
+          id?: string
+          module_id: string
+          position?: number
+        }
+        Update: {
+          curriculum_id?: string
+          id?: string
+          module_id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curriculum_modules_curriculum_id_fkey"
+            columns: ["curriculum_id"]
+            isOneToOne: false
+            referencedRelation: "curricula"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "curriculum_modules_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
             referencedColumns: ["id"]
           },
         ]
@@ -545,6 +620,99 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
         }
         Relationships: []
+      }
+      quiz_attempts: {
+        Row: {
+          answers: Json
+          created_at: string
+          id: string
+          module_id: string
+          passed: boolean
+          score: number
+          user_id: string
+        }
+        Insert: {
+          answers: Json
+          created_at?: string
+          id?: string
+          module_id: string
+          passed: boolean
+          score: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          id?: string
+          module_id?: string
+          passed?: boolean
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_questions: {
+        Row: {
+          choices: Json
+          correct_choice_id: string
+          created_at: string
+          created_by: string
+          id: string
+          module_id: string
+          position: number
+          question_text: string
+        }
+        Insert: {
+          choices: Json
+          correct_choice_id: string
+          created_at?: string
+          created_by: string
+          id?: string
+          module_id: string
+          position?: number
+          question_text: string
+        }
+        Update: {
+          choices?: Json
+          correct_choice_id?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          module_id?: string
+          position?: number
+          question_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_questions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_questions_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       slide_categories: {
         Row: {

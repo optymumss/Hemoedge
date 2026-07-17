@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitForReviewButton } from "@/components/submit-for-review-button";
@@ -40,13 +41,18 @@ export default async function ModulesPage() {
                   <StatusBadge status={m.status} />
                 </td>
                 <td className="px-4 py-2 text-right">
-                  {(m.status === "draft" || m.status === "changes_requested") && (
-                    <SubmitForReviewButton
-                      contentType="module"
-                      id={m.id}
-                      path="/admin/modules"
-                    />
-                  )}
+                  <div className="flex items-center justify-end gap-3">
+                    <Link href={`/admin/modules/${m.id}`} className="text-xs text-neutral-600 underline">
+                      Manage quiz
+                    </Link>
+                    {(m.status === "draft" || m.status === "changes_requested") && (
+                      <SubmitForReviewButton
+                        contentType="module"
+                        id={m.id}
+                        path="/admin/modules"
+                      />
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
