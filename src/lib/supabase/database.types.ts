@@ -75,6 +75,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
+          description: string | null
           id: string
           level: Database["public"]["Enums"]["content_level"]
           status: Database["public"]["Enums"]["content_status"]
@@ -84,6 +85,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by: string
+          description?: string | null
           id?: string
           level: Database["public"]["Enums"]["content_level"]
           status?: Database["public"]["Enums"]["content_status"]
@@ -93,6 +95,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string
+          description?: string | null
           id?: string
           level?: Database["public"]["Enums"]["content_level"]
           status?: Database["public"]["Enums"]["content_status"]
@@ -411,6 +414,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
+          description: string | null
           id: string
           level: Database["public"]["Enums"]["content_level"]
           status: Database["public"]["Enums"]["content_status"]
@@ -420,6 +424,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by: string
+          description?: string | null
           id?: string
           level: Database["public"]["Enums"]["content_level"]
           status?: Database["public"]["Enums"]["content_status"]
@@ -429,6 +434,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string
+          description?: string | null
           id?: string
           level?: Database["public"]["Enums"]["content_level"]
           status?: Database["public"]["Enums"]["content_status"]
