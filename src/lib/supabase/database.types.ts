@@ -378,6 +378,7 @@ export type Database = {
           seats: number | null
           slug: string
           status: string
+          tier_id: string | null
         }
         Insert: {
           created_at?: string
@@ -386,6 +387,7 @@ export type Database = {
           seats?: number | null
           slug: string
           status?: string
+          tier_id?: string | null
         }
         Update: {
           created_at?: string
@@ -394,8 +396,17 @@ export type Database = {
           seats?: number | null
           slug?: string
           status?: string
+          tier_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "organizations_tier_id_fkey"
+            columns: ["tier_id"]
+            isOneToOne: false
+            referencedRelation: "tiers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -506,6 +517,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tiers: {
+        Row: {
+          created_at: string
+          id: string
+          identifier: string
+          monthly_price_cents: number
+          name: string
+          yearly_price_cents: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          identifier: string
+          monthly_price_cents: number
+          name: string
+          yearly_price_cents: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          identifier?: string
+          monthly_price_cents?: number
+          name?: string
+          yearly_price_cents?: number
+        }
+        Relationships: []
       }
     }
     Views: {
