@@ -1,7 +1,95 @@
+import { getCurrentOrg } from "@/lib/org/get-current-org";
+import { getOrgProgress } from "@/lib/org/get-org-progress";
 import { ComingSoon } from "@/components/coming-soon";
 
-export default function Page() {
+export default async function AnalyticsPage() {
+  const org = await getCurrentOrg();
+  if (!org) {
+    return (
+      <ComingSoon
+        title="No organization assigned"
+        description="This account isn't set as an owner/admin of any organization yet."
+      />
+    );
+  }
+
+  const { members, modules } = await getOrgProgress(org.id);
+  const weakest = modules.slice(0, 5);
+
   return (
-    <ComingSoon title="Analytics" description="Team scores and weak areas across your learners." />
+    <div>
+      <h1 className="text-xl font-semibold">Analytics — {org.name}</h1>
+      <p className="mt-1 text-sm text-neutral-500">
+        Team scores and weak areas across your learners.
+      </p>
+
+      <div className="mt-6">
+        <h2 className="text-sm font-semibold text-neutral-700">Weakest modules</h2>
+        <div className="mt-2 overflow-hidden rounded-lg border border-neutral-200">
+          <table className="w-full text-sm">
+            <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+              <tr>
+                <th className="px-4 py-2">Module</th>
+                <th className="px-4 py-2">Attempts</th>
+                <th className="px-4 py-2">Average Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {weakest.map((m) => (
+                <tr key={m.moduleId} className="border-t border-neutral-200">
+                  <td className="px-4 py-2 font-medium">{m.title}</td>
+                  <td className="px-4 py-2 text-neutral-500">{m.attemptCount}</td>
+                  <td
+                    className={`px-4 py-2 ${m.averageScore < 70 ? "text-amber-700" : "text-neutral-500"}`}
+                  >
+                    {m.averageScore}%
+                  </td>
+                </tr>
+              ))}
+              {weakest.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="px-4 py-6 text-center text-neutral-400">
+                    No quiz attempts yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <h2 className="text-sm font-semibold text-neutral-700">Learners</h2>
+        <div className="mt-2 overflow-hidden rounded-lg border border-neutral-200">
+          <table className="w-full text-sm">
+            <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+              <tr>
+                <th className="px-4 py-2">Name</th>
+                <th className="px-4 py-2">Attempts</th>
+                <th className="px-4 py-2">Average Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {members.map((m) => (
+                <tr key={m.userId} className="border-t border-neutral-200">
+                  <td className="px-4 py-2 font-medium">{m.name}</td>
+                  <td className="px-4 py-2 text-neutral-500">{m.attemptCount}</td>
+                  <td className="px-4 py-2 text-neutral-500">
+                    {m.averageScore === null ? "—" : `${m.averageScore}%`}
+                  </td>
+                </tr>
+              ))}
+              {members.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="px-4 py-6 text-center text-neutral-400">
+                    No learners yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 }
