@@ -35,6 +35,13 @@ export function ModuleForm() {
           <option value="advanced">Advanced</option>
         </select>
       </div>
+      <div className="flex flex-1 min-w-64 flex-col gap-1">
+        <label className="text-xs text-neutral-500">Description (optional, grounds the AI Tutor)</label>
+        <input
+          name="description"
+          className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+      </div>
       <button
         type="submit"
         disabled={pending}

@@ -1,6 +1,7 @@
 import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { appNav, visibleFor } from "@/lib/nav";
 import { Sidebar } from "@/components/sidebar";
+import { TutorWidget } from "@/components/tutor-widget";
 import { logout } from "@/app/login/actions";
 
 export default async function LearnerLayout({
@@ -20,6 +21,7 @@ export default async function LearnerLayout({
         onLogout={logout}
       />
       <div className="flex-1 overflow-y-auto px-8 py-8">{children}</div>
+      <TutorWidget />
     </div>
   );
 }

@@ -14,6 +14,7 @@ export async function createModule(
 ): Promise<FormState> {
   const title = String(formData.get("title") ?? "").trim();
   const level = String(formData.get("level") ?? "") as Enums<"content_level">;
+  const description = String(formData.get("description") ?? "").trim() || null;
 
   if (!title) return { error: "Title is required." };
   if (!LEVELS.includes(level)) {
@@ -28,7 +29,7 @@ export async function createModule(
 
   const { error } = await supabase
     .from("modules")
-    .insert({ title, level, created_by: user.id });
+    .insert({ title, level, description, created_by: user.id });
 
   if (error) return { error: error.message };
 
