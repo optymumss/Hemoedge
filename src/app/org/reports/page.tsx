@@ -36,6 +36,7 @@ export default async function ReportsPage() {
 
       <a
         href="/org/reports/export"
+        download
         className="mt-6 inline-block rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
       >
         Download progress CSV
