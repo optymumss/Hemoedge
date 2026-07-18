@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/slugify";
 import { isOrgAtSeatLimit } from "@/lib/org/check-seat-limit";
+import { logAudit } from "@/lib/audit/log";
 
 export type FormState = { error?: string } | undefined;
 
@@ -49,6 +50,9 @@ export async function addOrgMember(
   }
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (await isOrgAtSeatLimit(supabase, orgId)) {
     return { error: "This organization has no seats left. Raise its seat count first." };
@@ -82,6 +86,13 @@ export async function addOrgMember(
     await supabase.from("profiles").update({ role: "org_admin" }).eq("id", profile.id);
   }
 
+  if (user) {
+    await logAudit(supabase, user.id, "org_member_added", "organization", orgId, {
+      member_email: email,
+      org_role: orgRole,
+    });
+  }
+
   revalidatePath(`/admin/organizations/${orgId}`);
   return undefined;
 }
@@ -101,12 +112,23 @@ export async function updateOrgTier(
   }
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { error } = await supabase
     .from("organizations")
     .update({ tier_id: tierIdRaw || null, seats })
     .eq("id", orgId);
 
   if (error) return { error: error.message };
+
+  if (user) {
+    await logAudit(supabase, user.id, "org_tier_updated", "organization", orgId, {
+      tier_id: tierIdRaw || null,
+      seats,
+    });
+  }
 
   revalidatePath(`/admin/organizations/${orgId}`);
   revalidatePath("/admin/organizations");
@@ -119,7 +141,17 @@ export async function removeOrgMember(formData: FormData) {
   if (!membershipId) return;
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   await supabase.from("organization_memberships").delete().eq("id", membershipId);
+
+  if (user) {
+    await logAudit(supabase, user.id, "org_member_removed", "organization", orgId, {
+      membership_id: membershipId,
+    });
+  }
 
   revalidatePath(`/admin/organizations/${orgId}`);
 }

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { CONTENT_TABLES, type ContentType } from "@/lib/content/types";
+import { logAudit } from "@/lib/audit/log";
 
 /** A Content Manager submits their draft (or bounced work) for Super Admin review. */
 export async function submitForReview(formData: FormData) {
@@ -72,6 +73,11 @@ export async function reviewContent(formData: FormData) {
       })
       .eq("id", pending.id);
   }
+
+  await logAudit(supabase, user.id, "content_reviewed", contentType, id, {
+    decision,
+    notes,
+  });
 
   revalidatePath("/admin/review-queue");
 }

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isOrgAtSeatLimit } from "@/lib/org/check-seat-limit";
+import { logAudit } from "@/lib/audit/log";
 
 export type FormState = { error?: string } | undefined;
 
@@ -16,6 +17,9 @@ export async function addMember(
   if (!orgId || !email) return { error: "Email is required." };
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (await isOrgAtSeatLimit(supabase, orgId)) {
     return { error: "Your organization has no seats left. Contact HemoEdge to add more." };
@@ -45,6 +49,13 @@ export async function addMember(
     };
   }
 
+  if (user) {
+    await logAudit(supabase, user.id, "org_member_added", "organization", orgId, {
+      member_email: email,
+      org_role: "member",
+    });
+  }
+
   revalidatePath("/org/roster");
   return undefined;
 }
@@ -54,7 +65,23 @@ export async function removeMember(formData: FormData) {
   if (!membershipId) return;
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: membership } = await supabase
+    .from("organization_memberships")
+    .select("org_id")
+    .eq("id", membershipId)
+    .maybeSingle();
+
   await supabase.from("organization_memberships").delete().eq("id", membershipId);
+
+  if (user && membership) {
+    await logAudit(supabase, user.id, "org_member_removed", "organization", membership.org_id, {
+      membership_id: membershipId,
+    });
+  }
 
   revalidatePath("/org/roster");
 }
