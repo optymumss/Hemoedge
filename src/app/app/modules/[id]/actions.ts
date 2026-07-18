@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { checkAndIssueCertificates } from "@/lib/quiz/certificates";
+import { getActiveImpersonation } from "@/lib/auth/impersonation";
 
 export type FormState = { error?: string } | undefined;
 
@@ -12,6 +13,10 @@ export async function submitQuizAttempt(
 ): Promise<FormState> {
   const moduleId = String(formData.get("module_id") ?? "");
   if (!moduleId) return { error: "Missing module." };
+
+  if (await getActiveImpersonation()) {
+    return { error: "Quiz submission is disabled while viewing as another user." };
+  }
 
   const supabase = await createClient();
   const {

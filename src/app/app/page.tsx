@@ -1,9 +1,14 @@
 import { getCurrentProfile } from "@/lib/auth/get-profile";
+import { getActiveImpersonation } from "@/lib/auth/impersonation";
 import { getLearnerOrgId } from "@/lib/learner/get-learner-org";
 import { getPublishedContent } from "@/lib/learner/published-content";
 
 export default async function LearnerHome() {
   const profile = await getCurrentProfile();
+  const impersonation = await getActiveImpersonation();
+  const displayName = impersonation
+    ? impersonation.target.fullName || impersonation.target.email
+    : profile?.fullName || profile?.email;
   const orgId = await getLearnerOrgId();
   const [modules, cases] = await Promise.all([
     getPublishedContent("modules", "module", orgId),
@@ -13,7 +18,7 @@ export default async function LearnerHome() {
   return (
     <div>
       <h1 className="text-xl font-semibold">
-        Welcome, {profile?.fullName || profile?.email}
+        Welcome, {displayName}
       </h1>
       <p className="mt-2 max-w-xl text-sm text-neutral-600">
         {orgId

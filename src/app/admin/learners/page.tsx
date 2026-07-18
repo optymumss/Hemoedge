@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { ComingSoon } from "@/components/coming-soon";
 import { RoleForm } from "./role-form";
+import { startImpersonation } from "./impersonation-actions";
 
 export default async function LearnersPage() {
   const profile = await getCurrentProfile();
@@ -37,6 +38,7 @@ export default async function LearnersPage() {
               <th className="px-4 py-2">Email</th>
               <th className="px-4 py-2">Organization</th>
               <th className="px-4 py-2">Role</th>
+              <th className="px-4 py-2" />
             </tr>
           </thead>
           <tbody>
@@ -50,11 +52,21 @@ export default async function LearnersPage() {
                 <td className="px-4 py-2">
                   <RoleForm userId={l.id} role={l.role} />
                 </td>
+                <td className="px-4 py-2 text-right">
+                  {l.id !== profile.id && (
+                    <form action={startImpersonation}>
+                      <input type="hidden" name="user_id" value={l.id} />
+                      <button type="submit" className="text-xs text-neutral-600 underline">
+                        View as
+                      </button>
+                    </form>
+                  )}
+                </td>
               </tr>
             ))}
             {(learners ?? []).length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={5} className="px-4 py-6 text-center text-neutral-400">
                   No accounts yet.
                 </td>
               </tr>

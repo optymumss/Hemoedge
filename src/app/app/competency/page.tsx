@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getLearnerOrgId } from "@/lib/learner/get-learner-org";
+import { getEffectiveUserId } from "@/lib/auth/impersonation";
 
 export default async function CompetencyPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const userId = await getEffectiveUserId();
   const orgId = await getLearnerOrgId();
 
   let curriculumIds: string[] | null = null;
@@ -32,7 +31,7 @@ export default async function CompetencyPage() {
   const { data: certificates } = await supabase
     .from("certificates")
     .select("curriculum_id")
-    .eq("user_id", user!.id);
+    .eq("user_id", userId!);
   const certifiedIds = new Set((certificates ?? []).map((c) => c.curriculum_id));
 
   const stages = await Promise.all(
@@ -49,7 +48,7 @@ export default async function CompetencyPage() {
           ? await supabase
               .from("quiz_attempts")
               .select("module_id, score")
-              .eq("user_id", user!.id)
+              .eq("user_id", userId!)
               .in("module_id", moduleIds)
           : { data: [] };
 

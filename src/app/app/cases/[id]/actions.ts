@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getActiveImpersonation } from "@/lib/auth/impersonation";
 
 export type FormState = { error?: string } | undefined;
 
@@ -11,6 +12,10 @@ export async function submitQuizAttempt(
 ): Promise<FormState> {
   const caseId = String(formData.get("case_id") ?? "");
   if (!caseId) return { error: "Missing case." };
+
+  if (await getActiveImpersonation()) {
+    return { error: "Quiz submission is disabled while viewing as another user." };
+  }
 
   const supabase = await createClient();
   const {

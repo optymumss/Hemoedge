@@ -1,15 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
+import { getEffectiveUserId } from "@/lib/auth/impersonation";
 
 export default async function CertificatesPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const userId = await getEffectiveUserId();
 
   const { data: certificates } = await supabase
     .from("certificates")
     .select("id, verification_code, issued_at, curricula(title, level)")
-    .eq("user_id", user!.id)
+    .eq("user_id", userId!)
     .order("issued_at", { ascending: false });
 
   return (

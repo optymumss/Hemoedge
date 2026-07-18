@@ -448,6 +448,45 @@ export type Database = {
           },
         ]
       }
+      impersonation_sessions: {
+        Row: {
+          actor_id: string
+          ended_at: string | null
+          id: string
+          started_at: string
+          target_id: string
+        }
+        Insert: {
+          actor_id: string
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          target_id: string
+        }
+        Update: {
+          actor_id?: string
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          target_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "impersonation_sessions_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "impersonation_sessions_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       modules: {
         Row: {
           created_at: string

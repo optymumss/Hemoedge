@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getEffectiveUserId, getActiveImpersonation } from "@/lib/auth/impersonation";
 import { QuizForm } from "./quiz-form";
 
 export default async function LearnerModuleDetailPage({
@@ -26,14 +27,13 @@ export default async function LearnerModuleDetailPage({
     .eq("module_id", id)
     .order("position");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const userId = await getEffectiveUserId();
+  const impersonation = await getActiveImpersonation();
   const { data: attempts } = await supabase
     .from("quiz_attempts")
     .select("score, passed")
     .eq("module_id", id)
-    .eq("user_id", user!.id)
+    .eq("user_id", userId!)
     .order("created_at", { ascending: false })
     .limit(1);
 
@@ -55,18 +55,24 @@ export default async function LearnerModuleDetailPage({
       )}
 
       {(questions ?? []).length > 0 ? (
-        <div className="mt-6">
-          <QuizForm
-            moduleId={module_.id}
-            questions={
-              (questions ?? []) as unknown as {
-                id: string;
-                question_text: string;
-                choices: { id: string; text: string }[];
-              }[]
-            }
-          />
-        </div>
+        impersonation ? (
+          <p className="mt-6 text-sm text-neutral-400">
+            Quiz submission is disabled while viewing as another user.
+          </p>
+        ) : (
+          <div className="mt-6">
+            <QuizForm
+              moduleId={module_.id}
+              questions={
+                (questions ?? []) as unknown as {
+                  id: string;
+                  question_text: string;
+                  choices: { id: string; text: string }[];
+                }[]
+              }
+            />
+          </div>
+        )
       ) : (
         <p className="mt-6 text-sm text-neutral-400">
           No quiz has been added to this module yet.
