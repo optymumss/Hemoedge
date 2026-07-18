@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { IMPERSONATION_COOKIE } from "@/lib/auth/impersonation";
 import { logAudit } from "@/lib/audit/log";
+import { defaultRouteForRole } from "@/lib/auth/roles";
 
 export async function startImpersonation(formData: FormData) {
   const targetUserId = String(formData.get("user_id") ?? "");
@@ -15,6 +16,13 @@ export async function startImpersonation(formData: FormData) {
   if (profile?.role !== "super_admin") return;
 
   const supabase = await createClient();
+
+  const { data: target } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", targetUserId)
+    .single();
+
   const { data: session, error } = await supabase
     .from("impersonation_sessions")
     .insert({ actor_id: profile.id, target_id: targetUserId })
@@ -33,7 +41,7 @@ export async function startImpersonation(formData: FormData) {
     path: "/",
   });
 
-  redirect("/app");
+  redirect(defaultRouteForRole(target?.role));
 }
 
 export async function endImpersonation() {

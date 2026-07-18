@@ -1,11 +1,12 @@
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import type { AppRole } from "@/lib/auth/roles";
 
 export const IMPERSONATION_COOKIE = "impersonation_session";
 
 export type ActiveImpersonation = {
   sessionId: string;
-  target: { id: string; email: string; fullName: string | null };
+  target: { id: string; email: string; fullName: string | null; role: AppRole };
 };
 
 /** Validates the cookie's session against the real auth session on every
@@ -23,7 +24,7 @@ export async function getActiveImpersonation(): Promise<ActiveImpersonation | nu
 
   const { data: session } = await supabase
     .from("impersonation_sessions")
-    .select("id, actor_id, ended_at, profiles!impersonation_sessions_target_id_fkey(id, email, full_name)")
+    .select("id, actor_id, ended_at, profiles!impersonation_sessions_target_id_fkey(id, email, full_name, role)")
     .eq("id", sessionId)
     .maybeSingle();
 
@@ -37,6 +38,7 @@ export async function getActiveImpersonation(): Promise<ActiveImpersonation | nu
       id: session.profiles.id,
       email: session.profiles.email,
       fullName: session.profiles.full_name,
+      role: session.profiles.role,
     },
   };
 }
