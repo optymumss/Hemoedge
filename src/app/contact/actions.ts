@@ -1,6 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { sendEmail } from "@/lib/email/send";
+import { enquiryReceivedEmail } from "@/lib/email/templates";
 
 export type FormState = { error?: string; success?: boolean } | undefined;
 
@@ -23,6 +25,11 @@ export async function submitEnquiry(
   const { error } = await supabase.from("enquiries").insert({ name, email, message });
 
   if (error) return { error: "Something went wrong — please try again." };
+
+  if (process.env.ENQUIRY_NOTIFY_EMAIL) {
+    const { subject, html } = enquiryReceivedEmail(name, email, message);
+    await sendEmail(process.env.ENQUIRY_NOTIFY_EMAIL, subject, html);
+  }
 
   return { success: true };
 }

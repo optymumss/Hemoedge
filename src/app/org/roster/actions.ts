@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isOrgAtSeatLimit } from "@/lib/org/check-seat-limit";
 import { logAudit } from "@/lib/audit/log";
+import { sendEmail } from "@/lib/email/send";
+import { orgInviteEmail } from "@/lib/email/templates";
+import { getActiveImpersonation } from "@/lib/auth/impersonation";
 
 export type FormState = { error?: string } | undefined;
 
@@ -15,6 +18,10 @@ export async function addMember(
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
 
   if (!orgId || !email) return { error: "Email is required." };
+
+  if (await getActiveImpersonation()) {
+    return { error: "Roster changes are disabled while viewing as another user." };
+  }
 
   const supabase = await createClient();
   const {
@@ -56,6 +63,12 @@ export async function addMember(
     });
   }
 
+  const { data: org } = await supabase.from("organizations").select("name").eq("id", orgId).single();
+  if (org) {
+    const { subject, html } = orgInviteEmail(org.name);
+    await sendEmail(email, subject, html);
+  }
+
   revalidatePath("/org/roster");
   return undefined;
 }
@@ -63,6 +76,8 @@ export async function addMember(
 export async function removeMember(formData: FormData) {
   const membershipId = String(formData.get("membership_id") ?? "");
   if (!membershipId) return;
+
+  if (await getActiveImpersonation()) return;
 
   const supabase = await createClient();
   const {

@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { getSlideViewUrl } from "./actions";
+import { WsiViewer } from "@/components/wsi-viewer";
 
-export function ViewSlideButton({ slideId }: { slideId: string }) {
+export function ViewSlideButton({ slideId, title }: { slideId: string; title: string }) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [url, setUrl] = useState<string | null>(null);
 
   async function view() {
     setPending(true);
@@ -16,7 +18,7 @@ export function ViewSlideButton({ slideId }: { slideId: string }) {
       setError(result.error);
       return;
     }
-    window.open(result.url, "_blank", "noopener,noreferrer");
+    setUrl(result.url ?? null);
   }
 
   return (
@@ -25,6 +27,23 @@ export function ViewSlideButton({ slideId }: { slideId: string }) {
         {pending ? "Preparing…" : "View"}
       </button>
       {error && <span className="ml-2 text-xs text-red-600">{error}</span>}
+
+      {url && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black/80 p-4">
+          <div className="flex items-center justify-between pb-2">
+            <p className="text-sm font-medium text-white">{title}</p>
+            <button
+              onClick={() => setUrl(null)}
+              className="rounded-md bg-white/10 px-3 py-1 text-sm text-white hover:bg-white/20"
+            >
+              Close
+            </button>
+          </div>
+          <div className="min-h-0 flex-1">
+            <WsiViewer imageUrl={url} />
+          </div>
+        </div>
+      )}
     </span>
   );
 }

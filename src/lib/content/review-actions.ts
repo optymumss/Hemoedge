@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { CONTENT_TABLES, type ContentType } from "@/lib/content/types";
 import { logAudit } from "@/lib/audit/log";
+import { sendEmail } from "@/lib/email/send";
+import { reviewDecisionEmail } from "@/lib/email/templates";
 
 /** A Content Manager submits their draft (or bounced work) for Super Admin review. */
 export async function submitForReview(formData: FormData) {
@@ -54,7 +56,7 @@ export async function reviewContent(formData: FormData) {
 
   const { data: pending } = await supabase
     .from("content_reviews")
-    .select("id")
+    .select("id, submitted_by")
     .eq("content_type", contentType)
     .eq("content_id", id)
     .is("decision", null)
@@ -78,6 +80,17 @@ export async function reviewContent(formData: FormData) {
     decision,
     notes,
   });
+
+  if (pending) {
+    const [{ data: content }, { data: submitter }] = await Promise.all([
+      supabase.from(table).select("title").eq("id", id).single(),
+      supabase.from("profiles").select("email").eq("id", pending.submitted_by).single(),
+    ]);
+    if (content && submitter) {
+      const { subject, html } = reviewDecisionEmail(content.title, decision, notes);
+      await sendEmail(submitter.email, subject, html);
+    }
+  }
 
   revalidatePath("/admin/review-queue");
 }

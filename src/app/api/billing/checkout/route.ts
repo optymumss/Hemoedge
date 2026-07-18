@@ -2,8 +2,16 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentOrg } from "@/lib/org/get-current-org";
 import { getStripeClient } from "@/lib/stripe/client";
+import { getActiveImpersonation } from "@/lib/auth/impersonation";
 
 export async function POST(request: Request) {
+  if (await getActiveImpersonation()) {
+    return NextResponse.json(
+      { error: "Billing actions are disabled while viewing as another user." },
+      { status: 403 },
+    );
+  }
+
   const org = await getCurrentOrg();
   if (!org) {
     return NextResponse.json({ error: "No organization to bill." }, { status: 403 });

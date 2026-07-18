@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/slugify";
 import { isOrgAtSeatLimit } from "@/lib/org/check-seat-limit";
 import { logAudit } from "@/lib/audit/log";
+import { sendEmail } from "@/lib/email/send";
+import { orgInviteEmail } from "@/lib/email/templates";
 
 export type FormState = { error?: string } | undefined;
 
@@ -91,6 +93,12 @@ export async function addOrgMember(
       member_email: email,
       org_role: orgRole,
     });
+  }
+
+  const { data: org } = await supabase.from("organizations").select("name").eq("id", orgId).single();
+  if (org) {
+    const { subject, html } = orgInviteEmail(org.name);
+    await sendEmail(email, subject, html);
   }
 
   revalidatePath(`/admin/organizations/${orgId}`);
