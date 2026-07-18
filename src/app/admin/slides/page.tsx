@@ -57,7 +57,7 @@ export default async function SlidesPage() {
                 </td>
                 <td className="px-4 py-2 text-right">
                   <div className="flex items-center justify-end gap-3">
-                    <ViewSlideButton slideId={s.id} />
+                    <ViewSlideButton slideId={s.id} title={s.title} />
                     {(s.status === "draft" || s.status === "changes_requested") && (
                       <SubmitForReviewButton
                         contentType="slide"
