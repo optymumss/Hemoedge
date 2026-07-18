@@ -633,32 +633,42 @@ export type Database = {
       quiz_attempts: {
         Row: {
           answers: Json
+          case_id: string | null
           created_at: string
           id: string
-          module_id: string
+          module_id: string | null
           passed: boolean
           score: number
           user_id: string
         }
         Insert: {
           answers: Json
+          case_id?: string | null
           created_at?: string
           id?: string
-          module_id: string
+          module_id?: string | null
           passed: boolean
           score: number
           user_id: string
         }
         Update: {
           answers?: Json
+          case_id?: string | null
           created_at?: string
           id?: string
-          module_id?: string
+          module_id?: string | null
           passed?: boolean
           score?: number
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "quiz_attempts_module_id_fkey"
             columns: ["module_id"]
@@ -677,36 +687,46 @@ export type Database = {
       }
       quiz_questions: {
         Row: {
+          case_id: string | null
           choices: Json
           correct_choice_id: string
           created_at: string
           created_by: string
           id: string
-          module_id: string
+          module_id: string | null
           position: number
           question_text: string
         }
         Insert: {
+          case_id?: string | null
           choices: Json
           correct_choice_id: string
           created_at?: string
           created_by: string
           id?: string
-          module_id: string
+          module_id?: string | null
           position?: number
           question_text: string
         }
         Update: {
+          case_id?: string | null
           choices?: Json
           correct_choice_id?: string
           created_at?: string
           created_by?: string
           id?: string
-          module_id?: string
+          module_id?: string | null
           position?: number
           question_text?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "quiz_questions_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "quiz_questions_created_by_fkey"
             columns: ["created_by"]

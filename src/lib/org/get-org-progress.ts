@@ -49,6 +49,7 @@ export async function getOrgProgress(orgId: string) {
 
   for (const a of attempts ?? []) {
     scoresByMember.set(a.user_id, [...(scoresByMember.get(a.user_id) ?? []), a.score]);
+    if (!a.module_id) continue;
     const moduleEntry = scoresByModule.get(a.module_id) ?? {
       title: a.modules?.title ?? "Untitled module",
       scores: [],

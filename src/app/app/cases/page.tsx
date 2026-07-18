@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getLearnerOrgId } from "@/lib/learner/get-learner-org";
 import { getPublishedContent } from "@/lib/learner/published-content";
 
@@ -14,10 +15,14 @@ export default async function LearnerCasesPage() {
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {cases.map((c) => (
-          <div key={c.id} className="rounded-lg border border-neutral-200 p-4">
+          <Link
+            key={c.id}
+            href={`/app/cases/${c.id}`}
+            className="rounded-lg border border-neutral-200 p-4 hover:border-neutral-400"
+          >
             <span className="text-xs uppercase text-neutral-400">{c.level}</span>
             <h2 className="mt-1 font-medium">{c.title}</h2>
-          </div>
+          </Link>
         ))}
         {cases.length === 0 && (
           <p className="col-span-full py-8 text-center text-sm text-neutral-400">

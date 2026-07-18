@@ -55,6 +55,7 @@ export default async function CompetencyPage() {
 
       const bestByModule = new Map<string, number>();
       for (const a of attempts ?? []) {
+        if (!a.module_id) continue;
         bestByModule.set(a.module_id, Math.max(bestByModule.get(a.module_id) ?? 0, a.score));
       }
 
