@@ -12,16 +12,18 @@ export function PageForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Title</label>
+        <label className="text-xs text-neutral-500" htmlFor="page-title">Title</label>
         <input
+          id="page-title"
           name="title"
           required
           className="w-56 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Type</label>
+        <label className="text-xs text-neutral-500" htmlFor="page-type">Type</label>
         <select
+          id="page-type"
           name="type"
           defaultValue="custom"
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
@@ -34,8 +36,9 @@ export function PageForm() {
         </select>
       </div>
       <div className="flex flex-1 min-w-64 flex-col gap-1">
-        <label className="text-xs text-neutral-500">Content (optional)</label>
+        <label className="text-xs text-neutral-500" htmlFor="page-content">Content (optional)</label>
         <input
+          id="page-content"
           name="content"
           className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />

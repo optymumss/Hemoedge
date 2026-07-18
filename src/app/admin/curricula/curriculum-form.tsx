@@ -12,16 +12,18 @@ export function CurriculumForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Title</label>
+        <label className="text-xs text-neutral-500" htmlFor="curriculum-title">Title</label>
         <input
+          id="curriculum-title"
           name="title"
           required
           className="w-64 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Level</label>
+        <label className="text-xs text-neutral-500" htmlFor="curriculum-level">Level</label>
         <select
+          id="curriculum-level"
           name="level"
           required
           defaultValue=""
@@ -36,8 +38,9 @@ export function CurriculumForm() {
         </select>
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Pass threshold (%)</label>
+        <label className="text-xs text-neutral-500" htmlFor="curriculum-pass-threshold">Pass threshold (%)</label>
         <input
+          id="curriculum-pass-threshold"
           name="pass_threshold"
           type="number"
           min={1}

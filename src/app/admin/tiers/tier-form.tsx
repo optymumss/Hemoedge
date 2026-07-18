@@ -12,8 +12,9 @@ export function TierForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Name</label>
+        <label className="text-xs text-neutral-500" htmlFor="tier-name">Name</label>
         <input
+          id="tier-name"
           name="name"
           required
           placeholder="Professional"
@@ -21,8 +22,9 @@ export function TierForm() {
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Monthly price (£)</label>
+        <label className="text-xs text-neutral-500" htmlFor="tier-monthly-price">Monthly price (£)</label>
         <input
+          id="tier-monthly-price"
           name="monthly_price"
           type="number"
           min={0}
@@ -32,8 +34,9 @@ export function TierForm() {
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Yearly price (£)</label>
+        <label className="text-xs text-neutral-500" htmlFor="tier-yearly-price">Yearly price (£)</label>
         <input
+          id="tier-yearly-price"
           name="yearly_price"
           type="number"
           min={0}

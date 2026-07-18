@@ -13,8 +13,9 @@ export function AddMemberForm({ orgId }: { orgId: string }) {
     <form action={action} className="flex flex-wrap items-end gap-2">
       <input type="hidden" name="org_id" value={orgId} />
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Learner email</label>
+        <label className="text-xs text-neutral-500" htmlFor="roster-email">Learner email</label>
         <input
+          id="roster-email"
           name="email"
           type="email"
           required

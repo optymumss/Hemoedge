@@ -12,23 +12,26 @@ export function AssociateForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Name</label>
+        <label className="text-xs text-neutral-500" htmlFor="associate-name">Name</label>
         <input
+          id="associate-name"
           name="name"
           required
           className="w-48 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Title (optional)</label>
+        <label className="text-xs text-neutral-500" htmlFor="associate-title">Title (optional)</label>
         <input
+          id="associate-title"
           name="title"
           className="w-48 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-1 min-w-64 flex-col gap-1">
-        <label className="text-xs text-neutral-500">Bio (optional)</label>
+        <label className="text-xs text-neutral-500" htmlFor="associate-bio">Bio (optional)</label>
         <input
+          id="associate-bio"
           name="bio"
           className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />

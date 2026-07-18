@@ -25,8 +25,9 @@ export function OrgTierForm({
     <form action={action} className="flex flex-wrap items-end gap-2">
       <input type="hidden" name="org_id" value={orgId} />
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Tier</label>
+        <label className="text-xs text-neutral-500" htmlFor="org-tier-select">Tier</label>
         <select
+          id="org-tier-select"
           name="tier_id"
           defaultValue={currentTierId ?? ""}
           className="w-56 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
@@ -40,8 +41,9 @@ export function OrgTierForm({
         </select>
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Seats (blank = unlimited)</label>
+        <label className="text-xs text-neutral-500" htmlFor="org-tier-seats">Seats (blank = unlimited)</label>
         <input
+          id="org-tier-seats"
           name="seats"
           type="number"
           min={1}

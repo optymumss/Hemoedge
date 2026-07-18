@@ -12,16 +12,18 @@ export function OrgForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Organization name</label>
+        <label className="text-xs text-neutral-500" htmlFor="org-name">Organization name</label>
         <input
+          id="org-name"
           name="name"
           required
           className="w-64 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Seats (optional)</label>
+        <label className="text-xs text-neutral-500" htmlFor="org-seats">Seats (optional)</label>
         <input
+          id="org-seats"
           name="seats"
           type="number"
           min={1}

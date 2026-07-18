@@ -17,6 +17,7 @@ export function ReviewForm({
     <div className="flex flex-col gap-2">
       <input
         placeholder="Notes (required if requesting changes)"
+        aria-label="Review notes"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         className="rounded-md border border-neutral-300 px-2 py-1 text-xs"

@@ -44,8 +44,9 @@ export default async function CurriculumDetailPage({
         <form action={linkModule} className="flex flex-wrap items-end gap-2">
           <input type="hidden" name="curriculum_id" value={curriculum.id} />
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-neutral-500">Add a module to this stage</label>
+            <label className="text-xs text-neutral-500" htmlFor="add-module">Add a module to this stage</label>
             <select
+              id="add-module"
               name="module_id"
               required
               defaultValue=""

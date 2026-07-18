@@ -12,8 +12,9 @@ export function CaseForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Title</label>
+        <label className="text-xs text-neutral-500" htmlFor="case-title">Title</label>
         <input
+          id="case-title"
           name="title"
           required
           placeholder="A 28-year-old Woman with Fatigue and Pallor"
@@ -21,8 +22,9 @@ export function CaseForm() {
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Level</label>
+        <label className="text-xs text-neutral-500" htmlFor="case-level">Level</label>
         <select
+          id="case-level"
           name="level"
           required
           defaultValue=""
@@ -37,8 +39,9 @@ export function CaseForm() {
         </select>
       </div>
       <div className="flex flex-1 min-w-64 flex-col gap-1">
-        <label className="text-xs text-neutral-500">Description (optional, grounds the AI Tutor)</label>
+        <label className="text-xs text-neutral-500" htmlFor="case-description">Description (optional, grounds the AI Tutor)</label>
         <input
+          id="case-description"
           name="description"
           className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />

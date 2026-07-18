@@ -23,12 +23,14 @@ export function StripePriceForm({
       <input
         name="stripe_price_id_monthly"
         placeholder="price_… (monthly)"
+        aria-label="Stripe monthly price ID"
         defaultValue={monthlyPriceId ?? ""}
         className="w-36 rounded-md border border-neutral-300 px-2 py-1 font-mono text-xs"
       />
       <input
         name="stripe_price_id_yearly"
         placeholder="price_… (yearly)"
+        aria-label="Stripe yearly price ID"
         defaultValue={yearlyPriceId ?? ""}
         className="w-36 rounded-md border border-neutral-300 px-2 py-1 font-mono text-xs"
       />

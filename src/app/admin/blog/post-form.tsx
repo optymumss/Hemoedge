@@ -12,16 +12,18 @@ export function PostForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Title</label>
+        <label className="text-xs text-neutral-500" htmlFor="post-title">Title</label>
         <input
+          id="post-title"
           name="title"
           required
           className="w-56 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-1 min-w-64 flex-col gap-1">
-        <label className="text-xs text-neutral-500">Excerpt (optional)</label>
+        <label className="text-xs text-neutral-500" htmlFor="post-excerpt">Excerpt (optional)</label>
         <input
+          id="post-excerpt"
           name="excerpt"
           className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />

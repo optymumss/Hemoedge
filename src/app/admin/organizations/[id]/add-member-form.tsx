@@ -13,8 +13,9 @@ export function AddMemberForm({ orgId }: { orgId: string }) {
     <form action={action} className="flex flex-wrap items-end gap-2">
       <input type="hidden" name="org_id" value={orgId} />
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Email</label>
+        <label className="text-xs text-neutral-500" htmlFor="add-org-member-email">Email</label>
         <input
+          id="add-org-member-email"
           name="email"
           type="email"
           required
@@ -22,8 +23,9 @@ export function AddMemberForm({ orgId }: { orgId: string }) {
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Role in org</label>
+        <label className="text-xs text-neutral-500" htmlFor="add-org-member-role">Role in org</label>
         <select
+          id="add-org-member-role"
           name="org_role"
           defaultValue="member"
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"

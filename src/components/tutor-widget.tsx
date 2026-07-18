@@ -63,7 +63,7 @@ export function TutorWidget() {
         </button>
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto px-3 py-2">
+      <div className="flex-1 space-y-3 overflow-y-auto px-3 py-2" aria-live="polite">
         {messages.length === 0 && (
           <p className="text-xs text-neutral-500">
             Ask about a cell type, feature, or module and I&apos;ll answer from the
@@ -97,6 +97,7 @@ export function TutorWidget() {
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Ask a question…"
+          aria-label="Ask the AI Tutor a question"
           className="flex-1 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
         <button

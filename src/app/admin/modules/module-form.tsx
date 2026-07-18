@@ -12,16 +12,18 @@ export function ModuleForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Title</label>
+        <label className="text-xs text-neutral-500" htmlFor="module-title">Title</label>
         <input
+          id="module-title"
           name="title"
           required
           className="w-64 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Level</label>
+        <label className="text-xs text-neutral-500" htmlFor="module-level">Level</label>
         <select
+          id="module-level"
           name="level"
           required
           defaultValue=""
@@ -36,8 +38,9 @@ export function ModuleForm() {
         </select>
       </div>
       <div className="flex flex-1 min-w-64 flex-col gap-1">
-        <label className="text-xs text-neutral-500">Description (optional, grounds the AI Tutor)</label>
+        <label className="text-xs text-neutral-500" htmlFor="module-description">Description (optional, grounds the AI Tutor)</label>
         <input
+          id="module-description"
           name="description"
           className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />

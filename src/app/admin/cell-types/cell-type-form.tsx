@@ -12,16 +12,18 @@ export function CellTypeForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Name</label>
+        <label className="text-xs text-neutral-500" htmlFor="cell-type-name">Name</label>
         <input
+          id="cell-type-name"
           name="name"
           required
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Code</label>
+        <label className="text-xs text-neutral-500" htmlFor="cell-type-code">Code</label>
         <input
+          id="cell-type-code"
           name="code"
           required
           maxLength={5}
@@ -30,8 +32,9 @@ export function CellTypeForm() {
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Lineage</label>
+        <label className="text-xs text-neutral-500" htmlFor="cell-type-lineage">Lineage</label>
         <select
+          id="cell-type-lineage"
           name="lineage"
           required
           defaultValue=""

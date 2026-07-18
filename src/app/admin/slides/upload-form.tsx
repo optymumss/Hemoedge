@@ -62,8 +62,9 @@ export function UploadForm({
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Title</label>
+        <label className="text-xs text-neutral-500" htmlFor="slide-title">Title</label>
         <input
+          id="slide-title"
           name="title"
           required
           placeholder="Peripheral smear — schistocytes"
@@ -71,8 +72,9 @@ export function UploadForm({
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Category (optional)</label>
+        <label className="text-xs text-neutral-500" htmlFor="slide-category">Category (optional)</label>
         <select
+          id="slide-category"
           name="category_id"
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         >
@@ -85,8 +87,9 @@ export function UploadForm({
         </select>
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">File</label>
+        <label className="text-xs text-neutral-500" htmlFor="slide-file">File</label>
         <input
+          id="slide-file"
           name="file"
           type="file"
           required

@@ -16,16 +16,18 @@ export function CategoryForm({
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Name</label>
+        <label className="text-xs text-neutral-500" htmlFor="category-name">Name</label>
         <input
+          id="category-name"
           name="name"
           required
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Parent (optional)</label>
+        <label className="text-xs text-neutral-500" htmlFor="category-parent">Parent (optional)</label>
         <select
+          id="category-parent"
           name="parent_id"
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         >
@@ -38,8 +40,9 @@ export function CategoryForm({
         </select>
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500">Description (optional)</label>
+        <label className="text-xs text-neutral-500" htmlFor="category-description">Description (optional)</label>
         <input
+          id="category-description"
           name="description"
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
