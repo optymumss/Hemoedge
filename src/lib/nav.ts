@@ -12,6 +12,7 @@ export const adminNav: NavSection[] = [
       { label: "Tiers", href: "/admin/tiers", roles: ["super_admin"] },
       { label: "Organizations", href: "/admin/organizations", roles: ["super_admin"] },
       { label: "Learners", href: "/admin/learners", roles: ["super_admin"] },
+      { label: "Audit Log", href: "/admin/audit-log", roles: ["super_admin"] },
     ],
   },
   {
@@ -56,6 +57,7 @@ export const orgNav: NavSection[] = [
       { label: "Catalog", href: "/org/catalog" },
       { label: "Analytics", href: "/org/analytics" },
       { label: "Reports", href: "/org/reports" },
+      { label: "Billing", href: "/org/billing" },
     ],
   },
 ];

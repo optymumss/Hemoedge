@@ -32,6 +32,7 @@ export function LoginForm() {
           name="email"
           type="email"
           placeholder="Email"
+          aria-label="Email"
           required
           className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
         />
@@ -39,6 +40,7 @@ export function LoginForm() {
           name="password"
           type="password"
           placeholder="Password"
+          aria-label="Password"
           required
           className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
         />
@@ -62,6 +64,7 @@ export function LoginForm() {
           <input
             name="full_name"
             placeholder="Full name"
+            aria-label="Full name"
             required
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
           />
@@ -69,6 +72,7 @@ export function LoginForm() {
             name="email"
             type="email"
             placeholder="Email"
+            aria-label="Email"
             required
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
           />
@@ -76,6 +80,7 @@ export function LoginForm() {
             name="password"
             type="password"
             placeholder="Password"
+            aria-label="Password"
             required
             minLength={8}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
