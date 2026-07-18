@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentOrg } from "@/lib/org/get-current-org";
 import { getOrgProgress } from "@/lib/org/get-org-progress";
-
-function csvEscape(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
+import { toCsv } from "@/lib/csv";
 
 export async function GET() {
   const org = await getCurrentOrg();
@@ -24,7 +21,7 @@ export async function GET() {
     ]),
   ];
 
-  const csv = rows.map((row) => row.map(csvEscape).join(",")).join("\n");
+  const csv = toCsv(rows);
 
   return new NextResponse(csv, {
     headers: {
