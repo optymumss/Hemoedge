@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isOrgAtSeatLimit } from "@/lib/org/check-seat-limit";
 import { logAudit } from "@/lib/audit/log";
+import { sendEmail } from "@/lib/email/send";
+import { orgInviteEmail } from "@/lib/email/templates";
 
 export type FormState = { error?: string } | undefined;
 
@@ -54,6 +56,12 @@ export async function addMember(
       member_email: email,
       org_role: "member",
     });
+  }
+
+  const { data: org } = await supabase.from("organizations").select("name").eq("id", orgId).single();
+  if (org) {
+    const { subject, html } = orgInviteEmail(org.name);
+    await sendEmail(email, subject, html);
   }
 
   revalidatePath("/org/roster");
