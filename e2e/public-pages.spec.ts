@@ -7,18 +7,20 @@ test("homepage renders the hero and sign-in link", async ({ page }) => {
 });
 
 test("public nav reaches blog, team, and contact", async ({ page }) => {
+  const nav = page.getByRole("navigation", { name: "Primary" });
+
   await page.goto("/");
-  await page.getByRole("link", { name: "Blog" }).click();
+  await nav.getByRole("link", { name: "Blog" }).click();
   await expect(page).toHaveURL(/\/blog$/);
-  await expect(page.getByRole("heading", { name: "Blog" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Notes from the lab" })).toBeVisible();
 
   await page.goto("/");
-  await page.getByRole("link", { name: "Team" }).click();
+  await nav.getByRole("link", { name: "Team" }).click();
   await expect(page).toHaveURL(/\/team$/);
-  await expect(page.getByRole("heading", { name: "Team" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "The people behind HemoEdge" })).toBeVisible();
 
   await page.goto("/");
-  await page.getByRole("link", { name: "Contact" }).click();
+  await nav.getByRole("link", { name: "Contact" }).click();
   await expect(page).toHaveURL(/\/contact$/);
 });
 
