@@ -6,6 +6,15 @@ export type AppRole =
 
 export type Surface = "/admin" | "/org" | "/app";
 
+/** Human-readable label shown wherever a user's role needs to be visible
+ * (sidebar identity, learner-list tables, ...). */
+export const ROLE_LABELS: Record<AppRole, string> = {
+  super_admin: "Super Admin",
+  content_manager: "Content Manager",
+  org_admin: "Org Admin",
+  member: "Member",
+};
+
 /** Which roles may enter each gated surface. Super Admin can always reach any of them. */
 export const SURFACE_ROLES: Record<Surface, AppRole[]> = {
   "/admin": ["super_admin", "content_manager"],
