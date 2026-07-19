@@ -3,6 +3,7 @@ import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { ComingSoon } from "@/components/coming-soon";
 import { RoleForm } from "./role-form";
 import { startImpersonation } from "./impersonation-actions";
+import { InviteContentManagerForm } from "./invite-content-manager-form";
 
 export default async function LearnersPage() {
   const profile = await getCurrentProfile();
@@ -29,6 +30,17 @@ export default async function LearnersPage() {
       <p className="mt-1 text-sm text-ink-dim">
         All registered accounts and their platform role.
       </p>
+
+      <div className="mt-6 rounded-lg border border-line bg-surface-raised p-4">
+        <h2 className="text-sm font-semibold">Invite a Content Manager</h2>
+        <p className="mt-1 text-xs text-ink-dim">
+          Content Managers don&apos;t sign up — invite a specific person by email
+          and their account is created for them.
+        </p>
+        <div className="mt-3">
+          <InviteContentManagerForm />
+        </div>
+      </div>
 
       <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
