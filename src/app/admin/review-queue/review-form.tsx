@@ -20,7 +20,7 @@ export function ReviewForm({
         aria-label="Review notes"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
-        className="rounded-md border border-neutral-300 px-2 py-1 text-xs"
+        className="rounded-md border border-line-strong px-2 py-1 text-xs"
       />
       <div className="flex gap-2">
         <form action={reviewContent}>
@@ -42,7 +42,7 @@ export function ReviewForm({
           <input type="hidden" name="notes" value={notes} />
           <button
             type="submit"
-            className="rounded-md border border-amber-600 px-2 py-1 text-xs font-medium text-amber-700"
+            className="rounded-md border border-warning px-2 py-1 text-xs font-medium text-warning-soft-ink"
           >
             Request changes
           </button>

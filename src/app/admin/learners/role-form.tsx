@@ -17,7 +17,7 @@ export function RoleForm({
         name="role"
         defaultValue={role}
         onChange={(e) => e.currentTarget.form?.requestSubmit()}
-        className="rounded-md border border-neutral-300 px-2 py-1 text-xs"
+        className="rounded-md border border-line-strong px-2 py-1 text-xs"
       >
         <option value="member">Member</option>
         <option value="content_manager">Content Manager</option>

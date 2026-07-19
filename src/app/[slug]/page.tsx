@@ -27,7 +27,7 @@ export default async function CmsPage({
       <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-16">
         <h1 className="text-2xl font-semibold">{page.title}</h1>
         {page.content && (
-          <p className="mt-4 whitespace-pre-line text-sm text-neutral-600">{page.content}</p>
+          <p className="mt-4 whitespace-pre-line text-sm text-ink-dim">{page.content}</p>
         )}
       </main>
     </>

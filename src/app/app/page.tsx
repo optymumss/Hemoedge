@@ -20,19 +20,19 @@ export default async function LearnerHome() {
       <h1 className="text-xl font-semibold">
         Welcome, {displayName}
       </h1>
-      <p className="mt-2 max-w-xl text-sm text-neutral-600">
+      <p className="mt-2 max-w-xl text-sm text-ink-dim">
         {orgId
           ? "Here's what your organization has assigned."
           : "Here's what's available to study."}
       </p>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border border-neutral-200 p-4">
-          <p className="text-xs uppercase text-neutral-400">Modules available</p>
+        <div className="rounded-lg border border-line p-4">
+          <p className="text-xs uppercase text-ink-faint">Modules available</p>
           <p className="mt-1 text-2xl font-semibold">{modules.length}</p>
         </div>
-        <div className="rounded-lg border border-neutral-200 p-4">
-          <p className="text-xs uppercase text-neutral-400">Cases available</p>
+        <div className="rounded-lg border border-line p-4">
+          <p className="text-xs uppercase text-ink-faint">Cases available</p>
           <p className="mt-1 text-2xl font-semibold">{cases.length}</p>
         </div>
       </div>

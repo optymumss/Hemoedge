@@ -62,21 +62,21 @@ export function UploadForm({
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="slide-title">Title</label>
+        <label className="text-xs text-ink-dim" htmlFor="slide-title">Title</label>
         <input
           id="slide-title"
           name="title"
           required
           placeholder="Peripheral smear — schistocytes"
-          className="w-64 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="w-64 rounded-md border border-line-strong px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="slide-category">Category (optional)</label>
+        <label className="text-xs text-ink-dim" htmlFor="slide-category">Category (optional)</label>
         <select
           id="slide-category"
           name="category_id"
-          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
         >
           <option value="">—</option>
           {categories.map((c) => (
@@ -87,23 +87,23 @@ export function UploadForm({
         </select>
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="slide-file">File</label>
+        <label className="text-xs text-ink-dim" htmlFor="slide-file">File</label>
         <input
           id="slide-file"
           name="file"
           type="file"
           required
-          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+        className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
       >
         {pending ? "Uploading…" : "Upload slide"}
       </button>
-      {error && <p className="w-full text-sm text-red-600">{error}</p>}
+      {error && <p className="w-full text-sm text-danger">{error}</p>}
     </form>
   );
 }

@@ -30,27 +30,27 @@ export default async function CurriculumDetailPage({
   const available = (allModules ?? []).filter((m) => !linkedIds.has(m.id));
 
   if (!curriculum) {
-    return <p className="text-sm text-neutral-500">Curriculum not found.</p>;
+    return <p className="text-sm text-ink-dim">Curriculum not found.</p>;
   }
 
   return (
     <div>
       <h1 className="text-xl font-semibold">{curriculum.title}</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         {curriculum.level} · {curriculum.pass_threshold}% pass threshold · {curriculum.status}
       </p>
 
-      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+      <div className="mt-6 rounded-lg border border-line p-4">
         <form action={linkModule} className="flex flex-wrap items-end gap-2">
           <input type="hidden" name="curriculum_id" value={curriculum.id} />
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-neutral-500" htmlFor="add-module">Add a module to this stage</label>
+            <label className="text-xs text-ink-dim" htmlFor="add-module">Add a module to this stage</label>
             <select
               id="add-module"
               name="module_id"
               required
               defaultValue=""
-              className="w-64 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+              className="w-64 rounded-md border border-line-strong px-2 py-1.5 text-sm"
             >
               <option value="" disabled>
                 Choose a module…
@@ -64,16 +64,16 @@ export default async function CurriculumDetailPage({
           </div>
           <button
             type="submit"
-            className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white"
+            className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink"
           >
             Add module
           </button>
         </form>
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
               <th className="px-4 py-2">Module</th>
               <th className="px-4 py-2">Status</th>
@@ -82,14 +82,14 @@ export default async function CurriculumDetailPage({
           </thead>
           <tbody>
             {(linked ?? []).map((l) => (
-              <tr key={l.id} className="border-t border-neutral-200">
+              <tr key={l.id} className="border-t border-line">
                 <td className="px-4 py-2 font-medium">{l.modules?.title}</td>
-                <td className="px-4 py-2 capitalize text-neutral-500">{l.modules?.status}</td>
+                <td className="px-4 py-2 capitalize text-ink-dim">{l.modules?.status}</td>
                 <td className="px-4 py-2 text-right">
                   <form action={unlinkModule}>
                     <input type="hidden" name="id" value={l.id} />
                     <input type="hidden" name="curriculum_id" value={curriculum.id} />
-                    <button type="submit" className="text-xs text-red-600 underline">
+                    <button type="submit" className="text-xs text-danger underline">
                       Remove
                     </button>
                   </form>
@@ -98,7 +98,7 @@ export default async function CurriculumDetailPage({
             ))}
             {(linked ?? []).length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={3} className="px-4 py-6 text-center text-ink-faint">
                   No modules linked yet.
                 </td>
               </tr>

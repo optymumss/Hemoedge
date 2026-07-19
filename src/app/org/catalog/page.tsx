@@ -46,23 +46,23 @@ export default async function CatalogPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold">Catalog — {org.name}</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         Cherry-pick which published modules, cases, and curricula your organization teaches.
       </p>
 
       <div className="mt-6 flex flex-col gap-8">
         {sections.map((section) => (
           <div key={section.type}>
-            <h2 className="text-sm font-semibold text-neutral-700">{section.label}</h2>
-            <div className="mt-2 overflow-hidden rounded-lg border border-neutral-200">
+            <h2 className="text-sm font-semibold text-ink">{section.label}</h2>
+            <div className="mt-2 overflow-hidden rounded-lg border border-line">
               <table className="w-full text-sm">
                 <tbody>
                   {section.items.map((item) => {
                     const selected = selectedKeys.has(`${section.type}:${item.id}`);
                     return (
-                      <tr key={item.id} className="border-t border-neutral-200 first:border-t-0">
+                      <tr key={item.id} className="border-t border-line first:border-t-0">
                         <td className="px-4 py-2 font-medium">{item.title}</td>
-                        <td className="px-4 py-2 capitalize text-neutral-500">{item.level}</td>
+                        <td className="px-4 py-2 capitalize text-ink-dim">{item.level}</td>
                         <td className="px-4 py-2 text-right">
                           <CatalogToggle
                             orgId={org.id}
@@ -76,7 +76,7 @@ export default async function CatalogPage() {
                   })}
                   {section.items.length === 0 && (
                     <tr>
-                      <td colSpan={3} className="px-4 py-6 text-center text-neutral-400">
+                      <td colSpan={3} className="px-4 py-6 text-center text-ink-faint">
                         Nothing published yet.
                       </td>
                     </tr>

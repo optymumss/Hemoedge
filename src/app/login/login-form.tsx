@@ -21,7 +21,7 @@ export function LoginForm() {
   return (
     <>
       {checkEmail && (
-        <p className="rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-700">
+        <p className="rounded-md bg-info-soft px-3 py-2 text-sm text-info-soft-ink">
           Check your email to confirm your account, then sign in below.
         </p>
       )}
@@ -34,7 +34,7 @@ export function LoginForm() {
           placeholder="Email"
           aria-label="Email"
           required
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className="rounded-md border border-line-strong px-3 py-2 text-sm"
         />
         <input
           name="password"
@@ -42,21 +42,21 @@ export function LoginForm() {
           placeholder="Password"
           aria-label="Password"
           required
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className="rounded-md border border-line-strong px-3 py-2 text-sm"
         />
         {loginState?.error && (
-          <p className="text-sm text-red-600">{loginState.error}</p>
+          <p className="text-sm text-danger">{loginState.error}</p>
         )}
         <button
           type="submit"
           disabled={loginPending}
-          className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-ink disabled:opacity-50"
         >
           {loginPending ? "Signing in…" : "Sign in"}
         </button>
       </form>
 
-      <details className="text-sm text-neutral-500">
+      <details className="text-sm text-ink-dim">
         <summary className="cursor-pointer">
           First time here? Create an account
         </summary>
@@ -66,7 +66,7 @@ export function LoginForm() {
             placeholder="Full name"
             aria-label="Full name"
             required
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            className="rounded-md border border-line-strong px-3 py-2 text-sm"
           />
           <input
             name="email"
@@ -74,7 +74,7 @@ export function LoginForm() {
             placeholder="Email"
             aria-label="Email"
             required
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            className="rounded-md border border-line-strong px-3 py-2 text-sm"
           />
           <input
             name="password"
@@ -83,15 +83,15 @@ export function LoginForm() {
             aria-label="Password"
             required
             minLength={8}
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            className="rounded-md border border-line-strong px-3 py-2 text-sm"
           />
           {signupState?.error && (
-            <p className="text-sm text-red-600">{signupState.error}</p>
+            <p className="text-sm text-danger">{signupState.error}</p>
           )}
           <button
             type="submit"
             disabled={signupPending}
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium disabled:opacity-50"
+            className="rounded-md border border-line-strong px-3 py-2 text-sm font-medium disabled:opacity-50"
           >
             {signupPending ? "Creating…" : "Create account"}
           </button>

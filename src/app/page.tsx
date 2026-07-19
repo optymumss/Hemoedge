@@ -25,13 +25,13 @@ export default async function Home() {
       <PublicNav />
       <main className="flex flex-1 flex-col items-center gap-4 px-6 py-16 text-center">
         <h1 className="text-2xl font-semibold">{homepage?.title || "HemoEdge"}</h1>
-        <p className="max-w-sm text-sm text-neutral-600">
+        <p className="max-w-sm text-sm text-ink-dim">
           {homepage?.content ||
             "WSI-based blood cell morphology training for laboratory professionals."}
         </p>
         <Link
           href="/login"
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+          className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-ink"
         >
           Sign in
         </Link>
@@ -41,10 +41,10 @@ export default async function Home() {
             {(testimonials ?? []).map((t) => (
               <blockquote
                 key={t.id}
-                className="rounded-lg border border-neutral-200 p-4 text-sm text-neutral-700"
+                className="rounded-lg border border-line p-4 text-sm text-ink"
               >
                 <p>&ldquo;{t.quote}&rdquo;</p>
-                <footer className="mt-2 text-xs text-neutral-500">
+                <footer className="mt-2 text-xs text-ink-dim">
                   {t.author_name}
                   {t.author_title ? `, ${t.author_title}` : ""}
                 </footer>

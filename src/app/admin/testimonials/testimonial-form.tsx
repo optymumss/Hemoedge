@@ -12,39 +12,39 @@ export function TestimonialForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="testimonial-author-name">Author name</label>
+        <label className="text-xs text-ink-dim" htmlFor="testimonial-author-name">Author name</label>
         <input
           id="testimonial-author-name"
           name="author_name"
           required
-          className="w-48 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="w-48 rounded-md border border-line-strong px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="testimonial-author-title">Author title (optional)</label>
+        <label className="text-xs text-ink-dim" htmlFor="testimonial-author-title">Author title (optional)</label>
         <input
           id="testimonial-author-title"
           name="author_title"
-          className="w-48 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="w-48 rounded-md border border-line-strong px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-1 min-w-64 flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="testimonial-quote">Quote</label>
+        <label className="text-xs text-ink-dim" htmlFor="testimonial-quote">Quote</label>
         <input
           id="testimonial-quote"
           name="quote"
           required
-          className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+        className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
       >
         {pending ? "Adding…" : "Add testimonial"}
       </button>
-      {state?.error && <p className="w-full text-sm text-red-600">{state.error}</p>}
+      {state?.error && <p className="w-full text-sm text-danger">{state.error}</p>}
     </form>
   );
 }

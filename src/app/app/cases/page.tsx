@@ -9,7 +9,7 @@ export default async function LearnerCasesPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold">Cases</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         Real-world haematology cases for clinical learning.
       </p>
 
@@ -18,14 +18,14 @@ export default async function LearnerCasesPage() {
           <Link
             key={c.id}
             href={`/app/cases/${c.id}`}
-            className="rounded-lg border border-neutral-200 p-4 hover:border-neutral-400"
+            className="rounded-lg border border-line p-4 hover:border-line-strong"
           >
-            <span className="text-xs uppercase text-neutral-400">{c.level}</span>
+            <span className="text-xs uppercase text-ink-faint">{c.level}</span>
             <h2 className="mt-1 font-medium">{c.title}</h2>
           </Link>
         ))}
         {cases.length === 0 && (
-          <p className="col-span-full py-8 text-center text-sm text-neutral-400">
+          <p className="col-span-full py-8 text-center text-sm text-ink-faint">
             No cases assigned yet.
           </p>
         )}

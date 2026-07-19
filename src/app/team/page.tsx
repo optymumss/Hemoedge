@@ -16,14 +16,14 @@ export default async function TeamPage() {
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           {(associates ?? []).map((a) => (
-            <div key={a.id} className="rounded-lg border border-neutral-200 p-4">
+            <div key={a.id} className="rounded-lg border border-line p-4">
               <h2 className="font-medium">{a.name}</h2>
-              {a.title && <p className="text-xs uppercase text-neutral-400">{a.title}</p>}
-              {a.bio && <p className="mt-2 text-sm text-neutral-600">{a.bio}</p>}
+              {a.title && <p className="text-xs uppercase text-ink-faint">{a.title}</p>}
+              {a.bio && <p className="mt-2 text-sm text-ink-dim">{a.bio}</p>}
             </div>
           ))}
           {(associates ?? []).length === 0 && (
-            <p className="col-span-full text-sm text-neutral-400">No team members listed yet.</p>
+            <p className="col-span-full text-sm text-ink-faint">No team members listed yet.</p>
           )}
         </div>
       </main>

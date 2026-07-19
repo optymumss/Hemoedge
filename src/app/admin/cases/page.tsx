@@ -14,17 +14,17 @@ export default async function CasesPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold">Cases</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         Real-world clinical scenarios with ordered slides and case questions.
       </p>
 
-      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+      <div className="mt-6 rounded-lg border border-line p-4">
         <CaseForm />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Level</th>
@@ -34,15 +34,15 @@ export default async function CasesPage() {
           </thead>
           <tbody>
             {(cases ?? []).map((c) => (
-              <tr key={c.id} className="border-t border-neutral-200">
+              <tr key={c.id} className="border-t border-line">
                 <td className="px-4 py-2 font-medium">{c.title}</td>
-                <td className="px-4 py-2 capitalize text-neutral-500">{c.level}</td>
+                <td className="px-4 py-2 capitalize text-ink-dim">{c.level}</td>
                 <td className="px-4 py-2">
                   <StatusBadge status={c.status} />
                 </td>
                 <td className="px-4 py-2 text-right">
                   <div className="flex items-center justify-end gap-3">
-                    <Link href={`/admin/cases/${c.id}`} className="text-xs text-neutral-600 underline">
+                    <Link href={`/admin/cases/${c.id}`} className="text-xs text-ink-dim underline">
                       Manage quiz
                     </Link>
                     {(c.status === "draft" || c.status === "changes_requested") && (
@@ -58,7 +58,7 @@ export default async function CasesPage() {
             ))}
             {(cases ?? []).length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={4} className="px-4 py-6 text-center text-ink-faint">
                   No cases yet.
                 </td>
               </tr>

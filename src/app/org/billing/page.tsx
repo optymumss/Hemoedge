@@ -41,27 +41,27 @@ export default async function BillingPage({
   return (
     <div>
       <h1 className="text-xl font-semibold">Billing</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         Current plan: {orgRow?.tiers?.name ?? "No tier"}
         {orgRow?.seats ? ` · ${orgRow.seats} seats` : ""}
       </p>
 
       {checkout === "success" && (
-        <p className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
+        <p className="mt-4 rounded-md bg-success-soft px-3 py-2 text-sm text-success-soft-ink">
           Subscription started — it may take a moment to reflect here.
         </p>
       )}
       {checkout === "cancelled" && (
-        <p className="mt-4 rounded-md bg-neutral-50 px-3 py-2 text-sm text-neutral-600">
+        <p className="mt-4 rounded-md bg-surface-sunken px-3 py-2 text-sm text-ink-dim">
           Checkout was cancelled.
         </p>
       )}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         {(tiers ?? []).map((t) => (
-          <div key={t.id} className="rounded-lg border border-neutral-200 p-4">
+          <div key={t.id} className="rounded-lg border border-line p-4">
             <p className="font-medium">{t.name}</p>
-            <p className="mt-1 text-sm text-neutral-500">
+            <p className="mt-1 text-sm text-ink-dim">
               {formatPrice(t.monthly_price_cents)}/mo · {formatPrice(t.yearly_price_cents)}/yr
             </p>
             <div className="mt-3 flex gap-2">
@@ -71,7 +71,7 @@ export default async function BillingPage({
           </div>
         ))}
         {(tiers ?? []).length === 0 && (
-          <p className="text-sm text-neutral-400">No tiers available yet.</p>
+          <p className="text-sm text-ink-faint">No tiers available yet.</p>
         )}
       </div>
     </div>

@@ -31,15 +31,15 @@ export default async function ReviewQueuePage() {
       <h1 className="text-xl font-semibold">
         {isSuperAdmin ? "Review Queue" : "My Submissions"}
       </h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         {isSuperAdmin
           ? "Content Manager submissions awaiting approval before they publish."
           : "Content you've submitted for review, awaiting a Super Admin's decision."}
       </p>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Type</th>
@@ -49,12 +49,12 @@ export default async function ReviewQueuePage() {
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} className="border-t border-neutral-200 align-top">
+              <tr key={r.id} className="border-t border-line align-top">
                 <td className="px-4 py-2 font-medium">{r.title}</td>
-                <td className="px-4 py-2 capitalize text-neutral-500">
+                <td className="px-4 py-2 capitalize text-ink-dim">
                   {r.content_type}
                 </td>
-                <td className="px-4 py-2 text-neutral-500">
+                <td className="px-4 py-2 text-ink-dim">
                   {r.profiles?.full_name || r.profiles?.email}
                 </td>
                 {isSuperAdmin && (
@@ -71,7 +71,7 @@ export default async function ReviewQueuePage() {
               <tr>
                 <td
                   colSpan={isSuperAdmin ? 4 : 3}
-                  className="px-4 py-6 text-center text-neutral-400"
+                  className="px-4 py-6 text-center text-ink-faint"
                 >
                   Nothing waiting on review.
                 </td>

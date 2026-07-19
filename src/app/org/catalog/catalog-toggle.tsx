@@ -23,8 +23,8 @@ export function CatalogToggle({
         type="submit"
         className={
           selected
-            ? "rounded-md border border-neutral-300 px-2 py-1 text-xs text-neutral-600"
-            : "rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white"
+            ? "rounded-md border border-line-strong px-2 py-1 text-xs text-ink-dim"
+            : "rounded-md bg-accent px-2 py-1 text-xs font-medium text-accent-ink"
         }
       >
         {selected ? "Remove from catalog" : "Teach this"}

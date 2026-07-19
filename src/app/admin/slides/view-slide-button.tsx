@@ -23,10 +23,10 @@ export function ViewSlideButton({ slideId, title }: { slideId: string; title: st
 
   return (
     <span>
-      <button onClick={view} disabled={pending} className="text-xs text-neutral-600 underline">
+      <button onClick={view} disabled={pending} className="text-xs text-ink-dim underline">
         {pending ? "Preparing…" : "View"}
       </button>
-      {error && <span className="ml-2 text-xs text-red-600">{error}</span>}
+      {error && <span className="ml-2 text-xs text-danger">{error}</span>}
 
       {url && (
         <div className="fixed inset-0 z-50 flex flex-col bg-black/80 p-4">

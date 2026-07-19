@@ -20,16 +20,16 @@ export default async function BlogIndexPage() {
           {(posts ?? []).map((p) => (
             <Link key={p.slug} href={`/blog/${p.slug}`} className="block group">
               <h2 className="font-medium group-hover:underline">{p.title}</h2>
-              {p.excerpt && <p className="mt-1 text-sm text-neutral-600">{p.excerpt}</p>}
+              {p.excerpt && <p className="mt-1 text-sm text-ink-dim">{p.excerpt}</p>}
               {p.published_at && (
-                <p className="mt-1 text-xs text-neutral-400">
+                <p className="mt-1 text-xs text-ink-faint">
                   {new Date(p.published_at).toLocaleDateString()}
                 </p>
               )}
             </Link>
           ))}
           {(posts ?? []).length === 0 && (
-            <p className="text-sm text-neutral-400">Nothing published yet.</p>
+            <p className="text-sm text-ink-faint">Nothing published yet.</p>
           )}
         </div>
       </main>

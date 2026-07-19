@@ -19,15 +19,15 @@ export default async function PagesPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold">Pages</h1>
-      <p className="mt-1 text-sm text-neutral-500">Marketing site pages.</p>
+      <p className="mt-1 text-sm text-ink-dim">Marketing site pages.</p>
 
-      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+      <div className="mt-6 rounded-lg border border-line p-4">
         <PageForm />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Type</th>
@@ -37,10 +37,10 @@ export default async function PagesPage() {
           </thead>
           <tbody>
             {(pages ?? []).map((p) => (
-              <tr key={p.id} className="border-t border-neutral-200">
+              <tr key={p.id} className="border-t border-line">
                 <td className="px-4 py-2 font-medium">{p.title}</td>
-                <td className="px-4 py-2 capitalize text-neutral-500">{p.type}</td>
-                <td className="px-4 py-2 capitalize text-neutral-500">{p.status}</td>
+                <td className="px-4 py-2 capitalize text-ink-dim">{p.type}</td>
+                <td className="px-4 py-2 capitalize text-ink-dim">{p.status}</td>
                 <td className="px-4 py-2 text-right">
                   <form action={togglePageStatus}>
                     <input type="hidden" name="id" value={p.id} />
@@ -49,7 +49,7 @@ export default async function PagesPage() {
                       name="next_status"
                       value={p.status === "published" ? "draft" : "published"}
                     />
-                    <button type="submit" className="text-xs text-blue-700 underline">
+                    <button type="submit" className="text-xs text-info-soft-ink underline">
                       {p.status === "published" ? "Unpublish" : "Publish"}
                     </button>
                   </form>
@@ -58,7 +58,7 @@ export default async function PagesPage() {
             ))}
             {(pages ?? []).length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={4} className="px-4 py-6 text-center text-ink-faint">
                   No pages yet.
                 </td>
               </tr>

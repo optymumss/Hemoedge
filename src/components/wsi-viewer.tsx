@@ -53,23 +53,23 @@ export function WsiViewer({ imageUrl }: { imageUrl: string }) {
   return (
     <div className="flex h-full flex-col gap-2">
       <div className="flex gap-2">
-        <button id="wsi-zoom-in" type="button" className="rounded-md border border-neutral-300 px-2 py-1 text-xs">
+        <button id="wsi-zoom-in" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs">
           Zoom in
         </button>
-        <button id="wsi-zoom-out" type="button" className="rounded-md border border-neutral-300 px-2 py-1 text-xs">
+        <button id="wsi-zoom-out" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs">
           Zoom out
         </button>
-        <button id="wsi-home" type="button" className="rounded-md border border-neutral-300 px-2 py-1 text-xs">
+        <button id="wsi-home" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs">
           Reset
         </button>
-        <button id="wsi-rotate-left" type="button" className="rounded-md border border-neutral-300 px-2 py-1 text-xs">
+        <button id="wsi-rotate-left" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs">
           Rotate left
         </button>
-        <button id="wsi-rotate-right" type="button" className="rounded-md border border-neutral-300 px-2 py-1 text-xs">
+        <button id="wsi-rotate-right" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs">
           Rotate right
         </button>
       </div>
-      <div ref={containerRef} className="min-h-0 flex-1 rounded-md bg-neutral-900" />
+      <div ref={containerRef} className="min-h-0 flex-1 rounded-md bg-accent" />
     </div>
   );
 }

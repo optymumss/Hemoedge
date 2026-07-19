@@ -18,12 +18,12 @@ export function Sidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-r border-neutral-200 bg-neutral-50 px-4 py-6">
+    <aside className="flex w-60 shrink-0 flex-col border-r border-line bg-surface-sunken px-4 py-6">
       <p className="px-2 text-sm font-semibold">{title}</p>
       <nav className="mt-6 flex flex-1 flex-col gap-5" aria-label="Primary">
         {sections.map((section) => (
           <div key={section.section}>
-            <p className="px-2 text-xs font-medium uppercase tracking-wide text-neutral-400">
+            <p className="px-2 text-xs font-medium uppercase tracking-wide text-ink-faint">
               {section.section}
             </p>
             <ul className="mt-1 flex flex-col gap-0.5">
@@ -36,8 +36,8 @@ export function Sidebar({
                       aria-current={active ? "page" : undefined}
                       className={`block rounded-md px-2 py-1.5 text-sm ${
                         active
-                          ? "bg-neutral-900 text-white"
-                          : "text-neutral-700 hover:bg-neutral-200"
+                          ? "bg-accent text-accent-ink"
+                          : "text-ink hover:bg-surface-sunken"
                       }`}
                     >
                       {item.label}
@@ -49,12 +49,12 @@ export function Sidebar({
           </div>
         ))}
       </nav>
-      <div className="mt-6 border-t border-neutral-200 pt-4">
-        <p className="truncate px-2 text-xs text-neutral-500">{identity}</p>
+      <div className="mt-6 border-t border-line pt-4">
+        <p className="truncate px-2 text-xs text-ink-dim">{identity}</p>
         <form action={onLogout}>
           <button
             type="submit"
-            className="mt-1 px-2 text-sm text-neutral-700 underline"
+            className="mt-1 px-2 text-sm text-ink underline"
           >
             Sign out
           </button>

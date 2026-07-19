@@ -38,19 +38,19 @@ export default async function OrganizationDetailPage({
   const { data: tiers } = await supabase.from("tiers").select("id, name").order("name");
 
   if (!org) {
-    return <p className="text-sm text-neutral-500">Organization not found.</p>;
+    return <p className="text-sm text-ink-dim">Organization not found.</p>;
   }
 
   return (
     <div>
       <h1 className="text-xl font-semibold">{org.name}</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         {(members ?? []).length} member{(members ?? []).length === 1 ? "" : "s"}
         {org.seats ? ` of ${org.seats} seats` : " — unlimited seats"} · {org.status} ·{" "}
         {org.tiers?.name ?? "No tier"}
       </p>
 
-      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+      <div className="mt-6 rounded-lg border border-line p-4">
         <h2 className="text-sm font-medium">Tier & seats</h2>
         <div className="mt-3">
           <OrgTierForm
@@ -62,13 +62,13 @@ export default async function OrganizationDetailPage({
         </div>
       </div>
 
-      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+      <div className="mt-6 rounded-lg border border-line p-4">
         <AddMemberForm orgId={org.id} />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
               <th className="px-4 py-2">Name</th>
               <th className="px-4 py-2">Email</th>
@@ -78,17 +78,17 @@ export default async function OrganizationDetailPage({
           </thead>
           <tbody>
             {(members ?? []).map((m) => (
-              <tr key={m.id} className="border-t border-neutral-200">
+              <tr key={m.id} className="border-t border-line">
                 <td className="px-4 py-2 font-medium">
                   {m.profiles?.full_name || "—"}
                 </td>
-                <td className="px-4 py-2 text-neutral-500">{m.profiles?.email}</td>
-                <td className="px-4 py-2 capitalize text-neutral-500">{m.org_role}</td>
+                <td className="px-4 py-2 text-ink-dim">{m.profiles?.email}</td>
+                <td className="px-4 py-2 capitalize text-ink-dim">{m.org_role}</td>
                 <td className="px-4 py-2 text-right">
                   <form action={removeOrgMember}>
                     <input type="hidden" name="membership_id" value={m.id} />
                     <input type="hidden" name="org_id" value={org.id} />
-                    <button type="submit" className="text-xs text-red-600 underline">
+                    <button type="submit" className="text-xs text-danger underline">
                       Remove
                     </button>
                   </form>
@@ -97,7 +97,7 @@ export default async function OrganizationDetailPage({
             ))}
             {(members ?? []).length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={4} className="px-4 py-6 text-center text-ink-faint">
                   No members yet.
                 </td>
               </tr>

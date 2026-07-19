@@ -18,7 +18,7 @@ export default async function LearnerModuleDetailPage({
     .maybeSingle();
 
   if (!module_) {
-    return <p className="text-sm text-neutral-500">Module not found or not yet published.</p>;
+    return <p className="text-sm text-ink-dim">Module not found or not yet published.</p>;
   }
 
   const { data: questions } = await supabase
@@ -42,12 +42,12 @@ export default async function LearnerModuleDetailPage({
   return (
     <div>
       <h1 className="text-xl font-semibold">{module_.title}</h1>
-      <p className="mt-1 text-sm capitalize text-neutral-500">{module_.level}</p>
+      <p className="mt-1 text-sm capitalize text-ink-dim">{module_.level}</p>
 
       {lastAttempt && (
         <div
           className={`mt-4 rounded-md px-3 py-2 text-sm ${
-            lastAttempt.passed ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"
+            lastAttempt.passed ? "bg-success-soft text-success-soft-ink" : "bg-warning-soft text-warning-soft-ink"
           }`}
         >
           Last attempt: {lastAttempt.score}% — {lastAttempt.passed ? "Passed" : "Not passed yet"}
@@ -56,7 +56,7 @@ export default async function LearnerModuleDetailPage({
 
       {(questions ?? []).length > 0 ? (
         impersonation ? (
-          <p className="mt-6 text-sm text-neutral-400">
+          <p className="mt-6 text-sm text-ink-faint">
             Quiz submission is disabled while viewing as another user.
           </p>
         ) : (
@@ -74,7 +74,7 @@ export default async function LearnerModuleDetailPage({
           </div>
         )
       ) : (
-        <p className="mt-6 text-sm text-neutral-400">
+        <p className="mt-6 text-sm text-ink-faint">
           No quiz has been added to this module yet.
         </p>
       )}
