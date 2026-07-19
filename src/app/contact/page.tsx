@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { PublicNav } from "@/components/public-nav";
+import { PublicFooter } from "@/components/public-footer";
+import { PageHeader } from "@/components/page-header";
 import { ContactForm } from "./contact-form";
 
 export default async function ContactPage() {
@@ -15,16 +17,14 @@ export default async function ContactPage() {
   return (
     <>
       <PublicNav />
-      <main className="mx-auto w-full max-w-md flex-1 px-6 py-16">
-        <h1 className="text-2xl font-semibold">{page?.title || "Contact us"}</h1>
-        {page?.content && (
-          <p className="mt-2 text-sm text-ink-dim">{page.content}</p>
-        )}
+      <main className="mx-auto w-full max-w-md flex-1 px-6 py-16 sm:py-20">
+        <PageHeader title={page?.title || "Contact us"} description={page?.content ?? undefined} />
 
-        <div className="mt-8">
+        <div className="mt-10 rounded-lg border border-line bg-surface-raised p-6">
           <ContactForm />
         </div>
       </main>
+      <PublicFooter />
     </>
   );
 }
