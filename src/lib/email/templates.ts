@@ -5,6 +5,16 @@ export function orgInviteEmail(orgName: string) {
   };
 }
 
+export function accountInviteEmail(context: string, actionLink: string) {
+  return {
+    subject: "You've been invited to HemoEdge",
+    html: `
+      <p>You've been invited to join HemoEdge${context ? ` — ${context}` : ""}.</p>
+      <p><a href="${actionLink}">Accept your invite and set a password</a></p>
+    `,
+  };
+}
+
 export function reviewDecisionEmail(
   contentTitle: string,
   decision: "approved" | "changes_requested",

@@ -1,9 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { defaultRouteForRole } from "@/lib/auth/roles";
+import { requestOrigin } from "@/lib/http/request-origin";
 
 export type AuthState = { error?: string } | undefined;
 
@@ -72,10 +72,7 @@ export async function requestPasswordReset(
   if (!email) return { error: "Enter your email address." };
 
   const supabase = await createClient();
-  const headerList = await headers();
-  const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
-  const protocol = headerList.get("x-forwarded-proto") ?? "https";
-  const origin = host ? `${protocol}://${host}` : "http://localhost:3000";
+  const origin = await requestOrigin();
 
   await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/auth/confirm?type=recovery&next=/reset-password`,
