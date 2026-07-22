@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { CategoryForm } from "./category-form";
+import { CategoriesTable, type CategoryRow } from "./categories-table";
 
 export default async function SlideCategoriesPage() {
   const supabase = await createClient();
@@ -10,6 +11,13 @@ export default async function SlideCategoriesPage() {
 
   const byId = new Map((categories ?? []).map((c) => [c.id, c]));
   const topLevel = (categories ?? []).filter((c) => !c.parent_id);
+
+  const rows: CategoryRow[] = (categories ?? []).map((c) => ({
+    id: c.id,
+    name: c.name,
+    parentName: c.parent_id ? byId.get(c.parent_id)?.name ?? null : null,
+    description: c.description,
+  }));
 
   return (
     <div>
@@ -22,36 +30,8 @@ export default async function SlideCategoriesPage() {
         <CategoryForm parents={topLevel} />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-line">
-        <table className="w-full text-sm">
-          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
-            <tr>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Parent</th>
-              <th className="px-4 py-2">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(categories ?? []).map((c) => (
-              <tr key={c.id} className="border-t border-line">
-                <td className="px-4 py-2 font-medium">{c.name}</td>
-                <td className="px-4 py-2 text-ink-dim">
-                  {c.parent_id ? byId.get(c.parent_id)?.name : "—"}
-                </td>
-                <td className="px-4 py-2 text-ink-dim">
-                  {c.description ?? "—"}
-                </td>
-              </tr>
-            ))}
-            {(categories ?? []).length === 0 && (
-              <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-ink-faint">
-                  No categories yet.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="mt-6">
+        <CategoriesTable rows={rows} />
       </div>
     </div>
   );

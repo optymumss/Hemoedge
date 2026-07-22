@@ -29,10 +29,18 @@ export function WsiViewer({ imageUrl }: { imageUrl: string }) {
       const viewer = OpenSeadragon({
         element: containerRef.current,
         tileSources: { type: "image", url: imageUrl },
-        showNavigator: true,
-        // Custom buttons below replace the default toolbar, which otherwise
-        // needs OpenSeadragon's own icon image assets served from prefixUrl.
-        showNavigationControl: false,
+        // The overview mini-map isn't useful for a single (non deep-zoom)
+        // image — it's just a shrunken duplicate of the same image.
+        showNavigator: false,
+        // showNavigationControl gates ALL button wiring, not just
+        // OpenSeadragon's own icon-based toolbar — it must be true for our
+        // custom buttons below to receive click handlers at all. Passing an
+        // `element` for each one (an id string, resolved by OpenSeadragon)
+        // makes it bind directly to our button instead of creating its own,
+        // so this doesn't require OpenSeadragon's icon image assets either.
+        showNavigationControl: true,
+        showRotationControl: true,
+        showFullPageControl: false,
         zoomInButton: "wsi-zoom-in",
         zoomOutButton: "wsi-zoom-out",
         homeButton: "wsi-home",
@@ -69,7 +77,7 @@ export function WsiViewer({ imageUrl }: { imageUrl: string }) {
           Rotate right
         </button>
       </div>
-      <div ref={containerRef} className="min-h-0 flex-1 rounded-md bg-accent" />
+      <div ref={containerRef} className="min-h-0 flex-1 rounded-md bg-black" />
     </div>
   );
 }
