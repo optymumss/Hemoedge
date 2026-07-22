@@ -10,6 +10,7 @@ export function LoginForm() {
   const params = useSearchParams();
   const redirectTo = params.get("redirect") ?? "";
   const checkEmail = params.get("check-email") === "1";
+  const accountDeleted = params.get("deleted") === "1";
   const [mode, setMode] = useState<"signin" | "signup">(
     params.get("mode") === "signup" ? "signup" : "signin",
   );
@@ -28,6 +29,11 @@ export function LoginForm() {
       {checkEmail && (
         <p className="rounded-md bg-info-soft px-3 py-2 text-sm text-info-soft-ink">
           Check your email to confirm your account, then sign in below.
+        </p>
+      )}
+      {accountDeleted && (
+        <p className="rounded-md bg-info-soft px-3 py-2 text-sm text-info-soft-ink">
+          Your account has been deleted.
         </p>
       )}
 

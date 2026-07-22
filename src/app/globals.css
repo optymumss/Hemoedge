@@ -30,6 +30,7 @@
   --accent-soft: #e8edfd;
   --accent-soft-ink: #1c3fb8;
   --danger: #c22a2a;
+  --danger-ink: #ffffff;
   --danger-soft: #fbeaea;
   --danger-soft-ink: #a11f1f;
   --success: #16794f;
@@ -58,6 +59,7 @@
     --accent-soft: #1c2648;
     --accent-soft-ink: #b7c7ff;
     --danger: #e5776f;
+    --danger-ink: #2a0f0d;
     --danger-soft: #3a1f1e;
     --danger-soft-ink: #f2a49d;
     --success: #4fbf8f;
@@ -86,6 +88,7 @@
   --accent-soft: #1c2648;
   --accent-soft-ink: #b7c7ff;
   --danger: #e5776f;
+  --danger-ink: #2a0f0d;
   --danger-soft: #3a1f1e;
   --danger-soft-ink: #f2a49d;
   --success: #4fbf8f;
@@ -113,6 +116,7 @@
   --accent-soft: #e8edfd;
   --accent-soft-ink: #1c3fb8;
   --danger: #c22a2a;
+  --danger-ink: #ffffff;
   --danger-soft: #fbeaea;
   --danger-soft-ink: #a11f1f;
   --success: #16794f;
@@ -140,6 +144,7 @@
   --color-accent-soft: var(--accent-soft);
   --color-accent-soft-ink: var(--accent-soft-ink);
   --color-danger: var(--danger);
+  --color-danger-ink: var(--danger-ink);
   --color-danger-soft: var(--danger-soft);
   --color-danger-soft-ink: var(--danger-soft-ink);
   --color-success: var(--success);
