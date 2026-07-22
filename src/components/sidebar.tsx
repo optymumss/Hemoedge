@@ -10,12 +10,14 @@ export function Sidebar({
   identity,
   role,
   sections,
+  settingsHref,
   onLogout,
 }: {
   title: string;
   identity: string;
   role?: string;
   sections: NavSection[];
+  settingsHref: string;
   onLogout: () => void;
 }) {
   const pathname = usePathname();
@@ -69,6 +71,28 @@ export function Sidebar({
           <p className="truncate text-sm font-medium text-ink">{identity}</p>
           {role && <p className="truncate text-xs text-ink-dim">{role}</p>}
         </div>
+        <Link
+          href={settingsHref}
+          aria-current={pathname === settingsHref ? "page" : undefined}
+          aria-label="Settings"
+          className={`rounded-md p-1.5 hover:bg-surface-raised ${
+            pathname === settingsHref ? "text-accent" : "text-ink-faint hover:text-ink"
+          }`}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path
+              d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"
+              stroke="currentColor"
+              strokeWidth="1.4"
+            />
+            <path
+              d="M8 1.5v1.4M8 13.1v1.4M14.5 8h-1.4M2.9 8H1.5M12.4 3.6l-1 1M4.6 11.4l-1 1M12.4 12.4l-1-1M4.6 4.6l-1-1"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
+          </svg>
+        </Link>
         <form action={onLogout}>
           <button
             type="submit"

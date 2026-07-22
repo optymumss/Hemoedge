@@ -35,6 +35,7 @@ export default async function OrgLayout({
           identity={identity}
           role={ROLE_LABELS[effectiveRole]}
           sections={sections}
+          settingsHref="/org/settings"
           onLogout={logout}
         />
         <main id="main-content" className="flex-1 overflow-y-auto px-8 py-8">
