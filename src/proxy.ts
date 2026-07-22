@@ -19,7 +19,7 @@ export async function proxy(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, full_name, email")
     .eq("id", user.id)
     .single();
 
@@ -29,7 +29,18 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
 
-  return response;
+  // Forward what we just verified so layouts don't re-authenticate and
+  // re-query the profile from scratch on every navigation — see
+  // lib/auth/get-profile.ts.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-user-id", user.id);
+  requestHeaders.set("x-user-role", role);
+  requestHeaders.set("x-user-email", profile.email ?? user.email ?? "");
+  requestHeaders.set("x-user-full-name", profile.full_name ?? "");
+
+  const forwardedResponse = NextResponse.next({ request: { headers: requestHeaders } });
+  response.cookies.getAll().forEach((cookie) => forwardedResponse.cookies.set(cookie));
+  return forwardedResponse;
 }
 
 export const config = {
