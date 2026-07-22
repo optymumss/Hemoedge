@@ -14,6 +14,7 @@ export function RoleForm({
     <form action={updateRole}>
       <input type="hidden" name="user_id" value={userId} />
       <select
+        key={role}
         name="role"
         defaultValue={role}
         onChange={(e) => e.currentTarget.form?.requestSubmit()}
