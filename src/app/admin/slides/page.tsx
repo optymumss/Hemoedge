@@ -25,17 +25,17 @@ export default async function SlidesPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold">Slides</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         The WSI slide bank — upload files here, then reference them from modules and cases.
       </p>
 
-      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+      <div className="mt-6 rounded-lg border border-line p-4">
         <UploadForm categories={categories ?? []} />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Category</th>
@@ -46,12 +46,12 @@ export default async function SlidesPage() {
           </thead>
           <tbody>
             {(slides ?? []).map((s) => (
-              <tr key={s.id} className="border-t border-neutral-200">
+              <tr key={s.id} className="border-t border-line">
                 <td className="px-4 py-2 font-medium">{s.title}</td>
-                <td className="px-4 py-2 text-neutral-500">
+                <td className="px-4 py-2 text-ink-dim">
                   {s.slide_categories?.name ?? "—"}
                 </td>
-                <td className="px-4 py-2 text-neutral-500">{formatSize(s.size_bytes)}</td>
+                <td className="px-4 py-2 text-ink-dim">{formatSize(s.size_bytes)}</td>
                 <td className="px-4 py-2">
                   <StatusBadge status={s.status} />
                 </td>
@@ -71,7 +71,7 @@ export default async function SlidesPage() {
             ))}
             {(slides ?? []).length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={5} className="px-4 py-6 text-center text-ink-faint">
                   No slides yet.
                 </td>
               </tr>

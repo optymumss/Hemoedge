@@ -25,23 +25,23 @@ export function StripePriceForm({
         placeholder="price_… (monthly)"
         aria-label="Stripe monthly price ID"
         defaultValue={monthlyPriceId ?? ""}
-        className="w-36 rounded-md border border-neutral-300 px-2 py-1 font-mono text-xs"
+        className="w-36 rounded-md border border-line-strong px-2 py-1 font-mono text-xs"
       />
       <input
         name="stripe_price_id_yearly"
         placeholder="price_… (yearly)"
         aria-label="Stripe yearly price ID"
         defaultValue={yearlyPriceId ?? ""}
-        className="w-36 rounded-md border border-neutral-300 px-2 py-1 font-mono text-xs"
+        className="w-36 rounded-md border border-line-strong px-2 py-1 font-mono text-xs"
       />
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md border border-neutral-300 px-2 py-1 text-xs disabled:opacity-50"
+        className="rounded-md border border-line-strong px-2 py-1 text-xs disabled:opacity-50"
       >
         {pending ? "…" : "Save"}
       </button>
-      {state?.error && <p className="w-full text-xs text-red-600">{state.error}</p>}
+      {state?.error && <p className="w-full text-xs text-danger">{state.error}</p>}
     </form>
   );
 }

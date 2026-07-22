@@ -16,17 +16,17 @@ export default async function FeaturesPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold">Features</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         Blood cell morphology reference entries with cropped image examples.
       </p>
 
-      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+      <div className="mt-6 rounded-lg border border-line p-4">
         <FeatureForm cellTypes={cellTypes ?? []} />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Cell Type</th>
@@ -36,9 +36,9 @@ export default async function FeaturesPage() {
           </thead>
           <tbody>
             {(features ?? []).map((f) => (
-              <tr key={f.id} className="border-t border-neutral-200">
+              <tr key={f.id} className="border-t border-line">
                 <td className="px-4 py-2 font-medium">{f.title}</td>
-                <td className="px-4 py-2 text-neutral-500">
+                <td className="px-4 py-2 text-ink-dim">
                   {f.cell_types?.name ?? "—"}
                 </td>
                 <td className="px-4 py-2">
@@ -57,7 +57,7 @@ export default async function FeaturesPage() {
             ))}
             {(features ?? []).length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={4} className="px-4 py-6 text-center text-ink-faint">
                   No features yet.
                 </td>
               </tr>

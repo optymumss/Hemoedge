@@ -12,21 +12,21 @@ export function PageForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="page-title">Title</label>
+        <label className="text-xs text-ink-dim" htmlFor="page-title">Title</label>
         <input
           id="page-title"
           name="title"
           required
-          className="w-56 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="w-56 rounded-md border border-line-strong px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="page-type">Type</label>
+        <label className="text-xs text-ink-dim" htmlFor="page-type">Type</label>
         <select
           id="page-type"
           name="type"
           defaultValue="custom"
-          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
         >
           <option value="homepage">Homepage</option>
           <option value="about">About</option>
@@ -36,21 +36,21 @@ export function PageForm() {
         </select>
       </div>
       <div className="flex flex-1 min-w-64 flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="page-content">Content (optional)</label>
+        <label className="text-xs text-ink-dim" htmlFor="page-content">Content (optional)</label>
         <input
           id="page-content"
           name="content"
-          className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+        className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
       >
         {pending ? "Creating…" : "Create page"}
       </button>
-      {state?.error && <p className="w-full text-sm text-red-600">{state.error}</p>}
+      {state?.error && <p className="w-full text-sm text-danger">{state.error}</p>}
     </form>
   );
 }

@@ -7,6 +7,8 @@ import { logAudit } from "@/lib/audit/log";
 import { sendEmail } from "@/lib/email/send";
 import { orgInviteEmail } from "@/lib/email/templates";
 import { getActiveImpersonation } from "@/lib/auth/impersonation";
+import { inviteUserByEmail } from "@/lib/auth/invite";
+import { requestOrigin } from "@/lib/http/request-origin";
 
 export type FormState = { error?: string } | undefined;
 
@@ -32,16 +34,25 @@ export async function addMember(
     return { error: "Your organization has no seats left. Contact HemoEdge to add more." };
   }
 
-  const { data: profile } = await supabase
+  const { data: org } = await supabase.from("organizations").select("name").eq("id", orgId).single();
+  if (!org) return { error: "Organization not found." };
+
+  let profile = await supabase
     .from("profiles")
     .select("id")
     .eq("email", email)
-    .maybeSingle();
+    .maybeSingle()
+    .then((r) => r.data);
 
+  let invited = false;
   if (!profile) {
-    return {
-      error: "No HemoEdge account for that email yet — ask them to sign up first, then add them.",
-    };
+    const result = await inviteUserByEmail(email, {
+      origin: await requestOrigin(),
+      context: org.name,
+    });
+    if (result.error) return { error: result.error };
+    profile = { id: result.userId! };
+    invited = true;
   }
 
   const { error } = await supabase.from("organization_memberships").insert({
@@ -63,8 +74,7 @@ export async function addMember(
     });
   }
 
-  const { data: org } = await supabase.from("organizations").select("name").eq("id", orgId).single();
-  if (org) {
+  if (!invited) {
     const { subject, html } = orgInviteEmail(org.name);
     await sendEmail(email, subject, html);
   }

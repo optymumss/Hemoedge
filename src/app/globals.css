@@ -1,28 +1,202 @@
 @import "tailwindcss";
 
+/*
+ * Field Clarity — HemoEdge's design system.
+ *
+ * One precise accent (a clinical instrument blue), a considered neutral
+ * scale with a faint cool-blue bias (not default Tailwind gray), and a
+ * slightly more generous radius scale than Tailwind's defaults. Semantic
+ * status colors (danger/success/warning) stay separate from the accent —
+ * they mean something specific and shouldn't compete with it.
+ *
+ * Tokens are consumed through Tailwind utilities (bg-surface, text-ink,
+ * border-line, bg-accent, ...) so every usage across the app repaints
+ * automatically when the theme flips — no dark: variants sprinkled through
+ * every file. Manual override wins over prefers-color-scheme in both
+ * directions via [data-theme] on <html>.
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #14181f;
+  --ink-dim: #565d6b;
+  --ink-faint: #8a91a0;
+  --surface: #fbfbfc;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f2f3f6;
+  --line: #e2e4ea;
+  --line-strong: #c7cad4;
+  --accent: #2454e8;
+  --accent-ink: #ffffff;
+  --accent-soft: #e8edfd;
+  --accent-soft-ink: #1c3fb8;
+  --danger: #c22a2a;
+  --danger-soft: #fbeaea;
+  --danger-soft-ink: #a11f1f;
+  --success: #16794f;
+  --success-soft: #e6f5ee;
+  --success-soft-ink: #146341;
+  --warning: #a5620a;
+  --warning-soft: #fbf0dd;
+  --warning-soft-ink: #8a5109;
+  --info: #1d5fa8;
+  --info-soft: #e8f1fb;
+  --info-soft-ink: #184e8a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #eef0f4;
+    --ink-dim: #a2a8b6;
+    --ink-faint: #6c7280;
+    --surface: #0b0d12;
+    --surface-raised: #14161d;
+    --surface-sunken: #1a1d26;
+    --line: #262a35;
+    --line-strong: #383d4a;
+    --accent: #6d93ff;
+    --accent-ink: #0b1330;
+    --accent-soft: #1c2648;
+    --accent-soft-ink: #b7c7ff;
+    --danger: #e5776f;
+    --danger-soft: #3a1f1e;
+    --danger-soft-ink: #f2a49d;
+    --success: #4fbf8f;
+    --success-soft: #16302a;
+    --success-soft-ink: #8ad9bb;
+    --warning: #e0a13f;
+    --warning-soft: #382b13;
+    --warning-soft-ink: #f0bf72;
+    --info: #6ea3e6;
+    --info-soft: #172943;
+    --info-soft-ink: #a9c6ee;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #eef0f4;
+  --ink-dim: #a2a8b6;
+  --ink-faint: #6c7280;
+  --surface: #0b0d12;
+  --surface-raised: #14161d;
+  --surface-sunken: #1a1d26;
+  --line: #262a35;
+  --line-strong: #383d4a;
+  --accent: #6d93ff;
+  --accent-ink: #0b1330;
+  --accent-soft: #1c2648;
+  --accent-soft-ink: #b7c7ff;
+  --danger: #e5776f;
+  --danger-soft: #3a1f1e;
+  --danger-soft-ink: #f2a49d;
+  --success: #4fbf8f;
+  --success-soft: #16302a;
+  --success-soft-ink: #8ad9bb;
+  --warning: #e0a13f;
+  --warning-soft: #382b13;
+  --warning-soft-ink: #f0bf72;
+  --info: #6ea3e6;
+  --info-soft: #172943;
+  --info-soft-ink: #a9c6ee;
+}
+
+:root[data-theme="light"] {
+  --ink: #14181f;
+  --ink-dim: #565d6b;
+  --ink-faint: #8a91a0;
+  --surface: #fbfbfc;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f2f3f6;
+  --line: #e2e4ea;
+  --line-strong: #c7cad4;
+  --accent: #2454e8;
+  --accent-ink: #ffffff;
+  --accent-soft: #e8edfd;
+  --accent-soft-ink: #1c3fb8;
+  --danger: #c22a2a;
+  --danger-soft: #fbeaea;
+  --danger-soft-ink: #a11f1f;
+  --success: #16794f;
+  --success-soft: #e6f5ee;
+  --success-soft-ink: #146341;
+  --warning: #a5620a;
+  --warning-soft: #fbf0dd;
+  --warning-soft-ink: #8a5109;
+  --info: #1d5fa8;
+  --info-soft: #e8f1fb;
+  --info-soft-ink: #184e8a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-ink-faint: var(--ink-faint);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-ink: var(--accent-soft-ink);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-soft-ink: var(--danger-soft-ink);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-soft-ink: var(--success-soft-ink);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-soft-ink: var(--warning-soft-ink);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-soft-ink: var(--info-soft-ink);
+
+  /* A touch more generous than Tailwind's defaults — reads calmer at this
+     content density than the tighter default scale. */
+  --radius-md: 0.5rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.25rem;
+
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
     monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-soft-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Theme toggle: which icon shows is decided purely by CSS off the same
+   [data-theme]/prefers-color-scheme signal everything else uses — no JS
+   state, so there's no hydration mismatch to guard against. */
+.theme-toggle-moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  .theme-toggle-sun { display: none; }
+  .theme-toggle-moon { display: block; }
 }
+:root[data-theme="dark"] .theme-toggle-sun { display: none; }
+:root[data-theme="dark"] .theme-toggle-moon { display: block; }
+:root[data-theme="light"] .theme-toggle-sun { display: block; }
+:root[data-theme="light"] .theme-toggle-moon { display: none; }

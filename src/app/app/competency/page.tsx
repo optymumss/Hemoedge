@@ -75,33 +75,33 @@ export default async function CompetencyPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold">Competency Pathway</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         Complete every module in a stage at or above its pass threshold to earn a certificate.
       </p>
 
       <div className="mt-6 flex flex-col gap-6">
         {stages.map(({ curriculum, modules, completed }) => (
-          <div key={curriculum.id} className="rounded-lg border border-neutral-200 p-4">
+          <div key={curriculum.id} className="rounded-lg border border-line p-4">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xs uppercase text-neutral-400">{curriculum.level}</span>
+                <span className="text-xs uppercase text-ink-faint">{curriculum.level}</span>
                 <h2 className="font-medium">{curriculum.title}</h2>
               </div>
               {certifiedIds.has(curriculum.id) ? (
-                <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                <span className="rounded-full bg-success-soft px-2 py-0.5 text-xs font-medium text-success-soft-ink">
                   Certified
                 </span>
               ) : completed ? (
-                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+                <span className="rounded-full bg-info-soft px-2 py-0.5 text-xs font-medium text-info-soft-ink">
                   Complete
                 </span>
               ) : (
-                <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">
+                <span className="rounded-full bg-surface-sunken px-2 py-0.5 text-xs font-medium text-ink-dim">
                   In progress
                 </span>
               )}
             </div>
-            <p className="mt-1 text-xs text-neutral-500">
+            <p className="mt-1 text-xs text-ink-dim">
               Pass threshold: {curriculum.pass_threshold}%
             </p>
             <ul className="mt-3 flex flex-col gap-1">
@@ -113,10 +113,10 @@ export default async function CompetencyPage() {
                   <span
                     className={
                       m.bestScore === null
-                        ? "text-neutral-400"
+                        ? "text-ink-faint"
                         : m.bestScore >= curriculum.pass_threshold
-                          ? "text-green-700"
-                          : "text-amber-700"
+                          ? "text-success-soft-ink"
+                          : "text-warning-soft-ink"
                     }
                   >
                     {m.bestScore === null ? "Not attempted" : `${m.bestScore}%`}
@@ -124,13 +124,13 @@ export default async function CompetencyPage() {
                 </li>
               ))}
               {modules.length === 0 && (
-                <li className="text-sm text-neutral-400">No modules linked to this stage yet.</li>
+                <li className="text-sm text-ink-faint">No modules linked to this stage yet.</li>
               )}
             </ul>
           </div>
         ))}
         {stages.length === 0 && (
-          <p className="py-8 text-center text-sm text-neutral-400">
+          <p className="py-8 text-center text-sm text-ink-faint">
             No curricula assigned yet.
           </p>
         )}

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { defaultRouteForRole } from "@/lib/auth/roles";
+import { requestOrigin } from "@/lib/http/request-origin";
 
 export type AuthState = { error?: string } | undefined;
 
@@ -59,4 +60,25 @@ export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+export type ResetState = { error?: string; success?: boolean } | undefined;
+
+export async function requestPasswordReset(
+  _prevState: ResetState,
+  formData: FormData,
+): Promise<ResetState> {
+  const email = String(formData.get("email") ?? "").trim();
+  if (!email) return { error: "Enter your email address." };
+
+  const supabase = await createClient();
+  const origin = await requestOrigin();
+
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/confirm?type=recovery&next=/reset-password`,
+  });
+
+  // Always report success regardless of whether the email exists — a
+  // differing response here would let someone enumerate registered emails.
+  return { success: true };
 }

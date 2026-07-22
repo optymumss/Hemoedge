@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { defaultRouteForRole, SURFACE_ROLES } from "./roles";
+import { defaultRouteForRole, SURFACE_ROLES, ROLE_LABELS, type AppRole } from "./roles";
 
 describe("defaultRouteForRole", () => {
   it("sends super_admin and content_manager to /admin", () => {
@@ -29,5 +29,21 @@ describe("SURFACE_ROLES", () => {
     expect(SURFACE_ROLES["/admin"]).not.toContain("member");
     expect(SURFACE_ROLES["/org"]).not.toContain("member");
     expect(SURFACE_ROLES["/app"]).toContain("member");
+  });
+});
+
+describe("ROLE_LABELS", () => {
+  it("has a human-readable label for every role", () => {
+    const roles: AppRole[] = ["super_admin", "content_manager", "org_admin", "member"];
+    for (const role of roles) {
+      expect(ROLE_LABELS[role]).toEqual(expect.any(String));
+      expect(ROLE_LABELS[role].length).toBeGreaterThan(0);
+    }
+  });
+
+  it("labels don't leak the raw snake_case role value", () => {
+    expect(ROLE_LABELS.super_admin).not.toContain("_");
+    expect(ROLE_LABELS.content_manager).not.toContain("_");
+    expect(ROLE_LABELS.org_admin).not.toContain("_");
   });
 });

@@ -12,33 +12,33 @@ export function CellTypeForm() {
   return (
     <form action={action} className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="cell-type-name">Name</label>
+        <label className="text-xs text-ink-dim" htmlFor="cell-type-name">Name</label>
         <input
           id="cell-type-name"
           name="name"
           required
-          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="cell-type-code">Code</label>
+        <label className="text-xs text-ink-dim" htmlFor="cell-type-code">Code</label>
         <input
           id="cell-type-code"
           name="code"
           required
           maxLength={5}
           placeholder="SPH"
-          className="w-20 rounded-md border border-neutral-300 px-2 py-1.5 text-sm uppercase"
+          className="w-20 rounded-md border border-line-strong px-2 py-1.5 text-sm uppercase"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-neutral-500" htmlFor="cell-type-lineage">Lineage</label>
+        <label className="text-xs text-ink-dim" htmlFor="cell-type-lineage">Lineage</label>
         <select
           id="cell-type-lineage"
           name="lineage"
           required
           defaultValue=""
-          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
         >
           <option value="" disabled>
             Choose…
@@ -51,11 +51,11 @@ export function CellTypeForm() {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+        className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
       >
         {pending ? "Adding…" : "Add cell type"}
       </button>
-      {state?.error && <p className="w-full text-sm text-red-600">{state.error}</p>}
+      {state?.error && <p className="w-full text-sm text-danger">{state.error}</p>}
     </form>
   );
 }

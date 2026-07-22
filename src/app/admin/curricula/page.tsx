@@ -14,17 +14,17 @@ export default async function CurriculaPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold">Curricula</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         Versioned sets of modules that lead to a certificate.
       </p>
 
-      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+      <div className="mt-6 rounded-lg border border-line p-4">
         <CurriculumForm />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Level</th>
@@ -35,14 +35,14 @@ export default async function CurriculaPage() {
           </thead>
           <tbody>
             {(curricula ?? []).map((c) => (
-              <tr key={c.id} className="border-t border-neutral-200">
+              <tr key={c.id} className="border-t border-line">
                 <td className="px-4 py-2 font-medium">
                   <Link href={`/admin/curricula/${c.id}`} className="hover:underline">
                     {c.title}
                   </Link>
                 </td>
-                <td className="px-4 py-2 capitalize text-neutral-500">{c.level}</td>
-                <td className="px-4 py-2 text-neutral-500">{c.pass_threshold}%</td>
+                <td className="px-4 py-2 capitalize text-ink-dim">{c.level}</td>
+                <td className="px-4 py-2 text-ink-dim">{c.pass_threshold}%</td>
                 <td className="px-4 py-2">
                   <StatusBadge status={c.status} />
                 </td>
@@ -59,7 +59,7 @@ export default async function CurriculaPage() {
             ))}
             {(curricula ?? []).length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={5} className="px-4 py-6 text-center text-ink-faint">
                   No curricula yet.
                 </td>
               </tr>

@@ -14,17 +14,17 @@ export default async function SlideCategoriesPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold">Slide Categories</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         Two-level hierarchy: Syndrome Group → Diagnosis.
       </p>
 
-      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+      <div className="mt-6 rounded-lg border border-line p-4">
         <CategoryForm parents={topLevel} />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
               <th className="px-4 py-2">Name</th>
               <th className="px-4 py-2">Parent</th>
@@ -33,19 +33,19 @@ export default async function SlideCategoriesPage() {
           </thead>
           <tbody>
             {(categories ?? []).map((c) => (
-              <tr key={c.id} className="border-t border-neutral-200">
+              <tr key={c.id} className="border-t border-line">
                 <td className="px-4 py-2 font-medium">{c.name}</td>
-                <td className="px-4 py-2 text-neutral-500">
+                <td className="px-4 py-2 text-ink-dim">
                   {c.parent_id ? byId.get(c.parent_id)?.name : "—"}
                 </td>
-                <td className="px-4 py-2 text-neutral-500">
+                <td className="px-4 py-2 text-ink-dim">
                   {c.description ?? "—"}
                 </td>
               </tr>
             ))}
             {(categories ?? []).length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={3} className="px-4 py-6 text-center text-ink-faint">
                   No categories yet.
                 </td>
               </tr>

@@ -20,13 +20,13 @@ export default async function BlogPage() {
     <div>
       <h1 className="text-xl font-semibold">Blog</h1>
 
-      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+      <div className="mt-6 rounded-lg border border-line p-4">
         <PostForm />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Status</th>
@@ -35,9 +35,9 @@ export default async function BlogPage() {
           </thead>
           <tbody>
             {(posts ?? []).map((p) => (
-              <tr key={p.id} className="border-t border-neutral-200">
+              <tr key={p.id} className="border-t border-line">
                 <td className="px-4 py-2 font-medium">{p.title}</td>
-                <td className="px-4 py-2 capitalize text-neutral-500">{p.status}</td>
+                <td className="px-4 py-2 capitalize text-ink-dim">{p.status}</td>
                 <td className="px-4 py-2 text-right">
                   <form action={togglePostStatus}>
                     <input type="hidden" name="id" value={p.id} />
@@ -46,7 +46,7 @@ export default async function BlogPage() {
                       name="next_status"
                       value={p.status === "published" ? "draft" : "published"}
                     />
-                    <button type="submit" className="text-xs text-blue-700 underline">
+                    <button type="submit" className="text-xs text-info-soft-ink underline">
                       {p.status === "published" ? "Unpublish" : "Publish"}
                     </button>
                   </form>
@@ -55,7 +55,7 @@ export default async function BlogPage() {
             ))}
             {(posts ?? []).length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={3} className="px-4 py-6 text-center text-ink-faint">
                   No posts yet.
                 </td>
               </tr>

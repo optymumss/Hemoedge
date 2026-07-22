@@ -25,7 +25,7 @@ export function QuizForm({
     <form action={action} className="flex flex-col gap-6">
       <input type="hidden" name="case_id" value={caseId} />
       {questions.map((q, i) => (
-        <fieldset key={q.id} className="rounded-lg border border-neutral-200 p-4">
+        <fieldset key={q.id} className="rounded-lg border border-line p-4">
           <legend className="px-1 text-sm font-medium">
             {i + 1}. {q.question_text}
           </legend>
@@ -42,11 +42,11 @@ export function QuizForm({
       <button
         type="submit"
         disabled={pending}
-        className="self-start rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+        className="self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-ink disabled:opacity-50"
       >
         {pending ? "Submitting…" : "Submit answers"}
       </button>
-      {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state?.error && <p className="text-sm text-danger">{state.error}</p>}
     </form>
   );
 }

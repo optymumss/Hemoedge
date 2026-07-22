@@ -47,7 +47,7 @@ export function TutorWidget() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 rounded-full bg-neutral-900 px-4 py-3 text-sm font-medium text-white shadow-lg"
+        className="fixed bottom-6 right-6 rounded-full bg-accent px-4 py-3 text-sm font-medium text-accent-ink shadow-lg"
       >
         Ask the AI Tutor
       </button>
@@ -55,17 +55,17 @@ export function TutorWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 flex h-[28rem] w-80 flex-col rounded-lg border border-neutral-200 bg-white shadow-xl">
-      <div className="flex items-center justify-between border-b border-neutral-200 px-3 py-2">
+    <div className="fixed bottom-6 right-6 flex h-[28rem] w-80 flex-col rounded-lg border border-line bg-white shadow-xl">
+      <div className="flex items-center justify-between border-b border-line px-3 py-2">
         <p className="text-sm font-medium">AI Tutor</p>
-        <button onClick={() => setOpen(false)} className="text-sm text-neutral-500">
+        <button onClick={() => setOpen(false)} className="text-sm text-ink-dim">
           Close
         </button>
       </div>
 
       <div className="flex-1 space-y-3 overflow-y-auto px-3 py-2" aria-live="polite">
         {messages.length === 0 && (
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-ink-dim">
             Ask about a cell type, feature, or module and I&apos;ll answer from the
             HemoEdge library.
           </p>
@@ -75,35 +75,35 @@ export function TutorWidget() {
             <p
               className={
                 m.role === "user"
-                  ? "inline-block rounded-lg bg-neutral-900 px-3 py-1.5 text-sm text-white"
-                  : "inline-block rounded-lg bg-neutral-100 px-3 py-1.5 text-sm text-neutral-800"
+                  ? "inline-block rounded-lg bg-accent px-3 py-1.5 text-sm text-accent-ink"
+                  : "inline-block rounded-lg bg-surface-sunken px-3 py-1.5 text-sm text-ink"
               }
             >
               {m.text}
             </p>
             {m.sources && m.sources.length > 0 && (
-              <p className="mt-1 text-[11px] text-neutral-400">
+              <p className="mt-1 text-[11px] text-ink-faint">
                 Sources: {m.sources.join(", ")}
               </p>
             )}
           </div>
         ))}
-        {pending && <p className="text-xs text-neutral-400">Thinking…</p>}
-        {error && <p className="text-xs text-red-600">{error}</p>}
+        {pending && <p className="text-xs text-ink-faint">Thinking…</p>}
+        {error && <p className="text-xs text-danger">{error}</p>}
       </div>
 
-      <form onSubmit={ask} className="flex gap-1 border-t border-neutral-200 p-2">
+      <form onSubmit={ask} className="flex gap-1 border-t border-line p-2">
         <input
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Ask a question…"
           aria-label="Ask the AI Tutor a question"
-          className="flex-1 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="flex-1 rounded-md border border-line-strong px-2 py-1.5 text-sm"
         />
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+          className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
         >
           Send
         </button>

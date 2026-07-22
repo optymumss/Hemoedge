@@ -17,17 +17,17 @@ export default async function CellTypesPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold">Cell Types</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-ink-dim">
         Powers slide tagging, the Feature Library, and the WBC diff counter.
       </p>
 
-      <div className="mt-6 rounded-lg border border-neutral-200 p-4">
+      <div className="mt-6 rounded-lg border border-line p-4">
         <CellTypeForm />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-lg border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+          <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
               <th className="px-4 py-2">Name</th>
               <th className="px-4 py-2">Code</th>
@@ -36,21 +36,21 @@ export default async function CellTypesPage() {
           </thead>
           <tbody>
             {(cellTypes ?? []).map((c) => (
-              <tr key={c.id} className="border-t border-neutral-200">
+              <tr key={c.id} className="border-t border-line">
                 <td className="px-4 py-2 font-medium">{c.name}</td>
                 <td className="px-4 py-2">
-                  <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs font-mono">
+                  <span className="rounded bg-surface-sunken px-1.5 py-0.5 text-xs font-mono">
                     {c.code}
                   </span>
                 </td>
-                <td className="px-4 py-2 text-neutral-500">
+                <td className="px-4 py-2 text-ink-dim">
                   {LINEAGE_LABEL[c.lineage] ?? c.lineage}
                 </td>
               </tr>
             ))}
             {(cellTypes ?? []).length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={3} className="px-4 py-6 text-center text-ink-faint">
                   No cell types yet.
                 </td>
               </tr>

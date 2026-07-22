@@ -16,7 +16,7 @@ export function QuestionForm({ caseId }: { caseId: string }) {
         name="question_text"
         required
         placeholder="Question text"
-        className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
       />
       {(["a", "b", "c", "d"] as const).map((id) => (
         <div key={id} className="flex items-center gap-2">
@@ -25,19 +25,19 @@ export function QuestionForm({ caseId }: { caseId: string }) {
             name={`choice_${id}`}
             placeholder={`Choice ${id.toUpperCase()}${id === "a" || id === "b" ? " (required)" : " (optional)"}`}
             required={id === "a" || id === "b"}
-            className="flex-1 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+            className="flex-1 rounded-md border border-line-strong px-2 py-1.5 text-sm"
           />
         </div>
       ))}
-      <p className="text-xs text-neutral-400">Select the radio button next to the correct choice.</p>
+      <p className="text-xs text-ink-faint">Select the radio button next to the correct choice.</p>
       <button
         type="submit"
         disabled={pending}
-        className="self-start rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+        className="self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
       >
         {pending ? "Adding…" : "Add question"}
       </button>
-      {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state?.error && <p className="text-sm text-danger">{state.error}</p>}
     </form>
   );
 }
