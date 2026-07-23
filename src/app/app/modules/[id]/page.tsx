@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getEffectiveUserId, getActiveImpersonation } from "@/lib/auth/impersonation";
 import { QuizForm } from "./quiz-form";
+import { LessonTree } from "./lesson-tree";
 
 export default async function LearnerModuleDetailPage({
   params,
@@ -12,7 +13,7 @@ export default async function LearnerModuleDetailPage({
 
   const { data: module_ } = await supabase
     .from("modules")
-    .select("id, title, level, status")
+    .select("id, title, level, status, description")
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
@@ -21,11 +22,18 @@ export default async function LearnerModuleDetailPage({
     return <p className="text-sm text-ink-dim">Module not found or not yet published.</p>;
   }
 
-  const { data: questions } = await supabase
-    .from("quiz_questions")
-    .select("id, question_text, choices")
-    .eq("module_id", id)
-    .order("position");
+  const [{ data: questions }, { data: lessons }] = await Promise.all([
+    supabase
+      .from("quiz_questions")
+      .select("id, question_text, choices")
+      .eq("module_id", id)
+      .order("position"),
+    supabase
+      .from("lessons")
+      .select("id, title, body, slide_id")
+      .eq("module_id", id)
+      .order("position"),
+  ]);
 
   const userId = await getEffectiveUserId();
   const impersonation = await getActiveImpersonation();
@@ -43,6 +51,15 @@ export default async function LearnerModuleDetailPage({
     <div>
       <h1 className="text-xl font-semibold">{module_.title}</h1>
       <p className="mt-1 text-sm capitalize text-ink-dim">{module_.level}</p>
+      {module_.description && (
+        <p className="mt-2 text-sm text-ink-dim">{module_.description}</p>
+      )}
+
+      {(lessons ?? []).length > 0 && (
+        <div className="mt-6">
+          <LessonTree lessons={lessons ?? []} />
+        </div>
+      )}
 
       {lastAttempt && (
         <div

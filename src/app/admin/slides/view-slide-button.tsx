@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { getSlideViewUrl } from "./actions";
+import { getSlideViewUrl } from "@/lib/slides/get-slide-view-url";
 import { WsiViewer } from "@/components/wsi-viewer";
 
 export function ViewSlideButton({ slideId, title }: { slideId: string; title: string }) {
