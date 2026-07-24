@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type OpenSeadragon from "openseadragon";
 
 /**
@@ -15,9 +15,19 @@ import type OpenSeadragon from "openseadragon";
  * (that pass still imports the module in Node). Importing it lazily inside
  * the effect keeps it out of the SSR path entirely.
  */
+
+// Slides aren't tagged with their scanner's native magnification yet, so
+// this assumes the common default (40x) — the preset buttons are relative
+// to that, matching how a real microscope objective turret works: "80x" is
+// a 2x digital zoom past the 40x capture, "4x" is a 10x zoom-out from it.
+const NATIVE_MAGNIFICATION = 40;
+const PRESETS = [4, 10, 20, 40, 80];
+const MAGNIFICATION_TOLERANCE = 0.05;
+
 export function WsiViewer({ imageUrl }: { imageUrl: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
+  const [activeMagnification, setActiveMagnification] = useState<number | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -49,6 +59,18 @@ export function WsiViewer({ imageUrl }: { imageUrl: string }) {
         gestureSettingsMouse: { clickToZoom: false },
       });
       viewerRef.current = viewer;
+
+      const syncActivePreset = () => {
+        const nativeZoom = viewer.viewport.imageToViewportZoom(1);
+        const currentZoom = viewer.viewport.getZoom();
+        const currentMagnification = (currentZoom / nativeZoom) * NATIVE_MAGNIFICATION;
+        const match = PRESETS.find(
+          (m) => Math.abs(m - currentMagnification) / m < MAGNIFICATION_TOLERANCE,
+        );
+        setActiveMagnification(match ?? null);
+      };
+      viewer.addHandler("zoom", syncActivePreset);
+      viewer.addHandler("open", syncActivePreset);
     });
 
     return () => {
@@ -58,22 +80,47 @@ export function WsiViewer({ imageUrl }: { imageUrl: string }) {
     };
   }, [imageUrl]);
 
+  function goToMagnification(magnification: number) {
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+    const nativeZoom = viewer.viewport.imageToViewportZoom(1);
+    viewer.viewport.zoomTo(nativeZoom * (magnification / NATIVE_MAGNIFICATION));
+  }
+
   return (
     <div className="flex h-full flex-col gap-2">
-      <div className="flex gap-2">
-        <button id="wsi-zoom-in" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs">
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex gap-1 rounded-md border border-white/20 bg-white/5 p-1" role="group" aria-label="Objective magnification">
+          {PRESETS.map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => goToMagnification(m)}
+              aria-pressed={activeMagnification === m}
+              className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+                activeMagnification === m
+                  ? "bg-accent text-accent-ink"
+                  : "text-white/80 hover:bg-white/10"
+              }`}
+            >
+              {m}x
+            </button>
+          ))}
+        </div>
+        <div className="h-5 w-px bg-white/20" aria-hidden="true" />
+        <button id="wsi-zoom-in" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
           Zoom in
         </button>
-        <button id="wsi-zoom-out" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs">
+        <button id="wsi-zoom-out" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
           Zoom out
         </button>
-        <button id="wsi-home" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs">
+        <button id="wsi-home" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
           Reset
         </button>
-        <button id="wsi-rotate-left" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs">
+        <button id="wsi-rotate-left" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
           Rotate left
         </button>
-        <button id="wsi-rotate-right" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs">
+        <button id="wsi-rotate-right" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
           Rotate right
         </button>
       </div>

@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      associates: {
+        Row: {
+          bio: string | null
+          created_at: string
+          id: string
+          name: string
+          title: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          title?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          title?: string | null
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           action: string
@@ -51,30 +75,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      associates: {
-        Row: {
-          bio: string | null
-          created_at: string
-          id: string
-          name: string
-          title: string | null
-        }
-        Insert: {
-          bio?: string | null
-          created_at?: string
-          id?: string
-          name: string
-          title?: string | null
-        }
-        Update: {
-          bio?: string | null
-          created_at?: string
-          id?: string
-          name?: string
-          title?: string | null
-        }
-        Relationships: []
       }
       blog_posts: {
         Row: {
@@ -483,6 +483,64 @@ export type Database = {
             columns: ["target_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          body: string | null
+          created_at: string
+          created_by: string
+          id: string
+          module_id: string
+          position: number
+          slide_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          module_id: string
+          position?: number
+          slide_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          module_id?: string
+          position?: number
+          slide_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_slide_id_fkey"
+            columns: ["slide_id"]
+            isOneToOne: false
+            referencedRelation: "slides"
             referencedColumns: ["id"]
           },
         ]

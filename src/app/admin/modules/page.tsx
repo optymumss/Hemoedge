@@ -42,6 +42,9 @@ export default async function ModulesPage() {
                 </td>
                 <td className="px-4 py-2 text-right">
                   <div className="flex items-center justify-end gap-3">
+                    <Link href={`/admin/modules/${m.id}/lessons`} className="text-xs text-ink-dim underline">
+                      Manage lessons
+                    </Link>
                     <Link href={`/admin/modules/${m.id}`} className="text-xs text-ink-dim underline">
                       Manage quiz
                     </Link>
