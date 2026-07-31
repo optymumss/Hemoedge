@@ -28,10 +28,12 @@ export function WsiViewer({ imageUrl }: { imageUrl: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
   const [activeMagnification, setActiveMagnification] = useState<number | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
     let cancelled = false;
+    setLoadError(null);
 
     import("openseadragon").then(({ default: OpenSeadragon }) => {
       if (cancelled || !containerRef.current) return;
@@ -71,6 +73,9 @@ export function WsiViewer({ imageUrl }: { imageUrl: string }) {
       };
       viewer.addHandler("zoom", syncActivePreset);
       viewer.addHandler("open", syncActivePreset);
+      viewer.addHandler("open-failed", () => {
+        setLoadError("This slide's image couldn't be loaded. The file may be missing, corrupted, or in an unsupported format.");
+      });
     });
 
     return () => {
@@ -124,7 +129,14 @@ export function WsiViewer({ imageUrl }: { imageUrl: string }) {
           Rotate right
         </button>
       </div>
-      <div ref={containerRef} className="min-h-0 flex-1 rounded-md bg-black" />
+      <div className="relative min-h-0 flex-1">
+        <div ref={containerRef} className="h-full rounded-md bg-black" />
+        {loadError && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/90 px-6 text-center text-sm text-white/80">
+            {loadError}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
