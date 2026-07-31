@@ -6,6 +6,22 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { login, signup, type AuthState } from "./actions";
 
+type SignupRole = "member" | "content_manager" | "org_admin";
+
+const SIGNUP_ROLE_OPTIONS: { value: SignupRole; label: string; description: string }[] = [
+  { value: "member", label: "Learner", description: "Take courses and quizzes." },
+  {
+    value: "content_manager",
+    label: "Content Manager",
+    description: "Create slides, modules, and quizzes for review.",
+  },
+  {
+    value: "org_admin",
+    label: "Organization Admin",
+    description: "Manage a team and assign them training.",
+  },
+];
+
 export function LoginForm() {
   const params = useSearchParams();
   const redirectTo = params.get("redirect") ?? "";
@@ -23,6 +39,7 @@ export function LoginForm() {
     AuthState,
     FormData
   >(signup, undefined);
+  const [signupRole, setSignupRole] = useState<SignupRole>("member");
 
   return (
     <div className="flex flex-col gap-5">
@@ -131,6 +148,44 @@ export function LoginForm() {
             minLength={8}
             className="rounded-md border border-line-strong px-3 py-2 text-sm"
           />
+
+          <div className="flex flex-col gap-1.5" role="radiogroup" aria-label="I'm signing up as">
+            <span className="text-xs text-ink-dim">I&apos;m signing up as</span>
+            {SIGNUP_ROLE_OPTIONS.map((option) => (
+              <label
+                key={option.value}
+                className={`flex cursor-pointer items-start gap-2 rounded-md border px-3 py-2 text-sm transition-colors ${
+                  signupRole === option.value
+                    ? "border-accent bg-accent-soft text-accent-soft-ink"
+                    : "border-line-strong text-ink hover:bg-surface-sunken"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="signup_role"
+                  value={option.value}
+                  checked={signupRole === option.value}
+                  onChange={() => setSignupRole(option.value)}
+                  className="mt-0.5"
+                />
+                <span>
+                  <span className="block font-medium">{option.label}</span>
+                  <span className="block text-xs text-ink-dim">{option.description}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+
+          {signupRole === "org_admin" && (
+            <input
+              name="org_name"
+              placeholder="Organization name"
+              aria-label="Organization name"
+              required
+              className="rounded-md border border-line-strong px-3 py-2 text-sm"
+            />
+          )}
+
           {signupState?.error && (
             <p className="text-sm text-danger">{signupState.error}</p>
           )}

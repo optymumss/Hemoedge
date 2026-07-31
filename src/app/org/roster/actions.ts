@@ -83,6 +83,60 @@ export async function addMember(
   return undefined;
 }
 
+export async function promoteMember(formData: FormData) {
+  const membershipId = String(formData.get("membership_id") ?? "");
+  if (!membershipId) return;
+
+  if (await getActiveImpersonation()) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: membership } = await supabase
+    .from("organization_memberships")
+    .update({ org_role: "admin" })
+    .eq("id", membershipId)
+    .select("org_id")
+    .maybeSingle();
+
+  if (user && membership) {
+    await logAudit(supabase, user.id, "org_member_promoted", "organization", membership.org_id, {
+      membership_id: membershipId,
+    });
+  }
+
+  revalidatePath("/org/roster");
+}
+
+export async function demoteAdmin(formData: FormData) {
+  const membershipId = String(formData.get("membership_id") ?? "");
+  if (!membershipId) return;
+
+  if (await getActiveImpersonation()) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: membership } = await supabase
+    .from("organization_memberships")
+    .update({ org_role: "member" })
+    .eq("id", membershipId)
+    .select("org_id")
+    .maybeSingle();
+
+  if (user && membership) {
+    await logAudit(supabase, user.id, "org_member_demoted", "organization", membership.org_id, {
+      membership_id: membershipId,
+    });
+  }
+
+  revalidatePath("/org/roster");
+}
+
 export async function removeMember(formData: FormData) {
   const membershipId = String(formData.get("membership_id") ?? "");
   if (!membershipId) return;
