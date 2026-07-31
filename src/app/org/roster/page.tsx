@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentOrg } from "@/lib/org/get-current-org";
 import { ComingSoon } from "@/components/coming-soon";
 import { AddMemberForm } from "./add-member-form";
-import { removeMember } from "./actions";
+import { removeMember, promoteMember, demoteAdmin } from "./actions";
 
 export default async function RosterPage() {
   const org = await getCurrentOrg();
@@ -52,14 +52,32 @@ export default async function RosterPage() {
                 <td className="px-4 py-2 text-ink-dim">{m.profiles?.email}</td>
                 <td className="px-4 py-2 capitalize text-ink-dim">{m.org_role}</td>
                 <td className="px-4 py-2 text-right">
-                  {m.org_role === "member" && (
-                    <form action={removeMember}>
-                      <input type="hidden" name="membership_id" value={m.id} />
-                      <button type="submit" className="text-xs text-danger underline">
-                        Remove
-                      </button>
-                    </form>
-                  )}
+                  <div className="flex items-center justify-end gap-3">
+                    {m.org_role === "member" && (
+                      <form action={promoteMember}>
+                        <input type="hidden" name="membership_id" value={m.id} />
+                        <button type="submit" className="text-xs text-ink-dim underline">
+                          Promote to Admin
+                        </button>
+                      </form>
+                    )}
+                    {m.org_role === "admin" && (
+                      <form action={demoteAdmin}>
+                        <input type="hidden" name="membership_id" value={m.id} />
+                        <button type="submit" className="text-xs text-ink-dim underline">
+                          Demote to Member
+                        </button>
+                      </form>
+                    )}
+                    {m.org_role === "member" && (
+                      <form action={removeMember}>
+                        <input type="hidden" name="membership_id" value={m.id} />
+                        <button type="submit" className="text-xs text-danger underline">
+                          Remove
+                        </button>
+                      </form>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
