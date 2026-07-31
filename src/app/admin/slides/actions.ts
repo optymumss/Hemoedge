@@ -73,3 +73,29 @@ export async function confirmSlideUpload(
   revalidatePath("/admin/slides");
   return {};
 }
+
+/** RLS scopes this to super admins (any slide) and content managers (their
+ * own draft or changes-requested slides) — see the "slides: content manager
+ * can delete their own draft or bounced work" policy. Deletes the DB row
+ * first so a status change that revokes permission mid-flight can't orphan
+ * a file with no row left to fix it. */
+export async function deleteSlide(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  const supabase = await createClient();
+  const { data: slide } = await supabase
+    .from("slides")
+    .select("file_path")
+    .eq("id", id)
+    .single();
+
+  const { error } = await supabase.from("slides").delete().eq("id", id);
+  if (error) return;
+
+  if (slide?.file_path) {
+    await supabase.storage.from("slides").remove([slide.file_path]);
+  }
+
+  revalidatePath("/admin/slides");
+}

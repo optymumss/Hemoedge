@@ -1,8 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitForReviewButton } from "@/components/submit-for-review-button";
 import { UploadForm } from "./upload-form";
 import { ViewSlideButton } from "./view-slide-button";
+import { DeleteSlideButton } from "./delete-slide-button";
 
 function formatSize(bytes: number | null) {
   if (!bytes) return "—";
@@ -12,9 +14,10 @@ function formatSize(bytes: number | null) {
 
 export default async function SlidesPage() {
   const supabase = await createClient();
+  const profile = await getCurrentProfile();
   const { data: slides } = await supabase
     .from("slides")
-    .select("id, title, size_bytes, status, slide_categories(name)")
+    .select("id, title, size_bytes, status, created_by, slide_categories(name)")
     .order("created_at", { ascending: false });
 
   const { data: categories } = await supabase
@@ -65,6 +68,13 @@ export default async function SlidesPage() {
                         path="/admin/slides"
                       />
                     )}
+                    {profile &&
+                      (profile.role === "super_admin" ||
+                        (profile.role === "content_manager" &&
+                          s.created_by === profile.id &&
+                          (s.status === "draft" || s.status === "changes_requested"))) && (
+                        <DeleteSlideButton id={s.id} title={s.title} />
+                      )}
                   </div>
                 </td>
               </tr>
