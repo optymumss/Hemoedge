@@ -41,12 +41,24 @@ export async function signup(
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const fullName = String(formData.get("full_name") ?? "");
+  const signupRole = String(formData.get("signup_role") ?? "member");
+  const orgName = String(formData.get("org_name") ?? "");
+
+  if (signupRole === "org_admin" && !orgName.trim()) {
+    return { error: "Organization name is required." };
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } },
+    options: {
+      data: {
+        full_name: fullName,
+        signup_role: signupRole,
+        org_name: orgName,
+      },
+    },
   });
 
   if (error) {
