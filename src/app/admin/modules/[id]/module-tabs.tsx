@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation";
 
 export function ModuleTabs({ moduleId }: { moduleId: string }) {
   const pathname = usePathname();
+  const detailsHref = `/admin/modules/${moduleId}`;
   const lessonsHref = `/admin/modules/${moduleId}/lessons`;
-  const quizHref = `/admin/modules/${moduleId}`;
-  const isLessons = pathname === lessonsHref;
+  const quizHref = `/admin/modules/${moduleId}/quiz`;
 
   const tabs = [
-    { href: lessonsHref, label: "Lessons", active: isLessons },
-    { href: quizHref, label: "Quiz", active: !isLessons },
+    { href: detailsHref, label: "Details", active: pathname === detailsHref },
+    { href: lessonsHref, label: "Lessons", active: pathname === lessonsHref },
+    { href: quizHref, label: "Quiz", active: pathname === quizHref },
   ];
 
   return (

@@ -560,34 +560,109 @@ export type Database = {
           },
         ]
       }
+      module_prerequisites: {
+        Row: {
+          module_id: string
+          prerequisite_module_id: string
+        }
+        Insert: {
+          module_id: string
+          prerequisite_module_id: string
+        }
+        Update: {
+          module_id?: string
+          prerequisite_module_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_prerequisites_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "module_prerequisites_prerequisite_module_id_fkey"
+            columns: ["prerequisite_module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      module_tags: {
+        Row: {
+          module_id: string
+          tag_id: string
+        }
+        Insert: {
+          module_id: string
+          tag_id: string
+        }
+        Update: {
+          module_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_tags_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "module_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       modules: {
         Row: {
+          cpd_points: number
           created_at: string
           created_by: string
           description: string | null
+          estimated_duration_minutes: number | null
           id: string
+          learning_objectives: string | null
           level: Database["public"]["Enums"]["content_level"]
+          module_type: string | null
           status: Database["public"]["Enums"]["content_status"]
+          teaching_notes: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          cpd_points?: number
           created_at?: string
           created_by: string
           description?: string | null
+          estimated_duration_minutes?: number | null
           id?: string
+          learning_objectives?: string | null
           level: Database["public"]["Enums"]["content_level"]
+          module_type?: string | null
           status?: Database["public"]["Enums"]["content_status"]
+          teaching_notes?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          cpd_points?: number
           created_at?: string
           created_by?: string
           description?: string | null
+          estimated_duration_minutes?: number | null
           id?: string
+          learning_objectives?: string | null
           level?: Database["public"]["Enums"]["content_level"]
+          module_type?: string | null
           status?: Database["public"]["Enums"]["content_status"]
+          teaching_notes?: string | null
           title?: string
           updated_at?: string
         }
@@ -978,6 +1053,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
       }
       testimonials: {
         Row: {
