@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth/get-profile";
-import { CONTENT_TABLES, type ContentType } from "@/lib/content/types";
+import { CONTENT_TABLES, CONTENT_TYPE_LABEL, type ContentType } from "@/lib/content/types";
 import { ReviewForm } from "./review-form";
 
 export default async function ReviewQueuePage() {
@@ -51,8 +51,8 @@ export default async function ReviewQueuePage() {
             {rows.map((r) => (
               <tr key={r.id} className="border-t border-line align-top">
                 <td className="px-4 py-2 font-medium">{r.title}</td>
-                <td className="px-4 py-2 capitalize text-ink-dim">
-                  {r.content_type}
+                <td className="px-4 py-2 text-ink-dim">
+                  {CONTENT_TYPE_LABEL[r.content_type as ContentType] ?? r.content_type}
                 </td>
                 <td className="px-4 py-2 text-ink-dim">
                   {r.profiles?.full_name || r.profiles?.email}

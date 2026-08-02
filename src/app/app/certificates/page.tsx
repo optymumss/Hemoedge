@@ -7,7 +7,7 @@ export default async function CertificatesPage() {
 
   const { data: certificates } = await supabase
     .from("certificates")
-    .select("id, verification_code, issued_at, curricula(title, level)")
+    .select("id, verification_code, issued_at, curricula(title, level, certificate_title)")
     .eq("user_id", userId!)
     .order("issued_at", { ascending: false });
 
@@ -26,7 +26,7 @@ export default async function CertificatesPage() {
                 <span className="text-xs uppercase text-ink-faint">
                   {c.curricula?.level}
                 </span>
-                <h2 className="font-medium">{c.curricula?.title}</h2>
+                <h2 className="font-medium">{c.curricula?.certificate_title || c.curricula?.title}</h2>
               </div>
               <p className="text-xs text-ink-faint">
                 {new Date(c.issued_at).toLocaleDateString()}
