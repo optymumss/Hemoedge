@@ -406,33 +406,45 @@ export type Database = {
       features: {
         Row: {
           cell_type_id: string | null
+          common_confusions: string | null
           created_at: string
           created_by: string
           definition: string | null
+          differential_diagnoses: string | null
           id: string
+          image_path: string | null
           status: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at: string
+          why_it_matters: string | null
         }
         Insert: {
           cell_type_id?: string | null
+          common_confusions?: string | null
           created_at?: string
           created_by: string
           definition?: string | null
+          differential_diagnoses?: string | null
           id?: string
+          image_path?: string | null
           status?: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at?: string
+          why_it_matters?: string | null
         }
         Update: {
           cell_type_id?: string | null
+          common_confusions?: string | null
           created_at?: string
           created_by?: string
           definition?: string | null
+          differential_diagnoses?: string | null
           id?: string
+          image_path?: string | null
           status?: Database["public"]["Enums"]["content_status"]
           title?: string
           updated_at?: string
+          why_it_matters?: string | null
         }
         Relationships: [
           {
