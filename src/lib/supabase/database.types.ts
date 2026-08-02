@@ -154,6 +154,7 @@ export type Database = {
         Row: {
           code: string
           created_at: string
+          description: string | null
           id: string
           lineage: string
           name: string
@@ -162,6 +163,7 @@ export type Database = {
         Insert: {
           code: string
           created_at?: string
+          description?: string | null
           id?: string
           lineage: string
           name: string
@@ -170,6 +172,7 @@ export type Database = {
         Update: {
           code?: string
           created_at?: string
+          description?: string | null
           id?: string
           lineage?: string
           name?: string

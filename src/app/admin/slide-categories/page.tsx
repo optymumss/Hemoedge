@@ -15,6 +15,7 @@ export default async function SlideCategoriesPage() {
   const rows: CategoryRow[] = (categories ?? []).map((c) => ({
     id: c.id,
     name: c.name,
+    parentId: c.parent_id,
     parentName: c.parent_id ? byId.get(c.parent_id)?.name ?? null : null,
     description: c.description,
   }));
@@ -31,7 +32,7 @@ export default async function SlideCategoriesPage() {
       </div>
 
       <div className="mt-6">
-        <CategoriesTable rows={rows} />
+        <CategoriesTable rows={rows} parents={topLevel} />
       </div>
     </div>
   );
