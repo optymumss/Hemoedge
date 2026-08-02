@@ -8,7 +8,7 @@ export default async function LearnerCasesPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">Cases</h1>
+      <h1 className="text-xl font-semibold">Case Studies</h1>
       <p className="mt-1 text-sm text-ink-dim">
         Real-world haematology cases for clinical learning.
       </p>

@@ -32,7 +32,7 @@ export default async function LearnerHome() {
           <p className="mt-1 text-2xl font-semibold">{modules.length}</p>
         </div>
         <div className="rounded-lg border border-line p-4">
-          <p className="text-xs uppercase text-ink-faint">Cases available</p>
+          <p className="text-xs uppercase text-ink-faint">Case studies available</p>
           <p className="mt-1 text-2xl font-semibold">{cases.length}</p>
         </div>
       </div>

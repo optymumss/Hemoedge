@@ -13,9 +13,9 @@ export default async function CasesPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">Cases</h1>
+      <h1 className="text-xl font-semibold">Case Studies</h1>
       <p className="mt-1 text-sm text-ink-dim">
-        Real-world clinical scenarios with ordered slides and case questions.
+        Real-world clinical scenarios built around a WSI slide, with case context, lab values, and a knowledge check.
       </p>
 
       <div className="mt-6 rounded-lg border border-line p-4">
@@ -43,6 +43,9 @@ export default async function CasesPage() {
                 <td className="px-4 py-2 text-right">
                   <div className="flex items-center justify-end gap-3">
                     <Link href={`/admin/cases/${c.id}`} className="text-xs text-ink-dim underline">
+                      Edit details
+                    </Link>
+                    <Link href={`/admin/cases/${c.id}/quiz`} className="text-xs text-ink-dim underline">
                       Manage quiz
                     </Link>
                     {(c.status === "draft" || c.status === "changes_requested") && (
@@ -59,7 +62,7 @@ export default async function CasesPage() {
             {(cases ?? []).length === 0 && (
               <tr>
                 <td colSpan={4} className="px-4 py-6 text-center text-ink-faint">
-                  No cases yet.
+                  No case studies yet.
                 </td>
               </tr>
             )}

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getEffectiveUserId, getActiveImpersonation } from "@/lib/auth/impersonation";
+import { CaseSlideViewer } from "./case-slide-viewer";
 import { QuizForm } from "./quiz-form";
 
 export default async function LearnerCaseDetailPage({
@@ -12,14 +13,21 @@ export default async function LearnerCaseDetailPage({
 
   const { data: case_ } = await supabase
     .from("cases")
-    .select("id, title, level, description, status")
+    .select(
+      "id, title, level, description, status, slide_id, case_context, lab_values, final_diagnosis, learning_points",
+    )
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
 
   if (!case_) {
-    return <p className="text-sm text-ink-dim">Case not found or not yet published.</p>;
+    return <p className="text-sm text-ink-dim">Case study not found or not yet published.</p>;
   }
+
+  const { data: featureLinks } = await supabase
+    .from("case_features")
+    .select("features(id, title)")
+    .eq("case_id", id);
 
   const { data: questions } = await supabase
     .from("quiz_questions")
@@ -47,9 +55,61 @@ export default async function LearnerCaseDetailPage({
         <p className="mt-4 max-w-2xl text-sm text-ink-dim">{case_.description}</p>
       )}
 
+      {case_.slide_id && (
+        <div className="mt-6">
+          <CaseSlideViewer slideId={case_.slide_id} />
+        </div>
+      )}
+
+      {case_.case_context && (
+        <div className="mt-6 max-w-2xl">
+          <h2 className="text-sm font-semibold">Case context</h2>
+          <p className="mt-1 whitespace-pre-wrap text-sm text-ink-dim">{case_.case_context}</p>
+        </div>
+      )}
+
+      {case_.lab_values && (
+        <div className="mt-6 max-w-2xl">
+          <h2 className="text-sm font-semibold">FBC / lab values</h2>
+          <p className="mt-1 whitespace-pre-wrap text-sm text-ink-dim">{case_.lab_values}</p>
+        </div>
+      )}
+
+      {(featureLinks ?? []).length > 0 && (
+        <div className="mt-6 max-w-2xl">
+          <h2 className="text-sm font-semibold">Related features</h2>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {(featureLinks ?? []).map((f) =>
+              f.features ? (
+                <span
+                  key={f.features.id}
+                  className="rounded-full bg-surface-sunken px-2.5 py-1 text-xs text-ink"
+                >
+                  {f.features.title}
+                </span>
+              ) : null,
+            )}
+          </div>
+        </div>
+      )}
+
+      {case_.final_diagnosis && (
+        <div className="mt-6 max-w-2xl">
+          <h2 className="text-sm font-semibold">Final diagnosis</h2>
+          <p className="mt-1 text-sm text-ink-dim">{case_.final_diagnosis}</p>
+        </div>
+      )}
+
+      {case_.learning_points && (
+        <div className="mt-6 max-w-2xl">
+          <h2 className="text-sm font-semibold">Key learning points</h2>
+          <p className="mt-1 whitespace-pre-wrap text-sm text-ink-dim">{case_.learning_points}</p>
+        </div>
+      )}
+
       {lastAttempt && (
         <div
-          className={`mt-4 rounded-md px-3 py-2 text-sm ${
+          className={`mt-6 rounded-md px-3 py-2 text-sm ${
             lastAttempt.passed ? "bg-success-soft text-success-soft-ink" : "bg-warning-soft text-warning-soft-ink"
           }`}
         >
@@ -78,7 +138,7 @@ export default async function LearnerCaseDetailPage({
         )
       ) : (
         <p className="mt-6 text-sm text-ink-faint">
-          No quiz has been added to this case yet.
+          No quiz has been added to this case study yet.
         </p>
       )}
     </div>

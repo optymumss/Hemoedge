@@ -15,6 +15,6 @@ export const CONTENT_TYPE_LABEL: Record<ContentType, string> = {
   slide: "Slide",
   feature: "Feature",
   module: "Module",
-  case: "Case",
+  case: "Case Study",
   curriculum: "Learning Pathway",
 };
