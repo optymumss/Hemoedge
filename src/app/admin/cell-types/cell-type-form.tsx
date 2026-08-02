@@ -48,6 +48,14 @@ export function CellTypeForm() {
           <option value="platelet">Platelet</option>
         </select>
       </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-ink-dim" htmlFor="cell-type-description">Description (optional)</label>
+        <input
+          id="cell-type-description"
+          name="description"
+          className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
+        />
+      </div>
       <button
         type="submit"
         disabled={pending}
