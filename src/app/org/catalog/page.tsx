@@ -40,7 +40,7 @@ export default async function CatalogPage() {
   }[] = [
     { label: "Modules", type: "module", items: modules ?? [] },
     { label: "Cases", type: "case", items: cases ?? [] },
-    { label: "Curricula", type: "curriculum", items: curricula ?? [] },
+    { label: "Learning Pathways", type: "curriculum", items: curricula ?? [] },
   ];
 
   return (

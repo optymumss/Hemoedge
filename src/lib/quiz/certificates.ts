@@ -24,10 +24,10 @@ export async function checkAndIssueCertificates(
   for (const link of curriculumLinks ?? []) {
     const { data: curriculum } = await supabase
       .from("curricula")
-      .select("id, pass_threshold")
+      .select("id, pass_threshold, certificate_awarded")
       .eq("id", link.curriculum_id)
       .single();
-    if (!curriculum) continue;
+    if (!curriculum || !curriculum.certificate_awarded) continue;
 
     const { data: stageModules } = await supabase
       .from("curriculum_modules")

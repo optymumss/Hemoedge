@@ -8,14 +8,14 @@ export default async function CurriculaPage() {
   const supabase = await createClient();
   const { data: curricula } = await supabase
     .from("curricula")
-    .select("id, title, level, pass_threshold, status")
+    .select("id, title, level, pass_threshold, status, version")
     .order("created_at", { ascending: false });
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">Curricula</h1>
+      <h1 className="text-xl font-semibold">Learning Pathways</h1>
       <p className="mt-1 text-sm text-ink-dim">
-        Versioned sets of modules that lead to a certificate.
+        Ordered sets of modules that lead to a certificate.
       </p>
 
       <div className="mt-6 rounded-lg border border-line p-4">
@@ -28,6 +28,7 @@ export default async function CurriculaPage() {
             <tr>
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Level</th>
+              <th className="px-4 py-2">Version</th>
               <th className="px-4 py-2">Pass Threshold</th>
               <th className="px-4 py-2">Status</th>
               <th className="px-4 py-2" />
@@ -42,6 +43,7 @@ export default async function CurriculaPage() {
                   </Link>
                 </td>
                 <td className="px-4 py-2 capitalize text-ink-dim">{c.level}</td>
+                <td className="px-4 py-2 text-ink-dim">v{c.version}</td>
                 <td className="px-4 py-2 text-ink-dim">{c.pass_threshold}%</td>
                 <td className="px-4 py-2">
                   <StatusBadge status={c.status} />
@@ -59,8 +61,8 @@ export default async function CurriculaPage() {
             ))}
             {(curricula ?? []).length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-ink-faint">
-                  No curricula yet.
+                <td colSpan={6} className="px-4 py-6 text-center text-ink-faint">
+                  No learning pathways yet.
                 </td>
               </tr>
             )}

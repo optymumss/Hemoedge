@@ -28,7 +28,7 @@ export const adminNav: NavSection[] = [
     section: "Module Management",
     items: [
       { label: "Modules", href: "/admin/modules" },
-      { label: "Curricula", href: "/admin/curricula" },
+      { label: "Learning Pathways", href: "/admin/curricula" },
     ],
   },
   {

@@ -304,34 +304,58 @@ export type Database = {
       }
       curricula: {
         Row: {
+          certificate_awarded: boolean
+          certificate_title: string | null
+          cpd_points: number
           created_at: string
           created_by: string
+          description: string | null
+          estimated_completion_minutes: number | null
           id: string
+          learning_outcomes: string | null
           level: Database["public"]["Enums"]["content_level"]
           pass_threshold: number
+          pathway_type: string | null
           status: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at: string
+          version: number
         }
         Insert: {
+          certificate_awarded?: boolean
+          certificate_title?: string | null
+          cpd_points?: number
           created_at?: string
           created_by: string
+          description?: string | null
+          estimated_completion_minutes?: number | null
           id?: string
+          learning_outcomes?: string | null
           level: Database["public"]["Enums"]["content_level"]
           pass_threshold?: number
+          pathway_type?: string | null
           status?: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at?: string
+          version?: number
         }
         Update: {
+          certificate_awarded?: boolean
+          certificate_title?: string | null
+          cpd_points?: number
           created_at?: string
           created_by?: string
+          description?: string | null
+          estimated_completion_minutes?: number | null
           id?: string
+          learning_outcomes?: string | null
           level?: Database["public"]["Enums"]["content_level"]
           pass_threshold?: number
+          pathway_type?: string | null
           status?: Database["public"]["Enums"]["content_status"]
           title?: string
           updated_at?: string
+          version?: number
         }
         Relationships: [
           {
