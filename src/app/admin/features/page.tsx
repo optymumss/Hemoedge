@@ -8,10 +8,23 @@ export default async function FeaturesPage() {
   const [{ data: features }, { data: cellTypes }] = await Promise.all([
     supabase
       .from("features")
-      .select("id, title, definition, status, cell_type_id, cell_types(name)")
+      .select("id, title, definition, status, cell_type_id, image_path, cell_types(name)")
       .order("created_at", { ascending: false }),
     supabase.from("cell_types").select("id, name").order("name"),
   ]);
+
+  const imageUrls = new Map(
+    await Promise.all(
+      (features ?? [])
+        .filter((f) => f.image_path)
+        .map(async (f) => {
+          const { data } = await supabase.storage
+            .from("feature-images")
+            .createSignedUrl(f.image_path!, 60 * 10);
+          return [f.id, data?.signedUrl ?? null] as const;
+        }),
+    ),
+  );
 
   return (
     <div>
@@ -28,6 +41,7 @@ export default async function FeaturesPage() {
         <table className="w-full text-sm">
           <thead className="bg-surface-sunken text-left text-xs uppercase text-ink-dim">
             <tr>
+              <th className="px-4 py-2">Image</th>
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Cell Type</th>
               <th className="px-4 py-2">Status</th>
@@ -37,6 +51,18 @@ export default async function FeaturesPage() {
           <tbody>
             {(features ?? []).map((f) => (
               <tr key={f.id} className="border-t border-line">
+                <td className="px-4 py-2">
+                  {imageUrls.get(f.id) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={imageUrls.get(f.id)!}
+                      alt=""
+                      className="h-10 w-10 rounded object-cover"
+                    />
+                  ) : (
+                    <span className="text-ink-faint">—</span>
+                  )}
+                </td>
                 <td className="px-4 py-2 font-medium">{f.title}</td>
                 <td className="px-4 py-2 text-ink-dim">
                   {f.cell_types?.name ?? "—"}
@@ -57,7 +83,7 @@ export default async function FeaturesPage() {
             ))}
             {(features ?? []).length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-ink-faint">
+                <td colSpan={5} className="px-4 py-6 text-center text-ink-faint">
                   No features yet.
                 </td>
               </tr>
