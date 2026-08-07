@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/lib/supabase/database.types";
 
@@ -27,12 +28,14 @@ export async function createModule(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not signed in." };
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("modules")
-    .insert({ title, level, description, created_by: user.id });
+    .insert({ title, level, description, created_by: user.id })
+    .select("id")
+    .single();
 
   if (error) return { error: error.message };
 
   revalidatePath("/admin/modules");
-  return undefined;
+  redirect(`/admin/modules/${data.id}`);
 }

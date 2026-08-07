@@ -28,7 +28,7 @@ export default async function ModuleQuestionsPage({
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">{module_.title} — Quiz</h1>
+      <h1 className="text-lg font-semibold">Quiz</h1>
       <p className="mt-1 text-sm text-ink-dim">
         Multiple-choice knowledge check for this module.
       </p>

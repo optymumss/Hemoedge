@@ -10,14 +10,14 @@ export function ModuleForm() {
   );
 
   return (
-    <form action={action} className="flex flex-wrap items-end gap-2">
+    <form action={action} className="flex flex-col gap-2">
       <div className="flex flex-col gap-1">
         <label className="text-xs text-ink-dim" htmlFor="module-title">Title</label>
         <input
           id="module-title"
           name="title"
           required
-          className="w-64 rounded-md border border-line-strong px-2 py-1.5 text-sm"
+          className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
         />
       </div>
       <div className="flex flex-col gap-1">
@@ -27,7 +27,7 @@ export function ModuleForm() {
           name="level"
           required
           defaultValue=""
-          className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
+          className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
         >
           <option value="" disabled>
             Choose…
@@ -37,8 +37,8 @@ export function ModuleForm() {
           <option value="advanced">Advanced</option>
         </select>
       </div>
-      <div className="flex flex-1 min-w-64 flex-col gap-1">
-        <label className="text-xs text-ink-dim" htmlFor="module-description">Description (optional, grounds the AI Tutor)</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-ink-dim" htmlFor="module-description">Description (optional)</label>
         <input
           id="module-description"
           name="description"
@@ -52,7 +52,7 @@ export function ModuleForm() {
       >
         {pending ? "Creating…" : "Create draft module"}
       </button>
-      {state?.error && <p className="w-full text-sm text-danger">{state.error}</p>}
+      {state?.error && <p className="text-sm text-danger">{state.error}</p>}
     </form>
   );
 }

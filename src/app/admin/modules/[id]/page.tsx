@@ -45,7 +45,7 @@ export default async function ModuleDetailsPage({
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">{module_.title} — Details</h1>
+      <h1 className="text-lg font-semibold">Details</h1>
       <p className="mt-1 text-sm text-ink-dim">Core module fields, tags, and prerequisites.</p>
 
       <div className="mt-6">

@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { updateModuleDetails, type FormState } from "./actions";
 
-const MODULE_TYPE_LABEL: Record<string, string> = {
+export const MODULE_TYPE_LABEL: Record<string, string> = {
   foundation: "Foundation",
   fbc: "FBC",
   morphology: "Morphology",
