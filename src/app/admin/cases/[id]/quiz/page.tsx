@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { QuestionForm } from "./question-form";
 import { deleteQuestion } from "./actions";
 
-export default async function ModuleQuestionsPage({
+export default async function CaseQuestionsPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -10,8 +10,8 @@ export default async function ModuleQuestionsPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: module_ } = await supabase
-    .from("modules")
+  const { data: case_ } = await supabase
+    .from("cases")
     .select("id, title, level, status")
     .eq("id", id)
     .single();
@@ -19,22 +19,22 @@ export default async function ModuleQuestionsPage({
   const { data: questions } = await supabase
     .from("quiz_questions")
     .select("id, question_text, choices, correct_choice_id")
-    .eq("module_id", id)
+    .eq("case_id", id)
     .order("position");
 
-  if (!module_) {
-    return <p className="text-sm text-ink-dim">Module not found.</p>;
+  if (!case_) {
+    return <p className="text-sm text-ink-dim">Case study not found.</p>;
   }
 
   return (
     <div>
-      <h1 className="text-lg font-semibold">Quiz</h1>
+      <h1 className="text-xl font-semibold">{case_.title} — Quiz</h1>
       <p className="mt-1 text-sm text-ink-dim">
-        Multiple-choice knowledge check for this module.
+        Multiple-choice knowledge check for this case study.
       </p>
 
       <div className="mt-6 rounded-lg border border-line p-4">
-        <QuestionForm moduleId={module_.id} />
+        <QuestionForm caseId={case_.id} />
       </div>
 
       <div className="mt-6 flex flex-col gap-3">
@@ -48,7 +48,7 @@ export default async function ModuleQuestionsPage({
                 </p>
                 <form action={deleteQuestion}>
                   <input type="hidden" name="id" value={q.id} />
-                  <input type="hidden" name="module_id" value={module_.id} />
+                  <input type="hidden" name="case_id" value={case_.id} />
                   <button type="submit" className="text-xs text-danger underline">
                     Delete
                   </button>

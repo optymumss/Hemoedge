@@ -51,7 +51,7 @@ export function CaseForm() {
         disabled={pending}
         className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
       >
-        {pending ? "Creating…" : "Create draft case"}
+        {pending ? "Creating…" : "Create draft case study"}
       </button>
       {state?.error && <p className="w-full text-sm text-danger">{state.error}</p>}
     </form>

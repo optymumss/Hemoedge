@@ -31,7 +31,7 @@ export default async function ModuleLessonsPage({
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">{module_.title} — Lessons</h1>
+      <h1 className="text-lg font-semibold">Lessons</h1>
       <p className="mt-1 text-sm text-ink-dim">
         Ordered content units learners work through. Link a slide to embed the WSI viewer.
       </p>

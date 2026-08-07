@@ -33,7 +33,7 @@ export const adminNav: NavSection[] = [
   },
   {
     section: "Case Management",
-    items: [{ label: "Cases", href: "/admin/cases" }],
+    items: [{ label: "Case Studies", href: "/admin/cases" }],
   },
   {
     section: "Website",
@@ -68,7 +68,7 @@ export const appNav: NavSection[] = [
     items: [
       { label: "Dashboard", href: "/app" },
       { label: "Modules", href: "/app/modules" },
-      { label: "Cases", href: "/app/cases" },
+      { label: "Case Studies", href: "/app/cases" },
       { label: "Library", href: "/app/library" },
       { label: "Competency", href: "/app/competency" },
       { label: "Certificates", href: "/app/certificates" },

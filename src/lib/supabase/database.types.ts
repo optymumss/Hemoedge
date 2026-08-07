@@ -109,33 +109,114 @@ export type Database = {
         }
         Relationships: []
       }
+      case_features: {
+        Row: {
+          case_id: string
+          feature_id: string
+        }
+        Insert: {
+          case_id: string
+          feature_id: string
+        }
+        Update: {
+          case_id?: string
+          feature_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_features_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_features_feature_id_fkey"
+            columns: ["feature_id"]
+            isOneToOne: false
+            referencedRelation: "features"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_tags: {
+        Row: {
+          case_id: string
+          tag_id: string
+        }
+        Insert: {
+          case_id: string
+          tag_id: string
+        }
+        Update: {
+          case_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_tags_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cases: {
         Row: {
+          case_context: string | null
+          cpd_points: number
           created_at: string
           created_by: string
           description: string | null
+          estimated_time_minutes: number | null
+          final_diagnosis: string | null
           id: string
+          lab_values: string | null
+          learning_points: string | null
           level: Database["public"]["Enums"]["content_level"]
+          slide_id: string | null
           status: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at: string
         }
         Insert: {
+          case_context?: string | null
+          cpd_points?: number
           created_at?: string
           created_by: string
           description?: string | null
+          estimated_time_minutes?: number | null
+          final_diagnosis?: string | null
           id?: string
+          lab_values?: string | null
+          learning_points?: string | null
           level: Database["public"]["Enums"]["content_level"]
+          slide_id?: string | null
           status?: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at?: string
         }
         Update: {
+          case_context?: string | null
+          cpd_points?: number
           created_at?: string
           created_by?: string
           description?: string | null
+          estimated_time_minutes?: number | null
+          final_diagnosis?: string | null
           id?: string
+          lab_values?: string | null
+          learning_points?: string | null
           level?: Database["public"]["Enums"]["content_level"]
+          slide_id?: string | null
           status?: Database["public"]["Enums"]["content_status"]
           title?: string
           updated_at?: string
@@ -146,6 +227,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cases_slide_id_fkey"
+            columns: ["slide_id"]
+            isOneToOne: false
+            referencedRelation: "slides"
             referencedColumns: ["id"]
           },
         ]
