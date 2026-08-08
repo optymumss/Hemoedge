@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getSlideViewUrl } from "@/lib/slides/get-slide-view-url";
+import { recordSlideView } from "@/lib/slides/record-slide-view";
 import { WsiViewer } from "@/components/wsi-viewer";
 
 export function CaseSlideViewer({ slideId }: { slideId: string }) {
@@ -15,6 +16,7 @@ export function CaseSlideViewer({ slideId }: { slideId: string }) {
       if (result.error) setError(result.error);
       else if (result.url) setUrl(result.url);
     });
+    recordSlideView(slideId);
     return () => {
       cancelled = true;
     };
