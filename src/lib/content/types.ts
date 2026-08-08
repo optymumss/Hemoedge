@@ -4,6 +4,7 @@ export const CONTENT_TABLES = {
   module: "modules",
   case: "cases",
   curriculum: "curricula",
+  wbc_diff_exercise: "wbc_diff_exercises",
 } as const;
 
 export type ContentType = keyof typeof CONTENT_TABLES;
@@ -17,4 +18,5 @@ export const CONTENT_TYPE_LABEL: Record<ContentType, string> = {
   module: "Module",
   case: "Case Study",
   curriculum: "Learning Pathway",
+  wbc_diff_exercise: "WBC Diff Exercise",
 };

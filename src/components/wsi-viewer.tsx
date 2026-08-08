@@ -24,16 +24,53 @@ const NATIVE_MAGNIFICATION = 40;
 const PRESETS = [4, 10, 20, 40, 80];
 const MAGNIFICATION_TOLERANCE = 0.05;
 
-export function WsiViewer({ imageUrl }: { imageUrl: string }) {
+const TONE_COLOR: Record<string, string> = {
+  neutral: "#38bdf8",
+  answered: "#a78bfa",
+  correct: "#22c55e",
+  incorrect: "#ef4444",
+};
+
+export type WsiHotspot = {
+  id: string;
+  xPct: number;
+  yPct: number;
+  tone?: "neutral" | "answered" | "correct" | "incorrect";
+};
+
+export function WsiViewer({
+  imageUrl,
+  hotspots,
+  onImageClick,
+}: {
+  imageUrl: string;
+  /** Normalized (0-1) pins rendered over the image — the WBC diff counter's
+   * ground-truth/answer markers. Purely visual; click handling is separate. */
+  hotspots?: WsiHotspot[];
+  /** Fires with the image-normalized (0-1) coordinates of a plain click —
+   * used by the WBC diff counter's annotate/classify modes. Matching a
+   * click to the nearest hotspot (within its tolerance) is the caller's
+   * job, not the viewer's. */
+  onImageClick?: (xPct: number, yPct: number) => void;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
+  const dimensionsRef = useRef<{ x: number; y: number } | null>(null);
+  const overlayElsRef = useRef<HTMLElement[]>([]);
+  const onImageClickRef = useRef(onImageClick);
   const [activeMagnification, setActiveMagnification] = useState<number | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    onImageClickRef.current = onImageClick;
+  }, [onImageClick]);
 
   useEffect(() => {
     if (!containerRef.current) return;
     let cancelled = false;
     setLoadError(null);
+    setReady(false);
 
     import("openseadragon").then(({ default: OpenSeadragon }) => {
       if (cancelled || !containerRef.current) return;
@@ -72,9 +109,24 @@ export function WsiViewer({ imageUrl }: { imageUrl: string }) {
         setActiveMagnification(match ?? null);
       };
       viewer.addHandler("zoom", syncActivePreset);
-      viewer.addHandler("open", syncActivePreset);
+      viewer.addHandler("open", () => {
+        syncActivePreset();
+        const dims = viewer.world.getItemAt(0)?.source.dimensions;
+        if (dims) dimensionsRef.current = { x: dims.x, y: dims.y };
+        setReady(true);
+      });
       viewer.addHandler("open-failed", () => {
         setLoadError("This slide's image couldn't be loaded. The file may be missing, corrupted, or in an unsupported format.");
+      });
+      viewer.addHandler("canvas-click", (event) => {
+        const handler = onImageClickRef.current;
+        if (!event.quick || !handler || !dimensionsRef.current) return;
+        const viewportPoint = viewer.viewport.pointFromPixel(event.position);
+        const imagePoint = viewer.viewport.viewportToImageCoordinates(viewportPoint);
+        const xPct = imagePoint.x / dimensionsRef.current.x;
+        const yPct = imagePoint.y / dimensionsRef.current.y;
+        if (xPct < 0 || xPct > 1 || yPct < 0 || yPct > 1) return;
+        handler(xPct, yPct);
       });
     });
 
@@ -84,6 +136,40 @@ export function WsiViewer({ imageUrl }: { imageUrl: string }) {
       viewerRef.current = null;
     };
   }, [imageUrl]);
+
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    const dims = dimensionsRef.current;
+    if (!viewer || !ready || !dims) return;
+
+    import("openseadragon").then(({ default: OpenSeadragon }) => {
+      for (const el of overlayElsRef.current) viewer.removeOverlay(el);
+      overlayElsRef.current = [];
+
+      for (const spot of hotspots ?? []) {
+        const el = document.createElement("div");
+        el.style.width = "14px";
+        el.style.height = "14px";
+        el.style.borderRadius = "50%";
+        el.style.border = "2px solid white";
+        el.style.boxShadow = "0 0 0 1px rgba(0,0,0,0.4)";
+        el.style.background = TONE_COLOR[spot.tone ?? "neutral"];
+        el.style.pointerEvents = "none";
+
+        const point = viewer.viewport.imageToViewportCoordinates(
+          spot.xPct * dims.x,
+          spot.yPct * dims.y,
+        );
+        viewer.addOverlay({ element: el, location: point, placement: OpenSeadragon.Placement.CENTER });
+        overlayElsRef.current.push(el);
+      }
+    });
+
+    return () => {
+      for (const el of overlayElsRef.current) viewer.removeOverlay(el);
+      overlayElsRef.current = [];
+    };
+  }, [hotspots, ready]);
 
   function goToMagnification(magnification: number) {
     const viewer = viewerRef.current;

@@ -36,6 +36,10 @@ export const adminNav: NavSection[] = [
     items: [{ label: "Case Studies", href: "/admin/cases" }],
   },
   {
+    section: "Assessments",
+    items: [{ label: "WBC Diff Counter", href: "/admin/wbc-diff" }],
+  },
+  {
     section: "Website",
     items: [
       { label: "Pages", href: "/admin/pages", roles: ["super_admin"] },
@@ -69,6 +73,7 @@ export const appNav: NavSection[] = [
       { label: "Dashboard", href: "/app" },
       { label: "Modules", href: "/app/modules" },
       { label: "Case Studies", href: "/app/cases" },
+      { label: "WBC Diff Counter", href: "/app/wbc-diff" },
       { label: "Library", href: "/app/library" },
       { label: "Competency", href: "/app/competency" },
       { label: "Certificates", href: "/app/certificates" },
