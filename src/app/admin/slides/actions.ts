@@ -1,15 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { createClient } from "@/lib/supabase/server";
+import { r2Client, R2_BUCKET_NAME, r2PublicUrl, isR2Url, r2KeyFromPublicUrl } from "@/lib/r2";
 
 export type UploadTarget =
-  | { slideId: string; path: string; token: string }
+  | { slideId: string; uploadUrl: string }
   | { error: string };
 
-/** Creates the draft slide row and a signed Storage upload URL — the actual
- * file bytes go straight from the browser to Storage, never through this
- * server, so large WSI files aren't bounded by the server-action body limit. */
+/** Creates the draft slide row and a presigned R2 PUT URL — the actual file
+ * bytes go straight from the browser to R2, never through this server, so
+ * large WSI files aren't bounded by the server-action body limit. Stores the
+ * object's public URL directly as file_path (R2 needs no signing to read),
+ * which is also how downstream code tells a new R2 upload apart from a
+ * legacy Supabase Storage key. */
 export async function createSlideUploadTarget(
   title: string,
   categoryId: string | null,
@@ -35,27 +41,30 @@ export async function createSlideUploadTarget(
   }
 
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const path = `${slide.id}/${safeName}`;
+  const key = `${slide.id}/${safeName}`;
 
-  const { data: signed, error: signError } = await supabase.storage
-    .from("slides")
-    .createSignedUploadUrl(path);
-
-  if (signError || !signed) {
+  let uploadUrl: string;
+  try {
+    uploadUrl = await getSignedUrl(
+      r2Client,
+      new PutObjectCommand({ Bucket: R2_BUCKET_NAME, Key: key }),
+      { expiresIn: 60 * 10 },
+    );
+  } catch {
     await supabase.from("slides").delete().eq("id", slide.id);
-    return { error: signError?.message ?? "Couldn't prepare the upload." };
+    return { error: "Couldn't prepare the upload." };
   }
 
   const { error: updateError } = await supabase
     .from("slides")
-    .update({ file_path: path })
+    .update({ file_path: r2PublicUrl(key) })
     .eq("id", slide.id);
 
   if (updateError) {
     return { error: updateError.message };
   }
 
-  return { slideId: slide.id, path, token: signed.token };
+  return { slideId: slide.id, uploadUrl };
 }
 
 export async function confirmSlideUpload(
@@ -94,7 +103,13 @@ export async function deleteSlide(formData: FormData) {
   if (error) return;
 
   if (slide?.file_path) {
-    await supabase.storage.from("slides").remove([slide.file_path]);
+    if (isR2Url(slide.file_path)) {
+      await r2Client.send(
+        new DeleteObjectCommand({ Bucket: R2_BUCKET_NAME, Key: r2KeyFromPublicUrl(slide.file_path) }),
+      );
+    } else {
+      await supabase.storage.from("slides").remove([slide.file_path]);
+    }
   }
 
   revalidatePath("/admin/slides");

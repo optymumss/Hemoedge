@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { createSlideUploadTarget, confirmSlideUpload } from "./actions";
 
 export function UploadForm({
@@ -34,13 +33,14 @@ export function UploadForm({
         return;
       }
 
-      const supabase = createClient();
-      const { error: uploadError } = await supabase.storage
-        .from("slides")
-        .uploadToSignedUrl(target.path, target.token, file);
+      const uploadResponse = await fetch(target.uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type || "application/octet-stream" },
+        body: file,
+      });
 
-      if (uploadError) {
-        setError(uploadError.message);
+      if (!uploadResponse.ok) {
+        setError("Upload failed — check your connection and try again.");
         return;
       }
 
