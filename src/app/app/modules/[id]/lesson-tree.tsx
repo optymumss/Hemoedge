@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { getSlideViewUrl } from "@/lib/slides/get-slide-view-url";
+import { recordSlideView } from "@/lib/slides/record-slide-view";
 import { WsiViewer } from "@/components/wsi-viewer";
 
 type Lesson = {
@@ -29,6 +30,7 @@ export function LessonTree({ lessons }: { lessons: Lesson[] }) {
         setSlideErrors((e) => ({ ...e, [lesson.id]: result.error! }));
       } else if (result.url) {
         setSlideUrls((u) => ({ ...u, [lesson.id]: result.url! }));
+        recordSlideView(lesson.slide_id);
       }
     }
   }

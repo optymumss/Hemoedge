@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getEffectiveUserId } from "@/lib/auth/impersonation";
 
@@ -36,9 +37,12 @@ export default async function CertificatesPage() {
           </div>
         ))}
         {(certificates ?? []).length === 0 && (
-          <p className="py-8 text-center text-sm text-ink-faint">
-            No certificates earned yet — complete a competency stage to earn one.
-          </p>
+          <div className="py-8 text-center text-sm text-ink-faint">
+            <p>No certificates earned yet.</p>
+            <Link href="/app/competency" className="mt-1 inline-block text-accent hover:underline">
+              View your competency pathway
+            </Link>
+          </div>
         )}
       </div>
     </div>

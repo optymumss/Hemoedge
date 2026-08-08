@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { WsiViewer, type WsiHotspot } from "@/components/wsi-viewer";
 import { getSlideViewUrl } from "@/lib/slides/get-slide-view-url";
+import { recordSlideView } from "@/lib/slides/record-slide-view";
 import { submitAttempt } from "./actions";
 
 type Hotspot = { id: string; x_pct: number; y_pct: number; tolerance_pct: number };
@@ -47,6 +48,7 @@ export function ClassifyExercise({
       if (r.error) setLoadError(r.error);
       else if (r.url) setUrl(r.url);
     });
+    recordSlideView(slideId);
     return () => {
       cancelled = true;
     };

@@ -1115,6 +1115,42 @@ export type Database = {
           },
         ]
       }
+      slide_views: {
+        Row: {
+          id: string
+          slide_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          slide_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          slide_id?: string
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slide_views_slide_id_fkey"
+            columns: ["slide_id"]
+            isOneToOne: false
+            referencedRelation: "slides"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "slide_views_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       slides: {
         Row: {
           category_id: string | null

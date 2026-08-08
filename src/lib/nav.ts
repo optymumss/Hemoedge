@@ -68,16 +68,24 @@ export const orgNav: NavSection[] = [
 
 export const appNav: NavSection[] = [
   {
-    section: "Learning",
+    section: "",
     items: [
       { label: "Dashboard", href: "/app" },
-      { label: "Modules", href: "/app/modules" },
-      { label: "Case Studies", href: "/app/cases" },
-      { label: "WBC Diff Counter", href: "/app/wbc-diff" },
-      { label: "Library", href: "/app/library" },
+      { label: "Cases", href: "/app/cases" },
       { label: "Competency", href: "/app/competency" },
       { label: "Certificates", href: "/app/certificates" },
     ],
+  },
+  {
+    section: "Learning",
+    items: [
+      { label: "Modules", href: "/app/modules" },
+      { label: "Library", href: "/app/library" },
+    ],
+  },
+  {
+    section: "Tools",
+    items: [{ label: "WBC Diff Counter", href: "/app/wbc-diff" }],
   },
 ];
 
