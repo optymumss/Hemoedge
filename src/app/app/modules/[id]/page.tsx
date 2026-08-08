@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getEffectiveUserId, getActiveImpersonation } from "@/lib/auth/impersonation";
 import { QuizForm } from "./quiz-form";
@@ -47,6 +48,13 @@ export default async function LearnerModuleDetailPage({
 
   const lastAttempt = attempts?.[0];
 
+  const { data: diffExercise } = await supabase
+    .from("wbc_diff_exercises")
+    .select("id, title")
+    .eq("module_id", id)
+    .eq("status", "published")
+    .maybeSingle();
+
   return (
     <div>
       <h1 className="text-xl font-semibold">{module_.title}</h1>
@@ -58,6 +66,14 @@ export default async function LearnerModuleDetailPage({
       {(lessons ?? []).length > 0 && (
         <div className="mt-6">
           <LessonTree lessons={lessons ?? []} />
+        </div>
+      )}
+
+      {diffExercise && (
+        <div className="mt-4 max-w-2xl rounded-md border border-line p-3">
+          <Link href={`/app/wbc-diff/${diffExercise.id}`} className="text-sm font-medium hover:underline">
+            Practice: {diffExercise.title} →
+          </Link>
         </div>
       )}
 

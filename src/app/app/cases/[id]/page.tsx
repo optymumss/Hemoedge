@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getEffectiveUserId, getActiveImpersonation } from "@/lib/auth/impersonation";
 import { CaseSlideViewer } from "./case-slide-viewer";
@@ -34,6 +35,13 @@ export default async function LearnerCaseDetailPage({
     .select("id, question_text, choices")
     .eq("case_id", id)
     .order("position");
+
+  const { data: diffExercise } = await supabase
+    .from("wbc_diff_exercises")
+    .select("id, title")
+    .eq("case_id", id)
+    .eq("status", "published")
+    .maybeSingle();
 
   const userId = await getEffectiveUserId();
   const impersonation = await getActiveImpersonation();
@@ -104,6 +112,14 @@ export default async function LearnerCaseDetailPage({
         <div className="mt-6 max-w-2xl">
           <h2 className="text-sm font-semibold">Key learning points</h2>
           <p className="mt-1 whitespace-pre-wrap text-sm text-ink-dim">{case_.learning_points}</p>
+        </div>
+      )}
+
+      {diffExercise && (
+        <div className="mt-6 max-w-2xl rounded-md border border-line p-3">
+          <Link href={`/app/wbc-diff/${diffExercise.id}`} className="text-sm font-medium hover:underline">
+            Practice: {diffExercise.title} →
+          </Link>
         </div>
       )}
 
