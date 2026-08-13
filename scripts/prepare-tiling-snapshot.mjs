@@ -53,10 +53,25 @@ async function run(sandbox, command, args, label) {
   return { stdout, stderr };
 }
 
+// Explicit credentials (VERCEL_TOKEN/VERCEL_TEAM_ID/VERCEL_PROJECT_ID) take
+// precedence when set — this is what lets the script run outside a linked
+// Vercel checkout. Omitting all three falls back to the SDK's own OIDC
+// resolution (works inside `vercel link`-ed local dev, or automatically in
+// production on Vercel).
+const explicitCredentials =
+  process.env.VERCEL_TOKEN && process.env.VERCEL_TEAM_ID && process.env.VERCEL_PROJECT_ID
+    ? {
+        token: process.env.VERCEL_TOKEN,
+        teamId: process.env.VERCEL_TEAM_ID,
+        projectId: process.env.VERCEL_PROJECT_ID,
+      }
+    : {};
+
 console.log("Creating sandbox...");
 const sandbox = await Sandbox.create({
   timeout: 15 * 60 * 1000,
   resources: { vcpus: 4 },
+  ...explicitCredentials,
 });
 console.log("Sandbox created:", sandbox.name);
 
