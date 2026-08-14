@@ -8,6 +8,7 @@ export function ViewSlideButton({ slideId, title }: { slideId: string; title: st
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState<string | null>(null);
+  const [dziUrl, setDziUrl] = useState<string | null>(null);
 
   async function view() {
     setPending(true);
@@ -19,6 +20,7 @@ export function ViewSlideButton({ slideId, title }: { slideId: string; title: st
       return;
     }
     setUrl(result.url ?? null);
+    setDziUrl(result.dziUrl ?? null);
   }
 
   return (
@@ -40,7 +42,7 @@ export function ViewSlideButton({ slideId, title }: { slideId: string; title: st
             </button>
           </div>
           <div className="min-h-0 flex-1">
-            <WsiViewer imageUrl={url} />
+            <WsiViewer imageUrl={url} dziUrl={dziUrl} />
           </div>
         </div>
       )}

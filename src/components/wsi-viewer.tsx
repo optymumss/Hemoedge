@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import type OpenSeadragon from "openseadragon";
 
 /**
- * Real pan/zoom/rotate viewing via OpenSeadragon's single-image mode.
- * This is not a tiled deep-zoom pyramid — building one from a raw WSI file
- * (SVS etc.) needs OpenSlide/libvips running a tiling pipeline, which is a
- * separate infrastructure piece. Single-image mode still gives smooth
- * zoom/pan on the full-resolution file without that pipeline.
+ * Pan/zoom/rotate viewing via OpenSeadragon. Uses a real tiled deep-zoom
+ * pyramid (dziUrl) when the slide has been tiled by the WSI tiling pipeline
+ * (see src/lib/tiling) — sharp at any zoom, loads only what the viewport
+ * needs. Falls back to single-image mode (the whole raw file, no tiling)
+ * for slides that haven't been tiled yet or where tiling failed; still
+ * gives smooth zoom/pan, just softens past the file's native resolution.
  *
  * openseadragon touches `document` at module-load time, which crashes
  * Next.js's server-side render pass even inside a "use client" component
@@ -40,11 +41,18 @@ export type WsiHotspot = {
 
 export function WsiViewer({
   imageUrl,
+  dziUrl,
   hotspots,
   onImageClick,
   onHotspotClick,
 }: {
   imageUrl: string;
+  /** DeepZoom manifest URL for a tiled pyramid — used instead of imageUrl
+   * (single full-resolution image mode) when the slide has been tiled.
+   * Stays sharp at any zoom and loads only the tiles the viewport needs,
+   * rather than the whole file. imageUrl is still required as the fallback
+   * for slides that haven't been tiled yet or where tiling failed. */
+  dziUrl?: string | null;
   /** Normalized (0-1) pins rendered over the image — the WBC diff counter's
    * ground-truth/answer markers, or teaching-mode annotations. Purely
    * visual; click handling is separate. */
@@ -91,7 +99,7 @@ export function WsiViewer({
 
       const viewer = OpenSeadragon({
         element: containerRef.current,
-        tileSources: { type: "image", url: imageUrl },
+        tileSources: dziUrl ?? { type: "image", url: imageUrl },
         // The overview mini-map isn't useful for a single (non deep-zoom)
         // image — it's just a shrunken duplicate of the same image.
         showNavigator: false,
@@ -152,7 +160,7 @@ export function WsiViewer({
       viewerRef.current?.destroy();
       viewerRef.current = null;
     };
-  }, [imageUrl]);
+  }, [imageUrl, dziUrl]);
 
   useEffect(() => {
     const viewer = viewerRef.current;

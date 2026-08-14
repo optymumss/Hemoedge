@@ -33,6 +33,7 @@ export function ClassifyExercise({
   cellTypes: { id: string; name: string }[];
 }) {
   const [url, setUrl] = useState<string | null>(null);
+  const [dziUrl, setDziUrl] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
@@ -47,6 +48,7 @@ export function ClassifyExercise({
       if (cancelled) return;
       if (r.error) setLoadError(r.error);
       else if (r.url) setUrl(r.url);
+      if (r.dziUrl) setDziUrl(r.dziUrl);
     });
     recordSlideView(slideId);
     return () => {
@@ -109,7 +111,7 @@ export function ClassifyExercise({
         Click each highlighted cell and classify it. {Object.keys(answers).length}/{hotspots.length} classified.
       </p>
       <div className="h-[32rem] rounded-md bg-black">
-        <WsiViewer imageUrl={url} hotspots={viewerHotspots} onImageClick={handleImageClick} />
+        <WsiViewer imageUrl={url} dziUrl={dziUrl} hotspots={viewerHotspots} onImageClick={handleImageClick} />
       </div>
 
       {activeHotspotId && !result && (
