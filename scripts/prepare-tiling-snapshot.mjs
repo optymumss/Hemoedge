@@ -135,7 +135,7 @@ try {
 
   console.log("\nAll checks passed. Snapshotting sandbox for reuse in production tiling jobs...");
   const snapshot = await sandbox.snapshot({ expiration: 0 });
-  console.log("\n✅ Snapshot ID:", snapshot.id);
+  console.log("\n✅ Snapshot ID:", snapshot.snapshotId);
   console.log("Add this to your environment as TILING_SANDBOX_SNAPSHOT_ID.");
 } finally {
   await sandbox.stop().catch(() => {});
