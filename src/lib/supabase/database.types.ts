@@ -1455,6 +1455,8 @@ export type Database = {
           id: string
           size_bytes: number | null
           status: Database["public"]["Enums"]["content_status"]
+          tile_manifest_url: string | null
+          tiling_status: string
           title: string
           updated_at: string
         }
@@ -1466,6 +1468,8 @@ export type Database = {
           id?: string
           size_bytes?: number | null
           status?: Database["public"]["Enums"]["content_status"]
+          tile_manifest_url?: string | null
+          tiling_status?: string
           title: string
           updated_at?: string
         }
@@ -1477,6 +1481,8 @@ export type Database = {
           id?: string
           size_bytes?: number | null
           status?: Database["public"]["Enums"]["content_status"]
+          tile_manifest_url?: string | null
+          tiling_status?: string
           title?: string
           updated_at?: string
         }
@@ -1577,6 +1583,47 @@ export type Database = {
           yearly_price_cents?: number
         }
         Relationships: []
+      }
+      tiling_jobs: {
+        Row: {
+          attempts: number
+          created_at: string
+          error: string | null
+          id: string
+          sandbox_id: string | null
+          slide_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          sandbox_id?: string | null
+          slide_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          sandbox_id?: string | null
+          slide_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tiling_jobs_slide_id_fkey"
+            columns: ["slide_id"]
+            isOneToOne: false
+            referencedRelation: "slides"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wbc_diff_attempts: {
         Row: {

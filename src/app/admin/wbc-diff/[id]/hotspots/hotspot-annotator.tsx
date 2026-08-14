@@ -25,6 +25,7 @@ export function HotspotAnnotator({
   cellTypes: { id: string; name: string }[];
 }) {
   const [url, setUrl] = useState<string | null>(null);
+  const [dziUrl, setDziUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<{ xPct: number; yPct: number } | null>(null);
   const [cellTypeId, setCellTypeId] = useState("");
@@ -36,6 +37,7 @@ export function HotspotAnnotator({
       if (cancelled) return;
       if (result.error) setError(result.error);
       else if (result.url) setUrl(result.url);
+      if (result.dziUrl) setDziUrl(result.dziUrl);
     });
     return () => {
       cancelled = true;
@@ -71,6 +73,7 @@ export function HotspotAnnotator({
       <div className="h-[32rem] rounded-md bg-black">
         <WsiViewer
           imageUrl={url}
+          dziUrl={dziUrl}
           hotspots={viewerHotspots}
           onImageClick={(xPct, yPct) => setPending({ xPct, yPct })}
         />

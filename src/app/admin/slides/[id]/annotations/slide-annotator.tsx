@@ -21,6 +21,7 @@ export function SlideAnnotator({
   annotations: Annotation[];
 }) {
   const [url, setUrl] = useState<string | null>(null);
+  const [dziUrl, setDziUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<{ xPct: number; yPct: number } | null>(null);
   const [label, setLabel] = useState("");
@@ -33,6 +34,7 @@ export function SlideAnnotator({
       if (cancelled) return;
       if (result.error) setError(result.error);
       else if (result.url) setUrl(result.url);
+      if (result.dziUrl) setDziUrl(result.dziUrl);
     });
     return () => {
       cancelled = true;
@@ -68,7 +70,12 @@ export function SlideAnnotator({
         up in Teaching mode wherever this slide is embedded.
       </p>
       <div className="h-[32rem] rounded-md bg-black">
-        <WsiViewer imageUrl={url} hotspots={viewerHotspots} onImageClick={(xPct, yPct) => setPending({ xPct, yPct })} />
+        <WsiViewer
+          imageUrl={url}
+          dziUrl={dziUrl}
+          hotspots={viewerHotspots}
+          onImageClick={(xPct, yPct) => setPending({ xPct, yPct })}
+        />
       </div>
 
       {pending && (

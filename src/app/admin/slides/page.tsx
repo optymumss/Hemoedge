@@ -6,6 +6,7 @@ import { SubmitForReviewButton } from "@/components/submit-for-review-button";
 import { UploadForm } from "./upload-form";
 import { ViewSlideButton } from "./view-slide-button";
 import { DeleteSlideButton } from "./delete-slide-button";
+import { retryTiling } from "./actions";
 
 function formatSize(bytes: number | null) {
   if (!bytes) return "—";
@@ -13,12 +14,20 @@ function formatSize(bytes: number | null) {
   return mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${mb.toFixed(1)} MB`;
 }
 
+const TILING_STATUS: Record<string, { label: string; className: string }> = {
+  none: { label: "Not tiled", className: "bg-surface-sunken text-ink-faint" },
+  queued: { label: "Queued", className: "bg-warning-soft text-warning-soft-ink" },
+  processing: { label: "Processing", className: "bg-warning-soft text-warning-soft-ink" },
+  ready: { label: "Tiled", className: "bg-success-soft text-success-soft-ink" },
+  failed: { label: "Tiling failed", className: "bg-danger-soft text-danger-soft-ink" },
+};
+
 export default async function SlidesPage() {
   const supabase = await createClient();
   const profile = await getCurrentProfile();
   const { data: slides } = await supabase
     .from("slides")
-    .select("id, title, size_bytes, status, created_by, slide_categories(name)")
+    .select("id, title, size_bytes, status, tiling_status, created_by, slide_categories(name)")
     .order("created_at", { ascending: false });
 
   const { data: categories } = await supabase
@@ -45,6 +54,7 @@ export default async function SlidesPage() {
               <th className="px-4 py-2">Category</th>
               <th className="px-4 py-2">Size</th>
               <th className="px-4 py-2">Status</th>
+              <th className="px-4 py-2">Tiling</th>
               <th className="px-4 py-2" />
             </tr>
           </thead>
@@ -58,6 +68,23 @@ export default async function SlidesPage() {
                 <td className="px-4 py-2 text-ink-dim">{formatSize(s.size_bytes)}</td>
                 <td className="px-4 py-2">
                   <StatusBadge status={s.status} />
+                </td>
+                <td className="px-4 py-2">
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs ${
+                      (TILING_STATUS[s.tiling_status] ?? TILING_STATUS.none).className
+                    }`}
+                  >
+                    {(TILING_STATUS[s.tiling_status] ?? TILING_STATUS.none).label}
+                  </span>
+                  {s.tiling_status === "failed" && (
+                    <form action={retryTiling} className="mt-1">
+                      <input type="hidden" name="id" value={s.id} />
+                      <button type="submit" className="text-xs text-ink-dim underline">
+                        Retry
+                      </button>
+                    </form>
+                  )}
                 </td>
                 <td className="px-4 py-2 text-right">
                   <div className="flex items-center justify-end gap-3">
@@ -85,7 +112,7 @@ export default async function SlidesPage() {
             ))}
             {(slides ?? []).length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-ink-faint">
+                <td colSpan={6} className="px-4 py-6 text-center text-ink-faint">
                   No slides yet.
                 </td>
               </tr>

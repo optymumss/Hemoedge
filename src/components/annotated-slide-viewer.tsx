@@ -22,6 +22,7 @@ export function AnnotatedSlideViewer({
   heightClassName?: string;
 }) {
   const [url, setUrl] = useState<string | null>(null);
+  const [dziUrl, setDziUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [annotations, setAnnotations] = useState<SlideAnnotation[]>([]);
   const [mode, setMode] = useState<"explore" | "teaching">("teaching");
@@ -33,6 +34,7 @@ export function AnnotatedSlideViewer({
       if (cancelled) return;
       if (result.error) setError(result.error);
       else if (result.url) setUrl(result.url);
+      if (result.dziUrl) setDziUrl(result.dziUrl);
     });
     getSlideAnnotations(slideId).then((a) => {
       if (!cancelled) setAnnotations(a);
@@ -97,6 +99,7 @@ export function AnnotatedSlideViewer({
       <div className={`${heightClassName} rounded-md bg-black`}>
         <WsiViewer
           imageUrl={url}
+          dziUrl={dziUrl}
           hotspots={hotspots}
           onHotspotClick={mode === "teaching" ? (id) => setSelectedId(id) : undefined}
         />
