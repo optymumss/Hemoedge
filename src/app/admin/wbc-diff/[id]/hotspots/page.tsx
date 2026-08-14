@@ -25,7 +25,7 @@ export default async function ExerciseHotspotsPage({
       .select("id, x_pct, y_pct, cell_type_id, cell_types(name)")
       .eq("exercise_id", id)
       .order("created_at"),
-    supabase.from("cell_types").select("id, name").eq("lineage", "white_cell").order("name"),
+    supabase.from("cell_types").select("id, name").eq("is_wbc_diff_countable", true).order("name"),
   ]);
 
   return (

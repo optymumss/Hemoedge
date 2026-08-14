@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { linkModule, unlinkModule, moveModule } from "./actions";
+import { linkModule, unlinkModule, moveModule, publishNewVersion } from "./actions";
 import { DetailsForm } from "./details-form";
 
 export default async function PathwayDetailPage({
@@ -13,7 +14,7 @@ export default async function PathwayDetailPage({
   const { data: pathway } = await supabase
     .from("curricula")
     .select(
-      "id, title, level, pass_threshold, status, description, pathway_type, learning_outcomes, certificate_awarded, certificate_title, cpd_points, estimated_completion_minutes, version",
+      "id, title, level, pass_threshold, status, description, pathway_type, learning_outcomes, certificate_awarded, certificate_title, cpd_points, estimated_completion_minutes, version, previous_version_id",
     )
     .eq("id", id)
     .single();
@@ -41,7 +42,31 @@ export default async function PathwayDetailPage({
       <h1 className="text-xl font-semibold">{pathway.title}</h1>
       <p className="mt-1 text-sm text-ink-dim">
         {pathway.level} · v{pathway.version} · {pathway.pass_threshold}% pass threshold · {pathway.status}
+        {pathway.previous_version_id && (
+          <>
+            {" · "}
+            <Link href={`/admin/curricula/${pathway.previous_version_id}`} className="underline">
+              View v{pathway.version - 1}
+            </Link>
+          </>
+        )}
       </p>
+
+      {pathway.status === "published" && (
+        <form action={publishNewVersion} className="mt-3">
+          <input type="hidden" name="id" value={pathway.id} />
+          <button
+            type="submit"
+            className="rounded-md border border-line-strong px-3 py-1.5 text-sm text-ink hover:bg-surface-sunken"
+          >
+            Publish new version (v{pathway.version + 1})
+          </button>
+          <p className="mt-1 text-xs text-ink-faint">
+            Creates an editable draft copy — this published version keeps working for learners
+            already on it until the new one is reviewed and published.
+          </p>
+        </form>
+      )}
 
       <div className="mt-6">
         <DetailsForm pathway={pathway} />

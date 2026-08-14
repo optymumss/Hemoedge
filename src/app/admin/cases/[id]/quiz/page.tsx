@@ -18,7 +18,7 @@ export default async function CaseQuestionsPage({
 
   const { data: questions } = await supabase
     .from("quiz_questions")
-    .select("id, question_text, choices, correct_choice_id")
+    .select("id, question_text, choices, correct_choice_id, model_answer")
     .eq("case_id", id)
     .order("position");
 
@@ -62,6 +62,9 @@ export default async function CaseQuestionsPage({
                   </li>
                 ))}
               </ul>
+              {q.model_answer && (
+                <p className="mt-2 text-xs text-ink-faint">Model answer: {q.model_answer}</p>
+              )}
             </div>
           );
         })}

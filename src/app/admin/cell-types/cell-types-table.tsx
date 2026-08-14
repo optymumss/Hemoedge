@@ -9,6 +9,7 @@ export type CellTypeRow = {
   code: string;
   lineage: string;
   description: string | null;
+  is_wbc_diff_countable: boolean;
 };
 
 type SortKey = "name" | "code" | "lineage";
@@ -93,6 +94,7 @@ export function CellTypesTable({ rows }: { rows: CellTypeRow[] }) {
                 </th>
               ))}
               <th className="px-4 py-2">Description</th>
+              <th className="px-4 py-2">WBC diff</th>
               <th className="px-4 py-2" />
             </tr>
           </thead>
@@ -112,6 +114,7 @@ export function CellTypesTable({ rows }: { rows: CellTypeRow[] }) {
                     {LINEAGE_LABEL[c.lineage] ?? c.lineage}
                   </td>
                   <td className="px-4 py-2 text-ink-dim">{c.description ?? "—"}</td>
+                  <td className="px-4 py-2 text-ink-dim">{c.is_wbc_diff_countable ? "Yes" : "—"}</td>
                   <td className="px-4 py-2 text-right">
                     <div className="flex items-center justify-end gap-3">
                       <button
@@ -139,7 +142,7 @@ export function CellTypesTable({ rows }: { rows: CellTypeRow[] }) {
             )}
             {sorted.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-ink-faint">
+                <td colSpan={6} className="px-4 py-6 text-center text-ink-faint">
                   {rows.length === 0 ? "No cell types yet." : "No cell types match your search."}
                 </td>
               </tr>
@@ -165,7 +168,7 @@ function EditRow({
 
   return (
     <tr className="border-t border-line bg-surface-sunken/50">
-      <td colSpan={5} className="px-4 py-3">
+      <td colSpan={6} className="px-4 py-3">
         <form action={action} className="flex flex-wrap items-end gap-2">
           <input type="hidden" name="id" value={cellType.id} />
           <div className="flex flex-col gap-1">
@@ -208,6 +211,15 @@ function EditRow({
               className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
             />
           </div>
+          <label className="flex items-center gap-2 pb-1.5 text-sm text-ink">
+            <input
+              type="checkbox"
+              name="is_wbc_diff_countable"
+              defaultChecked={cellType.is_wbc_diff_countable}
+              className="accent-accent"
+            />
+            Countable in WBC diff
+          </label>
           <button
             type="submit"
             disabled={pending}

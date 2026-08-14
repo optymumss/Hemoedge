@@ -40,13 +40,23 @@ export default async function LearnerModuleDetailPage({
   const impersonation = await getActiveImpersonation();
   const { data: attempts } = await supabase
     .from("quiz_attempts")
-    .select("score, passed")
+    .select("score, passed, answers")
     .eq("module_id", id)
     .eq("user_id", userId!)
     .order("created_at", { ascending: false })
     .limit(1);
 
   const lastAttempt = attempts?.[0];
+
+  // Only fetched once the learner has an attempt on record — the answer key
+  // (correct_choice_id, model_answer) must never be readable before that.
+  const { data: reviewQuestions } = lastAttempt
+    ? await supabase
+        .from("quiz_questions")
+        .select("id, question_text, choices, correct_choice_id, model_answer")
+        .eq("module_id", id)
+        .order("position")
+    : { data: null };
 
   const { data: diffExercise } = await supabase
     .from("wbc_diff_exercises")
@@ -84,6 +94,49 @@ export default async function LearnerModuleDetailPage({
           }`}
         >
           Last attempt: {lastAttempt.score}% — {lastAttempt.passed ? "Passed" : "Not passed yet"}
+        </div>
+      )}
+
+      {lastAttempt && (reviewQuestions ?? []).length > 0 && (
+        <div className="mt-4 flex flex-col gap-3">
+          {(reviewQuestions ?? []).map((q, i) => {
+            const choices = q.choices as { id: string; text: string }[];
+            const yourAnswer = (lastAttempt.answers as Record<string, string> | null)?.[q.id];
+            const wasCorrect = yourAnswer === q.correct_choice_id;
+            return (
+              <div key={q.id} className="rounded-lg border border-line p-4">
+                <p className="text-sm font-medium">
+                  {i + 1}. {q.question_text}{" "}
+                  <span className={wasCorrect ? "text-success-soft-ink" : "text-danger"}>
+                    {wasCorrect ? "✓ Correct" : "✗ Incorrect"}
+                  </span>
+                </p>
+                <ul className="mt-2 flex flex-col gap-1 text-sm text-ink-dim">
+                  {choices.map((c) => (
+                    <li
+                      key={c.id}
+                      className={
+                        c.id === q.correct_choice_id
+                          ? "font-medium text-success-soft-ink"
+                          : c.id === yourAnswer
+                            ? "text-danger"
+                            : ""
+                      }
+                    >
+                      {c.id.toUpperCase()}. {c.text}
+                      {c.id === q.correct_choice_id ? " ✓" : c.id === yourAnswer ? " (your answer)" : ""}
+                    </li>
+                  ))}
+                </ul>
+                {q.model_answer && (
+                  <p className="mt-2 text-sm text-ink-dim">
+                    <span className="font-medium text-ink">Model answer: </span>
+                    {q.model_answer}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 

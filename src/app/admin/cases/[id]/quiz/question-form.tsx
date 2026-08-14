@@ -30,6 +30,12 @@ export function QuestionForm({ caseId }: { caseId: string }) {
         </div>
       ))}
       <p className="text-xs text-ink-faint">Select the radio button next to the correct choice.</p>
+      <textarea
+        name="model_answer"
+        rows={2}
+        placeholder="Model answer (optional) — shown to the learner after they submit"
+        className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
+      />
       <button
         type="submit"
         disabled={pending}

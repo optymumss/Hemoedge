@@ -4,6 +4,7 @@ import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { getActiveImpersonation, getEffectiveUserId } from "@/lib/auth/impersonation";
 import { getLearnerOrgId } from "@/lib/learner/get-learner-org";
 import { getPublishedContent } from "@/lib/learner/published-content";
+import { getWeakAreas } from "@/lib/learner/weak-areas";
 
 const QUICK_LINKS = [
   { label: "Modules", href: "/app/modules", blurb: "Structured learning content" },
@@ -22,7 +23,7 @@ export default async function LearnerHome() {
     : profile?.fullName || profile?.email;
   const orgId = await getLearnerOrgId();
 
-  const [modules, cases, slideViewsResult, certificatesResult] = await Promise.all([
+  const [modules, cases, slideViewsResult, certificatesResult, weakAreas] = await Promise.all([
     getPublishedContent("modules", "module", orgId),
     getPublishedContent("cases", "case", orgId),
     supabase
@@ -33,6 +34,7 @@ export default async function LearnerHome() {
       .from("certificates")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId!),
+    getWeakAreas(supabase, userId!),
   ]);
 
   const stats = [
@@ -59,6 +61,27 @@ export default async function LearnerHome() {
           </div>
         ))}
       </div>
+
+      {weakAreas.length > 0 && (
+        <>
+          <h2 className="mt-8 text-sm font-semibold uppercase tracking-wider text-ink-faint">
+            Where you&apos;re weak
+          </h2>
+          <div className="mt-3 flex flex-col gap-2">
+            {weakAreas.map((area) => (
+              <div
+                key={area.label}
+                className="flex items-center justify-between rounded-lg border border-line p-3"
+              >
+                <span className="text-sm font-medium text-ink">{area.label}</span>
+                <span className="text-xs text-warning-soft-ink">
+                  {area.accuracyPct}% correct · {area.attempts} attempts
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       <h2 className="mt-8 text-sm font-semibold uppercase tracking-wider text-ink-faint">
         Continue learning

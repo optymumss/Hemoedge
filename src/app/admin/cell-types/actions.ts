@@ -16,6 +16,7 @@ export async function createCellType(
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
   const lineage = String(formData.get("lineage") ?? "");
   const description = String(formData.get("description") ?? "").trim() || null;
+  const isWbcDiffCountable = formData.get("is_wbc_diff_countable") === "on";
 
   if (!name || !code) return { error: "Name and code are required." };
   if (!LINEAGES.includes(lineage)) {
@@ -29,6 +30,7 @@ export async function createCellType(
     slug: slugify(name),
     lineage,
     description,
+    is_wbc_diff_countable: isWbcDiffCountable,
   });
 
   if (error) return { error: error.message };
@@ -46,6 +48,7 @@ export async function updateCellType(
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
   const lineage = String(formData.get("lineage") ?? "");
   const description = String(formData.get("description") ?? "").trim() || null;
+  const isWbcDiffCountable = formData.get("is_wbc_diff_countable") === "on";
 
   if (!id || !name || !code) return { error: "Name and code are required." };
   if (!LINEAGES.includes(lineage)) {
@@ -55,7 +58,14 @@ export async function updateCellType(
   const supabase = await createClient();
   const { error } = await supabase
     .from("cell_types")
-    .update({ name, code, slug: slugify(name), lineage, description })
+    .update({
+      name,
+      code,
+      slug: slugify(name),
+      lineage,
+      description,
+      is_wbc_diff_countable: isWbcDiffCountable,
+    })
     .eq("id", id);
 
   if (error) return { error: error.message };

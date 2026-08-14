@@ -8,6 +8,7 @@ import type { Enums } from "@/lib/supabase/database.types";
 export type FormState = { error?: string } | undefined;
 
 const LEVELS: Enums<"content_level">[] = ["beginner", "intermediate", "advanced"];
+const ESCALATION_DECISIONS = ["routine", "senior_review", "urgent"];
 
 export async function updateCaseDetails(
   _prevState: FormState,
@@ -24,9 +25,15 @@ export async function updateCaseDetails(
   const learningPoints = String(formData.get("learning_points") ?? "").trim() || null;
   const timeRaw = String(formData.get("estimated_time_minutes") ?? "").trim();
   const cpdRaw = String(formData.get("cpd_points") ?? "0").trim();
+  const caseCategory = String(formData.get("case_category") ?? "").trim() || null;
+  const escalationDecision = String(formData.get("escalation_decision") ?? "").trim() || null;
+  const suggestedReportComment = String(formData.get("suggested_report_comment") ?? "").trim() || null;
 
   if (!id || !title) return { error: "Title is required." };
   if (!LEVELS.includes(level)) return { error: "Choose a level." };
+  if (escalationDecision && !ESCALATION_DECISIONS.includes(escalationDecision)) {
+    return { error: "Choose a valid escalation decision." };
+  }
 
   const estimatedTimeMinutes = timeRaw ? Number(timeRaw) : null;
   if (estimatedTimeMinutes !== null && (!Number.isFinite(estimatedTimeMinutes) || estimatedTimeMinutes <= 0)) {
@@ -52,6 +59,9 @@ export async function updateCaseDetails(
       learning_points: learningPoints,
       estimated_time_minutes: estimatedTimeMinutes,
       cpd_points: cpdPoints,
+      case_category: caseCategory,
+      escalation_decision: escalationDecision,
+      suggested_report_comment: suggestedReportComment,
     })
     .eq("id", id);
 
@@ -118,5 +128,45 @@ export async function removeCaseFeature(formData: FormData) {
 
   const supabase = await createClient();
   await supabase.from("case_features").delete().eq("case_id", caseId).eq("feature_id", featureId);
+  revalidatePath(`/admin/cases/${caseId}`);
+}
+
+export async function addCaseModule(formData: FormData) {
+  const caseId = String(formData.get("case_id") ?? "");
+  const moduleId = String(formData.get("module_id") ?? "");
+  if (!caseId || !moduleId) return;
+
+  const supabase = await createClient();
+  await supabase.from("case_modules").insert({ case_id: caseId, module_id: moduleId });
+  revalidatePath(`/admin/cases/${caseId}`);
+}
+
+export async function removeCaseModule(formData: FormData) {
+  const caseId = String(formData.get("case_id") ?? "");
+  const moduleId = String(formData.get("module_id") ?? "");
+  if (!caseId || !moduleId) return;
+
+  const supabase = await createClient();
+  await supabase.from("case_modules").delete().eq("case_id", caseId).eq("module_id", moduleId);
+  revalidatePath(`/admin/cases/${caseId}`);
+}
+
+export async function addCaseSlide(formData: FormData) {
+  const caseId = String(formData.get("case_id") ?? "");
+  const slideId = String(formData.get("slide_id") ?? "");
+  if (!caseId || !slideId) return;
+
+  const supabase = await createClient();
+  await supabase.from("case_slides").insert({ case_id: caseId, slide_id: slideId });
+  revalidatePath(`/admin/cases/${caseId}`);
+}
+
+export async function removeCaseSlide(formData: FormData) {
+  const caseId = String(formData.get("case_id") ?? "");
+  const slideId = String(formData.get("slide_id") ?? "");
+  if (!caseId || !slideId) return;
+
+  const supabase = await createClient();
+  await supabase.from("case_slides").delete().eq("case_id", caseId).eq("slide_id", slideId);
   revalidatePath(`/admin/cases/${caseId}`);
 }

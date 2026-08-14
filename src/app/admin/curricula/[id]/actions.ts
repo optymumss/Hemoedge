@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/lib/supabase/database.types";
 
@@ -104,6 +105,74 @@ export async function unlinkModule(formData: FormData) {
   await supabase.from("curriculum_modules").delete().eq("id", id);
 
   revalidatePath(`/admin/curricula/${curriculumId}`);
+}
+
+/**
+ * Duplicates a published pathway into a new draft row (version + 1, linked
+ * back via previous_version_id) instead of editing it in place, so learners
+ * already partway through the published version keep working against
+ * content that doesn't shift under them mid-pathway.
+ */
+export async function publishNewVersion(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const { data: current } = await supabase
+    .from("curricula")
+    .select(
+      "title, level, pass_threshold, description, pathway_type, learning_outcomes, certificate_awarded, certificate_title, cpd_points, estimated_completion_minutes, version, status",
+    )
+    .eq("id", id)
+    .single();
+
+  if (!current || current.status !== "published") return;
+
+  const { data: created, error } = await supabase
+    .from("curricula")
+    .insert({
+      title: current.title,
+      level: current.level,
+      pass_threshold: current.pass_threshold,
+      description: current.description,
+      pathway_type: current.pathway_type,
+      learning_outcomes: current.learning_outcomes,
+      certificate_awarded: current.certificate_awarded,
+      certificate_title: current.certificate_title,
+      cpd_points: current.cpd_points,
+      estimated_completion_minutes: current.estimated_completion_minutes,
+      version: current.version + 1,
+      previous_version_id: id,
+      status: "draft",
+      created_by: user.id,
+    })
+    .select("id")
+    .single();
+
+  if (error || !created) return;
+
+  const { data: linkedModules } = await supabase
+    .from("curriculum_modules")
+    .select("module_id, position")
+    .eq("curriculum_id", id);
+
+  if (linkedModules && linkedModules.length > 0) {
+    await supabase.from("curriculum_modules").insert(
+      linkedModules.map((m) => ({
+        curriculum_id: created.id,
+        module_id: m.module_id,
+        position: m.position,
+      })),
+    );
+  }
+
+  revalidatePath("/admin/curricula");
+  redirect(`/admin/curricula/${created.id}`);
 }
 
 export async function moveModule(formData: FormData) {

@@ -15,6 +15,23 @@ export type CaseDetails = {
   learning_points: string | null;
   estimated_time_minutes: number | null;
   cpd_points: number;
+  case_category: string | null;
+  escalation_decision: string | null;
+  suggested_report_comment: string | null;
+};
+
+const CASE_CATEGORY_SUGGESTIONS = [
+  "Anaemia",
+  "Leukaemia",
+  "Platelet disorder",
+  "Normal blood film",
+  "Artefact",
+];
+
+const ESCALATION_LABEL: Record<string, string> = {
+  routine: "Routine",
+  senior_review: "Senior review",
+  urgent: "Urgent escalation",
 };
 
 export function DetailsForm({
@@ -96,6 +113,38 @@ export function DetailsForm({
             className="w-32 rounded-md border border-line-strong px-2 py-1.5 text-sm"
           />
         </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-ink-dim" htmlFor="case-category">Case category</label>
+          <input
+            id="case-category"
+            name="case_category"
+            list="case-category-suggestions"
+            placeholder="e.g. Anaemia"
+            defaultValue={case_.case_category ?? ""}
+            className="w-56 rounded-md border border-line-strong px-2 py-1.5 text-sm"
+          />
+          <datalist id="case-category-suggestions">
+            {CASE_CATEGORY_SUGGESTIONS.map((c) => (
+              <option key={c} value={c} />
+            ))}
+          </datalist>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-ink-dim" htmlFor="case-escalation">Escalation decision</label>
+          <select
+            id="case-escalation"
+            name="escalation_decision"
+            defaultValue={case_.escalation_decision ?? ""}
+            className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
+          >
+            <option value="">—</option>
+            {Object.entries(ESCALATION_LABEL).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="flex flex-col gap-1">
@@ -144,6 +193,18 @@ export function DetailsForm({
           name="learning_points"
           rows={3}
           defaultValue={case_.learning_points ?? ""}
+          className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-ink-dim" htmlFor="case-report-comment">
+          Suggested report comment (safe morphology wording)
+        </label>
+        <textarea
+          id="case-report-comment"
+          name="suggested_report_comment"
+          rows={3}
+          defaultValue={case_.suggested_report_comment ?? ""}
           className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
         />
       </div>
