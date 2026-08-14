@@ -37,7 +37,10 @@ export const adminNav: NavSection[] = [
   },
   {
     section: "Assessments",
-    items: [{ label: "WBC Diff Counter", href: "/admin/wbc-diff" }],
+    items: [
+      { label: "WBC Diff Counter", href: "/admin/wbc-diff" },
+      { label: "Grading Queue", href: "/admin/grading-queue" },
+    ],
   },
   {
     section: "Website",
@@ -58,6 +61,7 @@ export const orgNav: NavSection[] = [
     items: [
       { label: "Dashboard", href: "/org" },
       { label: "Roster", href: "/org/roster" },
+      { label: "Onboarding Plans", href: "/org/onboarding" },
       { label: "Catalog", href: "/org/catalog" },
       { label: "Analytics", href: "/org/analytics" },
       { label: "Reports", href: "/org/reports" },

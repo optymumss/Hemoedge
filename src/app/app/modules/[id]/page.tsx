@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getEffectiveUserId, getActiveImpersonation } from "@/lib/auth/impersonation";
+import { getQuestionImageUrls } from "@/lib/quiz/question-image-urls";
+import { QuizReview } from "@/components/quiz-review";
 import { QuizForm } from "./quiz-form";
 import { LessonTree } from "./lesson-tree";
 
@@ -26,7 +28,7 @@ export default async function LearnerModuleDetailPage({
   const [{ data: questions }, { data: lessons }] = await Promise.all([
     supabase
       .from("quiz_questions")
-      .select("id, question_text, choices")
+      .select("id, question_text, question_type, choices, feature_id, features(image_path)")
       .eq("module_id", id)
       .order("position"),
     supabase
@@ -35,12 +37,13 @@ export default async function LearnerModuleDetailPage({
       .eq("module_id", id)
       .order("position"),
   ]);
+  const questionImageUrls = await getQuestionImageUrls(supabase, questions ?? []);
 
   const userId = await getEffectiveUserId();
   const impersonation = await getActiveImpersonation();
   const { data: attempts } = await supabase
     .from("quiz_attempts")
-    .select("score, passed, answers")
+    .select("score, passed, answers, pending_manual_grading, manual_grades")
     .eq("module_id", id)
     .eq("user_id", userId!)
     .order("created_at", { ascending: false })
@@ -53,10 +56,13 @@ export default async function LearnerModuleDetailPage({
   const { data: reviewQuestions } = lastAttempt
     ? await supabase
         .from("quiz_questions")
-        .select("id, question_text, choices, correct_choice_id, model_answer")
+        .select(
+          "id, question_text, question_type, choices, correct_choice_id, correct_choice_ids, model_answer, feature_id, features(image_path)",
+        )
         .eq("module_id", id)
         .order("position")
     : { data: null };
+  const reviewImageUrls = reviewQuestions ? await getQuestionImageUrls(supabase, reviewQuestions) : new Map();
 
   const { data: diffExercise } = await supabase
     .from("wbc_diff_exercises")
@@ -93,51 +99,23 @@ export default async function LearnerModuleDetailPage({
             lastAttempt.passed ? "bg-success-soft text-success-soft-ink" : "bg-warning-soft text-warning-soft-ink"
           }`}
         >
-          Last attempt: {lastAttempt.score}% — {lastAttempt.passed ? "Passed" : "Not passed yet"}
+          {lastAttempt.pending_manual_grading
+            ? "Last attempt: pending review of your short-answer responses"
+            : `Last attempt: ${lastAttempt.score}% — ${lastAttempt.passed ? "Passed" : "Not passed yet"}`}
         </div>
       )}
 
       {lastAttempt && (reviewQuestions ?? []).length > 0 && (
-        <div className="mt-4 flex flex-col gap-3">
-          {(reviewQuestions ?? []).map((q, i) => {
-            const choices = q.choices as { id: string; text: string }[];
-            const yourAnswer = (lastAttempt.answers as Record<string, string> | null)?.[q.id];
-            const wasCorrect = yourAnswer === q.correct_choice_id;
-            return (
-              <div key={q.id} className="rounded-lg border border-line p-4">
-                <p className="text-sm font-medium">
-                  {i + 1}. {q.question_text}{" "}
-                  <span className={wasCorrect ? "text-success-soft-ink" : "text-danger"}>
-                    {wasCorrect ? "✓ Correct" : "✗ Incorrect"}
-                  </span>
-                </p>
-                <ul className="mt-2 flex flex-col gap-1 text-sm text-ink-dim">
-                  {choices.map((c) => (
-                    <li
-                      key={c.id}
-                      className={
-                        c.id === q.correct_choice_id
-                          ? "font-medium text-success-soft-ink"
-                          : c.id === yourAnswer
-                            ? "text-danger"
-                            : ""
-                      }
-                    >
-                      {c.id.toUpperCase()}. {c.text}
-                      {c.id === q.correct_choice_id ? " ✓" : c.id === yourAnswer ? " (your answer)" : ""}
-                    </li>
-                  ))}
-                </ul>
-                {q.model_answer && (
-                  <p className="mt-2 text-sm text-ink-dim">
-                    <span className="font-medium text-ink">Model answer: </span>
-                    {q.model_answer}
-                  </p>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <QuizReview
+          questions={(reviewQuestions ?? []).map((q) => ({
+            ...q,
+            choices: q.choices as { id: string; text: string }[],
+            correct_choice_ids: q.correct_choice_ids as string[] | null,
+            imageUrl: reviewImageUrls.get(q.id) ?? null,
+          }))}
+          answers={lastAttempt.answers as Record<string, string> | null}
+          manualGrades={lastAttempt.manual_grades as Record<string, boolean> | null}
+        />
       )}
 
       {(questions ?? []).length > 0 ? (
@@ -149,13 +127,13 @@ export default async function LearnerModuleDetailPage({
           <div className="mt-6">
             <QuizForm
               moduleId={module_.id}
-              questions={
-                (questions ?? []) as unknown as {
-                  id: string;
-                  question_text: string;
-                  choices: { id: string; text: string }[];
-                }[]
-              }
+              questions={(questions ?? []).map((q) => ({
+                id: q.id,
+                question_text: q.question_text,
+                question_type: q.question_type,
+                choices: q.choices as { id: string; text: string }[],
+                imageUrl: questionImageUrls.get(q.id) ?? null,
+              }))}
             />
           </div>
         )

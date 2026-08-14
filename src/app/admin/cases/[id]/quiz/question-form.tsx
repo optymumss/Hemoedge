@@ -2,8 +2,9 @@
 
 import { useActionState } from "react";
 import { addQuestion, type FormState } from "./actions";
+import { QuestionEditorFields, type FeatureOption } from "@/components/admin/question-editor-fields";
 
-export function QuestionForm({ caseId }: { caseId: string }) {
+export function QuestionForm({ caseId, features }: { caseId: string; features: FeatureOption[] }) {
   const [state, action, pending] = useActionState<FormState, FormData>(
     addQuestion,
     undefined,
@@ -12,30 +13,7 @@ export function QuestionForm({ caseId }: { caseId: string }) {
   return (
     <form action={action} className="flex flex-col gap-2">
       <input type="hidden" name="case_id" value={caseId} />
-      <input
-        name="question_text"
-        required
-        placeholder="Question text"
-        className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
-      />
-      {(["a", "b", "c", "d"] as const).map((id) => (
-        <div key={id} className="flex items-center gap-2">
-          <input type="radio" name="correct" value={id} required className="shrink-0" />
-          <input
-            name={`choice_${id}`}
-            placeholder={`Choice ${id.toUpperCase()}${id === "a" || id === "b" ? " (required)" : " (optional)"}`}
-            required={id === "a" || id === "b"}
-            className="flex-1 rounded-md border border-line-strong px-2 py-1.5 text-sm"
-          />
-        </div>
-      ))}
-      <p className="text-xs text-ink-faint">Select the radio button next to the correct choice.</p>
-      <textarea
-        name="model_answer"
-        rows={2}
-        placeholder="Model answer (optional) — shown to the learner after they submit"
-        className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
-      />
+      <QuestionEditorFields features={features} />
       <button
         type="submit"
         disabled={pending}

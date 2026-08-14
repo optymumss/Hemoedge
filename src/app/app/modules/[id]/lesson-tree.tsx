@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { getSlideViewUrl } from "@/lib/slides/get-slide-view-url";
-import { recordSlideView } from "@/lib/slides/record-slide-view";
-import { WsiViewer } from "@/components/wsi-viewer";
+import { AnnotatedSlideViewer } from "@/components/annotated-slide-viewer";
 
 type Lesson = {
   id: string;
@@ -14,26 +12,6 @@ type Lesson = {
 
 export function LessonTree({ lessons }: { lessons: Lesson[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(lessons[0]?.id ?? null);
-  const [slideUrls, setSlideUrls] = useState<Record<string, string>>({});
-  const [slideErrors, setSlideErrors] = useState<Record<string, string>>({});
-  const [loadingSlideId, setLoadingSlideId] = useState<string | null>(null);
-
-  async function toggle(lesson: Lesson) {
-    const nextExpanded = expandedId === lesson.id ? null : lesson.id;
-    setExpandedId(nextExpanded);
-
-    if (nextExpanded && lesson.slide_id && !slideUrls[lesson.id]) {
-      setLoadingSlideId(lesson.id);
-      const result = await getSlideViewUrl(lesson.slide_id);
-      setLoadingSlideId(null);
-      if (result.error) {
-        setSlideErrors((e) => ({ ...e, [lesson.id]: result.error! }));
-      } else if (result.url) {
-        setSlideUrls((u) => ({ ...u, [lesson.id]: result.url! }));
-        recordSlideView(lesson.slide_id);
-      }
-    }
-  }
 
   return (
     <div className="flex flex-col gap-2">
@@ -43,7 +21,7 @@ export function LessonTree({ lessons }: { lessons: Lesson[] }) {
           <div key={lesson.id} className="rounded-lg border border-line">
             <button
               type="button"
-              onClick={() => toggle(lesson)}
+              onClick={() => setExpandedId(isExpanded ? null : lesson.id)}
               aria-expanded={isExpanded}
               className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
             >
@@ -63,17 +41,7 @@ export function LessonTree({ lessons }: { lessons: Lesson[] }) {
 
                 {lesson.slide_id && (
                   <div className="mt-3">
-                    {loadingSlideId === lesson.id && (
-                      <p className="text-xs text-ink-faint">Loading slide…</p>
-                    )}
-                    {slideErrors[lesson.id] && (
-                      <p className="text-xs text-danger">{slideErrors[lesson.id]}</p>
-                    )}
-                    {slideUrls[lesson.id] && (
-                      <div className="h-[28rem] rounded-md bg-black">
-                        <WsiViewer imageUrl={slideUrls[lesson.id]} />
-                      </div>
-                    )}
+                    <AnnotatedSlideViewer slideId={lesson.slide_id} heightClassName="h-[28rem]" />
                   </div>
                 )}
 
