@@ -139,6 +139,66 @@ export type Database = {
           },
         ]
       }
+      case_modules: {
+        Row: {
+          case_id: string
+          module_id: string
+        }
+        Insert: {
+          case_id: string
+          module_id: string
+        }
+        Update: {
+          case_id?: string
+          module_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_modules_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_modules_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_slides: {
+        Row: {
+          case_id: string
+          slide_id: string
+        }
+        Insert: {
+          case_id: string
+          slide_id: string
+        }
+        Update: {
+          case_id?: string
+          slide_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_slides_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_slides_slide_id_fkey"
+            columns: ["slide_id"]
+            isOneToOne: false
+            referencedRelation: "slides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_tags: {
         Row: {
           case_id: string
@@ -171,11 +231,13 @@ export type Database = {
       }
       cases: {
         Row: {
+          case_category: string | null
           case_context: string | null
           cpd_points: number
           created_at: string
           created_by: string
           description: string | null
+          escalation_decision: string | null
           estimated_time_minutes: number | null
           final_diagnosis: string | null
           id: string
@@ -184,15 +246,18 @@ export type Database = {
           level: Database["public"]["Enums"]["content_level"]
           slide_id: string | null
           status: Database["public"]["Enums"]["content_status"]
+          suggested_report_comment: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          case_category?: string | null
           case_context?: string | null
           cpd_points?: number
           created_at?: string
           created_by: string
           description?: string | null
+          escalation_decision?: string | null
           estimated_time_minutes?: number | null
           final_diagnosis?: string | null
           id?: string
@@ -201,15 +266,18 @@ export type Database = {
           level: Database["public"]["Enums"]["content_level"]
           slide_id?: string | null
           status?: Database["public"]["Enums"]["content_status"]
+          suggested_report_comment?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          case_category?: string | null
           case_context?: string | null
           cpd_points?: number
           created_at?: string
           created_by?: string
           description?: string | null
+          escalation_decision?: string | null
           estimated_time_minutes?: number | null
           final_diagnosis?: string | null
           id?: string
@@ -218,6 +286,7 @@ export type Database = {
           level?: Database["public"]["Enums"]["content_level"]
           slide_id?: string | null
           status?: Database["public"]["Enums"]["content_status"]
+          suggested_report_comment?: string | null
           title?: string
           updated_at?: string
         }
@@ -244,6 +313,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          is_wbc_diff_countable: boolean
           lineage: string
           name: string
           slug: string
@@ -253,6 +323,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_wbc_diff_countable?: boolean
           lineage: string
           name: string
           slug: string
@@ -262,6 +333,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_wbc_diff_countable?: boolean
           lineage?: string
           name?: string
           slug?: string
@@ -404,6 +476,7 @@ export type Database = {
           level: Database["public"]["Enums"]["content_level"]
           pass_threshold: number
           pathway_type: string | null
+          previous_version_id: string | null
           status: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at: string
@@ -422,6 +495,7 @@ export type Database = {
           level: Database["public"]["Enums"]["content_level"]
           pass_threshold?: number
           pathway_type?: string | null
+          previous_version_id?: string | null
           status?: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at?: string
@@ -440,6 +514,7 @@ export type Database = {
           level?: Database["public"]["Enums"]["content_level"]
           pass_threshold?: number
           pathway_type?: string | null
+          previous_version_id?: string | null
           status?: Database["public"]["Enums"]["content_status"]
           title?: string
           updated_at?: string
@@ -451,6 +526,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "curricula_previous_version_id_fkey"
+            columns: ["previous_version_id"]
+            isOneToOne: false
+            referencedRelation: "curricula"
             referencedColumns: ["id"]
           },
         ]
@@ -1029,7 +1111,9 @@ export type Database = {
           correct_choice_id: string
           created_at: string
           created_by: string
+          feature_id: string | null
           id: string
+          model_answer: string | null
           module_id: string | null
           position: number
           question_text: string
@@ -1040,7 +1124,9 @@ export type Database = {
           correct_choice_id: string
           created_at?: string
           created_by: string
+          feature_id?: string | null
           id?: string
+          model_answer?: string | null
           module_id?: string | null
           position?: number
           question_text: string
@@ -1051,7 +1137,9 @@ export type Database = {
           correct_choice_id?: string
           created_at?: string
           created_by?: string
+          feature_id?: string | null
           id?: string
+          model_answer?: string | null
           module_id?: string | null
           position?: number
           question_text?: string
@@ -1069,6 +1157,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_questions_feature_id_fkey"
+            columns: ["feature_id"]
+            isOneToOne: false
+            referencedRelation: "features"
             referencedColumns: ["id"]
           },
           {

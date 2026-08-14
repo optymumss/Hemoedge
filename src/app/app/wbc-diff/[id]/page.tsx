@@ -26,7 +26,7 @@ export default async function LearnerWbcDiffExercisePage({
       .from("wbc_diff_hotspots")
       .select("id, x_pct, y_pct, tolerance_pct")
       .eq("exercise_id", id),
-    supabase.from("cell_types").select("id, name").eq("lineage", "white_cell").order("name"),
+    supabase.from("cell_types").select("id, name").eq("is_wbc_diff_countable", true).order("name"),
   ]);
 
   const userId = await getEffectiveUserId();

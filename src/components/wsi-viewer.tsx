@@ -61,6 +61,7 @@ export function WsiViewer({
   const [activeMagnification, setActiveMagnification] = useState<number | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [isFullPage, setIsFullPage] = useState(false);
 
   useEffect(() => {
     onImageClickRef.current = onImageClick;
@@ -89,15 +90,18 @@ export function WsiViewer({
         // so this doesn't require OpenSeadragon's icon image assets either.
         showNavigationControl: true,
         showRotationControl: true,
-        showFullPageControl: false,
+        showFullPageControl: true,
         zoomInButton: "wsi-zoom-in",
         zoomOutButton: "wsi-zoom-out",
         homeButton: "wsi-home",
         rotateLeftButton: "wsi-rotate-left",
         rotateRightButton: "wsi-rotate-right",
+        fullPageButton: "wsi-fullscreen",
         gestureSettingsMouse: { clickToZoom: false },
       });
       viewerRef.current = viewer;
+
+      viewer.addHandler("full-screen", (event) => setIsFullPage(event.fullScreen));
 
       const syncActivePreset = () => {
         const nativeZoom = viewer.viewport.imageToViewportZoom(1);
@@ -213,6 +217,10 @@ export function WsiViewer({
         </button>
         <button id="wsi-rotate-right" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
           Rotate right
+        </button>
+        <div className="h-5 w-px bg-white/20" aria-hidden="true" />
+        <button id="wsi-fullscreen" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
+          {isFullPage ? "Exit fullscreen" : "Fullscreen"}
         </button>
       </div>
       <div className="relative min-h-0 flex-1">

@@ -12,6 +12,7 @@ export async function addQuestion(
   const moduleId = String(formData.get("module_id") ?? "");
   const questionText = String(formData.get("question_text") ?? "").trim();
   const correct = String(formData.get("correct") ?? "");
+  const modelAnswer = String(formData.get("model_answer") ?? "").trim() || null;
 
   const choices = ["a", "b", "c", "d"]
     .map((id) => ({ id, text: String(formData.get(`choice_${id}`) ?? "").trim() }))
@@ -34,6 +35,7 @@ export async function addQuestion(
     question_text: questionText,
     choices,
     correct_choice_id: correct,
+    model_answer: modelAnswer,
     created_by: user.id,
   });
 

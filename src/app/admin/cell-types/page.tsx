@@ -6,7 +6,7 @@ export default async function CellTypesPage() {
   const supabase = await createClient();
   const { data: cellTypes } = await supabase
     .from("cell_types")
-    .select("id, name, code, lineage, description")
+    .select("id, name, code, lineage, description, is_wbc_diff_countable")
     .order("name");
 
   return (
