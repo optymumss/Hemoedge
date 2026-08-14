@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { parseQuestionForm } from "@/lib/quiz/parse-question-form";
 
 export type FormState = { error?: string } | undefined;
 
@@ -10,19 +11,10 @@ export async function addQuestion(
   formData: FormData,
 ): Promise<FormState> {
   const caseId = String(formData.get("case_id") ?? "");
-  const questionText = String(formData.get("question_text") ?? "").trim();
-  const correct = String(formData.get("correct") ?? "");
-  const modelAnswer = String(formData.get("model_answer") ?? "").trim() || null;
+  if (!caseId) return { error: "Missing case." };
 
-  const choices = ["a", "b", "c", "d"]
-    .map((id) => ({ id, text: String(formData.get(`choice_${id}`) ?? "").trim() }))
-    .filter((c) => c.text.length > 0);
-
-  if (!caseId || !questionText) return { error: "Question text is required." };
-  if (choices.length < 2) return { error: "Enter at least two choices." };
-  if (!choices.some((c) => c.id === correct)) {
-    return { error: "Pick which choice is correct." };
-  }
+  const parsed = parseQuestionForm(formData);
+  if ("error" in parsed) return parsed;
 
   const supabase = await createClient();
   const {
@@ -32,10 +24,13 @@ export async function addQuestion(
 
   const { error } = await supabase.from("quiz_questions").insert({
     case_id: caseId,
-    question_text: questionText,
-    choices,
-    correct_choice_id: correct,
-    model_answer: modelAnswer,
+    question_text: parsed.question_text,
+    question_type: parsed.question_type,
+    choices: parsed.choices,
+    correct_choice_id: parsed.correct_choice_id,
+    correct_choice_ids: parsed.correct_choice_ids,
+    feature_id: parsed.feature_id,
+    model_answer: parsed.model_answer,
     created_by: user.id,
   });
 

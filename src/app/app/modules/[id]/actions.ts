@@ -4,40 +4,10 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { checkAndIssueCertificates } from "@/lib/quiz/certificates";
 import { getActiveImpersonation } from "@/lib/auth/impersonation";
+import { computeAttempt } from "@/lib/quiz/score-attempt";
+import { getModulePassThreshold } from "@/lib/quiz/pass-threshold";
 
 export type FormState = { error?: string } | undefined;
-
-const DEFAULT_PASS_THRESHOLD = 70;
-
-/**
- * A module can belong to zero, one, or several curricula, each with its own
- * pass_threshold — there's no single "correct" threshold in the ambiguous
- * cases, so this only applies a curriculum's threshold when the module
- * belongs to exactly one; otherwise it falls back to the platform default.
- * Certificate issuance (checkAndIssueCertificates) separately re-checks the
- * raw score against each linked curriculum's own threshold, so that part
- * already accounts for multi-curriculum membership correctly regardless of
- * what's stored here.
- */
-async function getPassThreshold(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  moduleId: string,
-): Promise<number> {
-  const { data: links } = await supabase
-    .from("curriculum_modules")
-    .select("curriculum_id")
-    .eq("module_id", moduleId);
-
-  if (!links || links.length !== 1) return DEFAULT_PASS_THRESHOLD;
-
-  const { data: curriculum } = await supabase
-    .from("curricula")
-    .select("pass_threshold")
-    .eq("id", links[0].curriculum_id)
-    .single();
-
-  return curriculum?.pass_threshold ?? DEFAULT_PASS_THRESHOLD;
-}
 
 export async function submitQuizAttempt(
   _prevState: FormState,
@@ -58,23 +28,19 @@ export async function submitQuizAttempt(
 
   const { data: questions } = await supabase
     .from("quiz_questions")
-    .select("id, correct_choice_id")
+    .select("id, question_type, correct_choice_id, correct_choice_ids")
     .eq("module_id", moduleId);
 
   if (!questions || questions.length === 0) {
     return { error: "No questions to score." };
   }
 
-  const answers: Record<string, string> = {};
-  let correctCount = 0;
-  for (const q of questions) {
-    const chosen = String(formData.get(`q_${q.id}`) ?? "");
-    answers[q.id] = chosen;
-    if (chosen === q.correct_choice_id) correctCount += 1;
-  }
-
-  const score = Math.round((correctCount / questions.length) * 100);
-  const passed = score >= (await getPassThreshold(supabase, moduleId));
+  const passThreshold = await getModulePassThreshold(supabase, moduleId);
+  const { answers, score, passed, pendingManualGrading } = computeAttempt(
+    questions,
+    formData,
+    passThreshold,
+  );
 
   const { error } = await supabase.from("quiz_attempts").insert({
     user_id: user.id,
@@ -82,11 +48,17 @@ export async function submitQuizAttempt(
     score,
     passed,
     answers,
+    pending_manual_grading: pendingManualGrading,
   });
 
   if (error) return { error: error.message };
 
-  await checkAndIssueCertificates(supabase, user.id, moduleId);
+  // Issuing a certificate off a score that's still waiting on manual grading
+  // would be premature — the grading queue recomputes and re-checks this
+  // once the pending short-answer questions are graded.
+  if (!pendingManualGrading) {
+    await checkAndIssueCertificates(supabase, user.id, moduleId);
+  }
 
   revalidatePath(`/app/modules/${moduleId}`);
   revalidatePath("/app/competency");

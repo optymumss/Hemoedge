@@ -870,6 +870,143 @@ export type Database = {
           },
         ]
       }
+      onboarding_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string
+          due_date: string | null
+          id: string
+          plan_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by: string
+          due_date?: string | null
+          id?: string
+          plan_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string
+          due_date?: string | null
+          id?: string
+          plan_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_assignments_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_plan_items: {
+        Row: {
+          curriculum_id: string | null
+          id: string
+          module_id: string | null
+          plan_id: string
+          position: number
+        }
+        Insert: {
+          curriculum_id?: string | null
+          id?: string
+          module_id?: string | null
+          plan_id: string
+          position?: number
+        }
+        Update: {
+          curriculum_id?: string | null
+          id?: string
+          module_id?: string | null
+          plan_id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_plan_items_curriculum_id_fkey"
+            columns: ["curriculum_id"]
+            isOneToOne: false
+            referencedRelation: "curricula"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_plan_items_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_plan_items_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_plans: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          org_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          org_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_plans_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_plans_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       org_catalog_selections: {
         Row: {
           added_by: string
@@ -1055,8 +1192,10 @@ export type Database = {
           case_id: string | null
           created_at: string
           id: string
+          manual_grades: Json | null
           module_id: string | null
           passed: boolean
+          pending_manual_grading: boolean
           score: number
           user_id: string
         }
@@ -1065,8 +1204,10 @@ export type Database = {
           case_id?: string | null
           created_at?: string
           id?: string
+          manual_grades?: Json | null
           module_id?: string | null
           passed: boolean
+          pending_manual_grading?: boolean
           score: number
           user_id: string
         }
@@ -1075,8 +1216,10 @@ export type Database = {
           case_id?: string | null
           created_at?: string
           id?: string
+          manual_grades?: Json | null
           module_id?: string | null
           passed?: boolean
+          pending_manual_grading?: boolean
           score?: number
           user_id?: string
         }
@@ -1108,7 +1251,8 @@ export type Database = {
         Row: {
           case_id: string | null
           choices: Json
-          correct_choice_id: string
+          correct_choice_id: string | null
+          correct_choice_ids: Json | null
           created_at: string
           created_by: string
           feature_id: string | null
@@ -1117,11 +1261,13 @@ export type Database = {
           module_id: string | null
           position: number
           question_text: string
+          question_type: string
         }
         Insert: {
           case_id?: string | null
           choices: Json
-          correct_choice_id: string
+          correct_choice_id?: string | null
+          correct_choice_ids?: Json | null
           created_at?: string
           created_by: string
           feature_id?: string | null
@@ -1130,11 +1276,13 @@ export type Database = {
           module_id?: string | null
           position?: number
           question_text: string
+          question_type?: string
         }
         Update: {
           case_id?: string | null
           choices?: Json
-          correct_choice_id?: string
+          correct_choice_id?: string | null
+          correct_choice_ids?: Json | null
           created_at?: string
           created_by?: string
           feature_id?: string | null
@@ -1143,6 +1291,7 @@ export type Database = {
           module_id?: string | null
           position?: number
           question_text?: string
+          question_type?: string
         }
         Relationships: [
           {
@@ -1171,6 +1320,57 @@ export type Database = {
             columns: ["module_id"]
             isOneToOne: false
             referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      slide_annotations: {
+        Row: {
+          body: string | null
+          created_at: string
+          created_by: string
+          id: string
+          label: string
+          position: number
+          slide_id: string
+          x_pct: number
+          y_pct: number
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          label: string
+          position?: number
+          slide_id: string
+          x_pct: number
+          y_pct: number
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          label?: string
+          position?: number
+          slide_id?: string
+          x_pct?: number
+          y_pct?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slide_annotations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "slide_annotations_slide_id_fkey"
+            columns: ["slide_id"]
+            isOneToOne: false
+            referencedRelation: "slides"
             referencedColumns: ["id"]
           },
         ]

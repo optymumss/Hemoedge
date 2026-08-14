@@ -42,22 +42,31 @@ export function WsiViewer({
   imageUrl,
   hotspots,
   onImageClick,
+  onHotspotClick,
 }: {
   imageUrl: string;
   /** Normalized (0-1) pins rendered over the image — the WBC diff counter's
-   * ground-truth/answer markers. Purely visual; click handling is separate. */
+   * ground-truth/answer markers, or teaching-mode annotations. Purely
+   * visual; click handling is separate. */
   hotspots?: WsiHotspot[];
   /** Fires with the image-normalized (0-1) coordinates of a plain click —
    * used by the WBC diff counter's annotate/classify modes. Matching a
    * click to the nearest hotspot (within its tolerance) is the caller's
    * job, not the viewer's. */
   onImageClick?: (xPct: number, yPct: number) => void;
+  /** When set, hotspot pins themselves become clickable (fires with the
+   * hotspot's id) instead of being purely decorative pass-through markers —
+   * used by the teaching-mode annotation viewer to reveal a pin's content.
+   * Leaving this unset preserves the WBC diff counter's existing behavior
+   * where clicks pass through pins to the underlying canvas. */
+  onHotspotClick?: (id: string) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
   const dimensionsRef = useRef<{ x: number; y: number } | null>(null);
   const overlayElsRef = useRef<HTMLElement[]>([]);
   const onImageClickRef = useRef(onImageClick);
+  const onHotspotClickRef = useRef(onHotspotClick);
   const [activeMagnification, setActiveMagnification] = useState<number | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
@@ -66,6 +75,10 @@ export function WsiViewer({
   useEffect(() => {
     onImageClickRef.current = onImageClick;
   }, [onImageClick]);
+
+  useEffect(() => {
+    onHotspotClickRef.current = onHotspotClick;
+  }, [onHotspotClick]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -158,7 +171,17 @@ export function WsiViewer({
         el.style.border = "2px solid white";
         el.style.boxShadow = "0 0 0 1px rgba(0,0,0,0.4)";
         el.style.background = TONE_COLOR[spot.tone ?? "neutral"];
-        el.style.pointerEvents = "none";
+
+        if (onHotspotClickRef.current) {
+          el.style.pointerEvents = "auto";
+          el.style.cursor = "pointer";
+          el.addEventListener("click", (e) => {
+            e.stopPropagation();
+            onHotspotClickRef.current?.(spot.id);
+          });
+        } else {
+          el.style.pointerEvents = "none";
+        }
 
         const point = viewer.viewport.imageToViewportCoordinates(
           spot.xPct * dims.x,

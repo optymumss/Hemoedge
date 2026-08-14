@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { StatusBadge } from "@/components/status-badge";
@@ -61,6 +62,9 @@ export default async function SlidesPage() {
                 <td className="px-4 py-2 text-right">
                   <div className="flex items-center justify-end gap-3">
                     <ViewSlideButton slideId={s.id} title={s.title} />
+                    <Link href={`/admin/slides/${s.id}/annotations`} className="text-xs text-ink-dim underline">
+                      Annotate
+                    </Link>
                     {(s.status === "draft" || s.status === "changes_requested") && (
                       <SubmitForReviewButton
                         contentType="slide"

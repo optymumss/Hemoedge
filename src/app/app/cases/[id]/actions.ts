@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveImpersonation } from "@/lib/auth/impersonation";
+import { computeAttempt } from "@/lib/quiz/score-attempt";
 
 export type FormState = { error?: string } | undefined;
 
@@ -25,23 +26,14 @@ export async function submitQuizAttempt(
 
   const { data: questions } = await supabase
     .from("quiz_questions")
-    .select("id, correct_choice_id")
+    .select("id, question_type, correct_choice_id, correct_choice_ids")
     .eq("case_id", caseId);
 
   if (!questions || questions.length === 0) {
     return { error: "No questions to score." };
   }
 
-  const answers: Record<string, string> = {};
-  let correctCount = 0;
-  for (const q of questions) {
-    const chosen = String(formData.get(`q_${q.id}`) ?? "");
-    answers[q.id] = chosen;
-    if (chosen === q.correct_choice_id) correctCount += 1;
-  }
-
-  const score = Math.round((correctCount / questions.length) * 100);
-  const passed = score >= 70;
+  const { answers, score, passed, pendingManualGrading } = computeAttempt(questions, formData);
 
   const { error } = await supabase.from("quiz_attempts").insert({
     user_id: user.id,
@@ -49,6 +41,7 @@ export async function submitQuizAttempt(
     score,
     passed,
     answers,
+    pending_manual_grading: pendingManualGrading,
   });
 
   if (error) return { error: error.message };
