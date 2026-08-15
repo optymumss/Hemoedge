@@ -30,7 +30,7 @@ export default async function LearnerLayout({
         Skip to content
       </a>
       {impersonation && <ImpersonationBanner name={identity} />}
-      <div className="flex flex-1">
+      <div className="flex flex-1 flex-col md:flex-row">
         <LearnerSidebar
           identity={identity}
           role={ROLE_LABELS[effectiveRole]}
@@ -38,7 +38,7 @@ export default async function LearnerLayout({
           settingsHref="/app/settings"
           onLogout={logout}
         />
-        <main id="main-content" className="flex-1 overflow-y-auto px-8 py-8">
+        <main id="main-content" className="flex-1 overflow-y-auto px-4 py-6 sm:px-8 sm:py-8">
           {children}
         </main>
         {!impersonation && <TutorWidget />}
