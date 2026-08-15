@@ -1835,6 +1835,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      find_profile_id_by_email: { Args: { p_email: string }; Returns: string }
       is_org_admin: { Args: { target_org: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
     }
