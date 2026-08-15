@@ -231,6 +231,8 @@ export type Database = {
       }
       cases: {
         Row: {
+          audio_path: string | null
+          audio_transcript: string | null
           case_category: string | null
           case_context: string | null
           cpd_points: number
@@ -249,8 +251,11 @@ export type Database = {
           suggested_report_comment: string | null
           title: string
           updated_at: string
+          video_path: string | null
         }
         Insert: {
+          audio_path?: string | null
+          audio_transcript?: string | null
           case_category?: string | null
           case_context?: string | null
           cpd_points?: number
@@ -269,8 +274,11 @@ export type Database = {
           suggested_report_comment?: string | null
           title: string
           updated_at?: string
+          video_path?: string | null
         }
         Update: {
+          audio_path?: string | null
+          audio_transcript?: string | null
           case_category?: string | null
           case_context?: string | null
           cpd_points?: number
@@ -289,6 +297,7 @@ export type Database = {
           suggested_report_comment?: string | null
           title?: string
           updated_at?: string
+          video_path?: string | null
         }
         Relationships: [
           {
@@ -599,6 +608,8 @@ export type Database = {
       }
       features: {
         Row: {
+          audio_path: string | null
+          audio_transcript: string | null
           cell_type_id: string | null
           common_confusions: string | null
           created_at: string
@@ -610,9 +621,12 @@ export type Database = {
           status: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at: string
+          video_path: string | null
           why_it_matters: string | null
         }
         Insert: {
+          audio_path?: string | null
+          audio_transcript?: string | null
           cell_type_id?: string | null
           common_confusions?: string | null
           created_at?: string
@@ -624,9 +638,12 @@ export type Database = {
           status?: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at?: string
+          video_path?: string | null
           why_it_matters?: string | null
         }
         Update: {
+          audio_path?: string | null
+          audio_transcript?: string | null
           cell_type_id?: string | null
           common_confusions?: string | null
           created_at?: string
@@ -638,6 +655,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["content_status"]
           title?: string
           updated_at?: string
+          video_path?: string | null
           why_it_matters?: string | null
         }
         Relationships: [
@@ -698,6 +716,8 @@ export type Database = {
       }
       lessons: {
         Row: {
+          audio_path: string | null
+          audio_transcript: string | null
           body: string | null
           created_at: string
           created_by: string
@@ -707,8 +727,11 @@ export type Database = {
           slide_id: string | null
           title: string
           updated_at: string
+          video_path: string | null
         }
         Insert: {
+          audio_path?: string | null
+          audio_transcript?: string | null
           body?: string | null
           created_at?: string
           created_by: string
@@ -718,8 +741,11 @@ export type Database = {
           slide_id?: string | null
           title: string
           updated_at?: string
+          video_path?: string | null
         }
         Update: {
+          audio_path?: string | null
+          audio_transcript?: string | null
           body?: string | null
           created_at?: string
           created_by?: string
@@ -729,6 +755,7 @@ export type Database = {
           slide_id?: string | null
           title?: string
           updated_at?: string
+          video_path?: string | null
         }
         Relationships: [
           {
@@ -816,6 +843,8 @@ export type Database = {
       }
       modules: {
         Row: {
+          audio_path: string | null
+          audio_transcript: string | null
           cpd_points: number
           created_at: string
           created_by: string
@@ -829,8 +858,11 @@ export type Database = {
           teaching_notes: string | null
           title: string
           updated_at: string
+          video_path: string | null
         }
         Insert: {
+          audio_path?: string | null
+          audio_transcript?: string | null
           cpd_points?: number
           created_at?: string
           created_by: string
@@ -844,8 +876,11 @@ export type Database = {
           teaching_notes?: string | null
           title: string
           updated_at?: string
+          video_path?: string | null
         }
         Update: {
+          audio_path?: string | null
+          audio_transcript?: string | null
           cpd_points?: number
           created_at?: string
           created_by?: string
@@ -859,6 +894,7 @@ export type Database = {
           teaching_notes?: string | null
           title?: string
           updated_at?: string
+          video_path?: string | null
         }
         Relationships: [
           {

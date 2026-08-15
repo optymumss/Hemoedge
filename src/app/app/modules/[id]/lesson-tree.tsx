@@ -2,12 +2,16 @@
 
 import { useState } from "react";
 import { AnnotatedSlideViewer } from "@/components/annotated-slide-viewer";
+import { MediaPlayer } from "@/components/media-player";
 
 type Lesson = {
   id: string;
   title: string;
   body: string | null;
   slide_id: string | null;
+  audio_path: string | null;
+  audio_transcript: string | null;
+  video_path: string | null;
 };
 
 export function LessonTree({ lessons }: { lessons: Lesson[] }) {
@@ -45,7 +49,17 @@ export function LessonTree({ lessons }: { lessons: Lesson[] }) {
                   </div>
                 )}
 
-                {!lesson.body && !lesson.slide_id && (
+                {(lesson.audio_path || lesson.video_path) && (
+                  <div className="mt-3">
+                    <MediaPlayer
+                      audioUrl={lesson.audio_path}
+                      audioTranscript={lesson.audio_transcript}
+                      videoUrl={lesson.video_path}
+                    />
+                  </div>
+                )}
+
+                {!lesson.body && !lesson.slide_id && !lesson.audio_path && !lesson.video_path && (
                   <p className="text-sm text-ink-faint">No content added yet.</p>
                 )}
               </div>

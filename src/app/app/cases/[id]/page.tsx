@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getEffectiveUserId, getActiveImpersonation } from "@/lib/auth/impersonation";
 import { getQuestionImageUrls } from "@/lib/quiz/question-image-urls";
 import { QuizReview } from "@/components/quiz-review";
+import { MediaPlayer } from "@/components/media-player";
 import { CaseSlideViewer } from "./case-slide-viewer";
 import { QuizForm } from "./quiz-form";
 
@@ -23,7 +24,7 @@ export default async function LearnerCaseDetailPage({
   const { data: case_ } = await supabase
     .from("cases")
     .select(
-      "id, title, level, description, status, slide_id, case_context, lab_values, final_diagnosis, learning_points, case_category, escalation_decision, suggested_report_comment",
+      "id, title, level, description, status, slide_id, case_context, lab_values, final_diagnosis, learning_points, case_category, escalation_decision, suggested_report_comment, audio_path, audio_transcript, video_path",
     )
     .eq("id", id)
     .eq("status", "published")
@@ -130,6 +131,16 @@ export default async function LearnerCaseDetailPage({
         <div className="mt-6 max-w-2xl">
           <h2 className="text-sm font-semibold">FBC / lab values</h2>
           <p className="mt-1 whitespace-pre-wrap text-sm text-ink-dim">{case_.lab_values}</p>
+        </div>
+      )}
+
+      {(case_.audio_path || case_.video_path) && (
+        <div className="mt-6 max-w-2xl">
+          <MediaPlayer
+            audioUrl={case_.audio_path}
+            audioTranscript={case_.audio_transcript}
+            videoUrl={case_.video_path}
+          />
         </div>
       )}
 

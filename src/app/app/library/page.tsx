@@ -63,7 +63,11 @@ export default async function LearnerLibraryPage({
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((f) => (
-          <div key={f.id} className="rounded-lg border border-line p-4">
+          <Link
+            key={f.id}
+            href={`/app/library/${f.id}`}
+            className="rounded-lg border border-line p-4 hover:border-line-strong hover:bg-surface-raised"
+          >
             {f.cell_types?.name && (
               <span className="text-xs uppercase text-ink-faint">
                 {f.cell_types.name}
@@ -75,7 +79,7 @@ export default async function LearnerLibraryPage({
                 {f.definition}
               </p>
             )}
-          </div>
+          </Link>
         ))}
         {filtered.length === 0 && (
           <p className="col-span-full py-8 text-center text-sm text-ink-faint">

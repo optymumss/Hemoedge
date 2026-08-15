@@ -23,7 +23,7 @@ export default async function ModuleLessonsPage({
   const [{ data: lessons }, { data: slides }] = await Promise.all([
     supabase
       .from("lessons")
-      .select("id, title, body, slide_id")
+      .select("id, title, body, slide_id, audio_path, audio_transcript, video_path")
       .eq("module_id", id)
       .order("position"),
     supabase.from("slides").select("id, title").order("title"),

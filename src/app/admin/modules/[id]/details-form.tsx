@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { MediaFields } from "@/components/admin/media-fields";
 import { updateModuleDetails, type FormState } from "./actions";
 
 export const MODULE_TYPE_LABEL: Record<string, string> = {
@@ -22,6 +23,9 @@ export type ModuleDetails = {
   teaching_notes: string | null;
   estimated_duration_minutes: number | null;
   cpd_points: number;
+  audio_path: string | null;
+  audio_transcript: string | null;
+  video_path: string | null;
 };
 
 export function DetailsForm({ module_ }: { module_: ModuleDetails }) {
@@ -137,5 +141,17 @@ export function DetailsForm({ module_ }: { module_: ModuleDetails }) {
       </button>
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
     </form>
+  );
+}
+
+export function ModuleMediaFields({ module_ }: { module_: ModuleDetails }) {
+  return (
+    <MediaFields
+      table="modules"
+      id={module_.id}
+      audioUrl={module_.audio_path}
+      audioTranscript={module_.audio_transcript}
+      videoUrl={module_.video_path}
+    />
   );
 }

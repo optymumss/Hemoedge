@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { MediaFields } from "@/components/admin/media-fields";
 import { updateCaseDetails, type FormState } from "./actions";
 
 export type CaseDetails = {
@@ -18,6 +19,9 @@ export type CaseDetails = {
   case_category: string | null;
   escalation_decision: string | null;
   suggested_report_comment: string | null;
+  audio_path: string | null;
+  audio_transcript: string | null;
+  video_path: string | null;
 };
 
 const CASE_CATEGORY_SUGGESTIONS = [
@@ -218,5 +222,17 @@ export function DetailsForm({
       </button>
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
     </form>
+  );
+}
+
+export function CaseMediaFields({ case_ }: { case_: CaseDetails }) {
+  return (
+    <MediaFields
+      table="cases"
+      id={case_.id}
+      audioUrl={case_.audio_path}
+      audioTranscript={case_.audio_transcript}
+      videoUrl={case_.video_path}
+    />
   );
 }

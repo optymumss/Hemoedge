@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { addModuleTag, removeModuleTag, addModulePrerequisite, removeModulePrerequisite } from "./actions";
-import { DetailsForm } from "./details-form";
+import { DetailsForm, ModuleMediaFields } from "./details-form";
 
 export default async function ModuleDetailsPage({
   params,
@@ -20,7 +20,7 @@ export default async function ModuleDetailsPage({
     supabase
       .from("modules")
       .select(
-        "id, title, level, description, module_type, learning_objectives, teaching_notes, estimated_duration_minutes, cpd_points",
+        "id, title, level, description, module_type, learning_objectives, teaching_notes, estimated_duration_minutes, cpd_points, audio_path, audio_transcript, video_path",
       )
       .eq("id", id)
       .single(),
@@ -50,6 +50,14 @@ export default async function ModuleDetailsPage({
 
       <div className="mt-6">
         <DetailsForm module_={module_} />
+      </div>
+
+      <div className="mt-6 rounded-lg border border-line p-4">
+        <h2 className="text-sm font-semibold">Media</h2>
+        <p className="mt-1 text-sm text-ink-dim">Optional audio narration or video demonstration for this module.</p>
+        <div className="mt-3">
+          <ModuleMediaFields module_={module_} />
+        </div>
       </div>
 
       <div className="mt-6 rounded-lg border border-line p-4">
