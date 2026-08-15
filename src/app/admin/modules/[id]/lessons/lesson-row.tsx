@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { MediaFields } from "@/components/admin/media-fields";
 import { updateLesson, deleteLesson, moveLesson, type FormState } from "./actions";
 
 export type LessonRowData = {
@@ -8,6 +9,9 @@ export type LessonRowData = {
   title: string;
   body: string | null;
   slide_id: string | null;
+  audio_path: string | null;
+  audio_transcript: string | null;
+  video_path: string | null;
 };
 
 export function LessonRow({
@@ -89,42 +93,52 @@ export function LessonRow({
       </div>
 
       {editing && (
-        <form action={action} className="mt-3 flex flex-col gap-2 border-t border-line pt-3">
-          <input type="hidden" name="id" value={lesson.id} />
-          <input type="hidden" name="module_id" value={moduleId} />
-          <input
-            name="title"
-            required
-            defaultValue={lesson.title}
-            className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
+        <div className="mt-3 flex flex-col gap-3 border-t border-line pt-3">
+          <form action={action} className="flex flex-col gap-2">
+            <input type="hidden" name="id" value={lesson.id} />
+            <input type="hidden" name="module_id" value={moduleId} />
+            <input
+              name="title"
+              required
+              defaultValue={lesson.title}
+              className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
+            />
+            <textarea
+              name="body"
+              rows={4}
+              defaultValue={lesson.body ?? ""}
+              className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
+            />
+            <select
+              name="slide_id"
+              defaultValue={lesson.slide_id ?? ""}
+              className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
+            >
+              <option value="">No slide</option>
+              {slides.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.title}
+                </option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              disabled={pending}
+              className="self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
+            >
+              {pending ? "Saving…" : "Save changes"}
+            </button>
+            {state?.error && <p className="text-sm text-danger">{state.error}</p>}
+          </form>
+
+          <MediaFields
+            table="lessons"
+            id={lesson.id}
+            audioUrl={lesson.audio_path}
+            audioTranscript={lesson.audio_transcript}
+            videoUrl={lesson.video_path}
           />
-          <textarea
-            name="body"
-            rows={4}
-            defaultValue={lesson.body ?? ""}
-            className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
-          />
-          <select
-            name="slide_id"
-            defaultValue={lesson.slide_id ?? ""}
-            className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
-          >
-            <option value="">No slide</option>
-            {slides.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.title}
-              </option>
-            ))}
-          </select>
-          <button
-            type="submit"
-            disabled={pending}
-            className="self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
-          >
-            {pending ? "Saving…" : "Save changes"}
-          </button>
-          {state?.error && <p className="text-sm text-danger">{state.error}</p>}
-        </form>
+        </div>
       )}
     </div>
   );

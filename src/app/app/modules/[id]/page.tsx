@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getEffectiveUserId, getActiveImpersonation } from "@/lib/auth/impersonation";
 import { getQuestionImageUrls } from "@/lib/quiz/question-image-urls";
 import { QuizReview } from "@/components/quiz-review";
+import { MediaPlayer } from "@/components/media-player";
 import { QuizForm } from "./quiz-form";
 import { LessonTree } from "./lesson-tree";
 
@@ -16,7 +17,7 @@ export default async function LearnerModuleDetailPage({
 
   const { data: module_ } = await supabase
     .from("modules")
-    .select("id, title, level, status, description")
+    .select("id, title, level, status, description, audio_path, audio_transcript, video_path")
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
@@ -33,7 +34,7 @@ export default async function LearnerModuleDetailPage({
       .order("position"),
     supabase
       .from("lessons")
-      .select("id, title, body, slide_id")
+      .select("id, title, body, slide_id, audio_path, audio_transcript, video_path")
       .eq("module_id", id)
       .order("position"),
   ]);
@@ -77,6 +78,16 @@ export default async function LearnerModuleDetailPage({
       <p className="mt-1 text-sm capitalize text-ink-dim">{module_.level}</p>
       {module_.description && (
         <p className="mt-2 text-sm text-ink-dim">{module_.description}</p>
+      )}
+
+      {(module_.audio_path || module_.video_path) && (
+        <div className="mt-4">
+          <MediaPlayer
+            audioUrl={module_.audio_path}
+            audioTranscript={module_.audio_transcript}
+            videoUrl={module_.video_path}
+          />
+        </div>
       )}
 
       {(lessons ?? []).length > 0 && (

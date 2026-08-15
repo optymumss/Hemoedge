@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { createContentMediaUploadTarget, confirmContentMedia } from "@/lib/media/content-media";
+import { validateMediaFile } from "@/lib/media/media-limits";
 import { createFeature, createFeatureImageUploadTarget, confirmFeatureImage } from "./actions";
 
 export function FeatureForm({
@@ -27,8 +29,21 @@ export function FeatureForm({
     const commonConfusions = String(data.get("common_confusions") ?? "").trim() || null;
     const fileInput = form.elements.namedItem("image") as HTMLInputElement;
     const file = fileInput.files?.[0];
+    const audioInput = form.elements.namedItem("audio") as HTMLInputElement;
+    const audioFile = audioInput.files?.[0];
+    const videoInput = form.elements.namedItem("video") as HTMLInputElement;
+    const videoFile = videoInput.files?.[0];
+    const audioTranscript = String(data.get("audio_transcript") ?? "").trim() || null;
 
     if (!title) return setError("Title is required.");
+    if (audioFile) {
+      const audioError = validateMediaFile("audio", audioFile);
+      if (audioError) return setError(audioError);
+    }
+    if (videoFile) {
+      const videoError = validateMediaFile("video", videoFile);
+      if (videoError) return setError(videoError);
+    }
 
     setPending(true);
     try {
@@ -63,6 +78,48 @@ export function FeatureForm({
         }
 
         const confirmed = await confirmFeatureImage(created.featureId, target.path);
+        if (confirmed.error) {
+          setError(confirmed.error);
+          return;
+        }
+      }
+
+      for (const [kind, mediaFile] of [
+        ["audio", audioFile],
+        ["video", videoFile],
+      ] as const) {
+        if (!mediaFile) continue;
+
+        const target = await createContentMediaUploadTarget({
+          table: "features",
+          id: created.featureId,
+          kind,
+          fileName: mediaFile.name,
+          contentType: mediaFile.type,
+          sizeBytes: mediaFile.size,
+        });
+        if ("error" in target) {
+          setError(target.error);
+          return;
+        }
+
+        const uploadResponse = await fetch(target.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": mediaFile.type || "application/octet-stream" },
+          body: mediaFile,
+        });
+        if (!uploadResponse.ok) {
+          setError("Upload failed — check your connection and try again.");
+          return;
+        }
+
+        const confirmed = await confirmContentMedia(
+          "features",
+          created.featureId,
+          kind,
+          target.key,
+          kind === "audio" ? audioTranscript : undefined,
+        );
         if (confirmed.error) {
           setError(confirmed.error);
           return;
@@ -116,6 +173,36 @@ export function FeatureForm({
             className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
           />
         </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-ink-dim" htmlFor="feature-audio">Audio narration (optional)</label>
+          <input
+            id="feature-audio"
+            name="audio"
+            type="file"
+            accept="audio/mpeg,audio/mp4,audio/wav,audio/ogg,audio/webm"
+            className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-ink-dim" htmlFor="feature-video">Video (optional)</label>
+          <input
+            id="feature-video"
+            name="video"
+            type="file"
+            accept="video/mp4,video/webm,video/quicktime"
+            className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-ink-dim" htmlFor="feature-audio-transcript">Audio transcript (optional)</label>
+        <textarea
+          id="feature-audio-transcript"
+          name="audio_transcript"
+          rows={2}
+          className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
+        />
       </div>
 
       <div className="flex flex-col gap-1">
