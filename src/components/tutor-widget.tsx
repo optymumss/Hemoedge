@@ -55,7 +55,7 @@ export function TutorWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 flex h-[28rem] w-80 flex-col rounded-lg border border-line bg-surface-raised shadow-xl">
+    <div className="fixed inset-x-4 bottom-6 z-30 flex h-[28rem] flex-col rounded-lg border border-line bg-surface-raised shadow-xl sm:inset-x-auto sm:right-6 sm:w-80">
       <div className="flex items-center justify-between border-b border-line px-3 py-2">
         <p className="text-sm font-medium">AI Tutor</p>
         <button onClick={() => setOpen(false)} className="text-sm text-ink-dim">
