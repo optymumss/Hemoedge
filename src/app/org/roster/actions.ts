@@ -37,12 +37,13 @@ export async function addMember(
   const { data: org } = await supabase.from("organizations").select("name").eq("id", orgId).single();
   if (!org) return { error: "Organization not found." };
 
-  let profile = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("email", email)
-    .maybeSingle()
-    .then((r) => r.data);
+  // profiles only has a self-read RLS policy, so this can't be a direct
+  // `.from("profiles")` select for an arbitrary email -- it would always
+  // come back empty for anyone but the caller. find_profile_id_by_email is
+  // a narrow SECURITY DEFINER lookup that returns just the id, letting an
+  // existing learner be linked instead of always falling through to invite.
+  const { data: existingId } = await supabase.rpc("find_profile_id_by_email", { p_email: email });
+  let profile = existingId ? { id: existingId } : null;
 
   let invited = false;
   if (!profile) {
