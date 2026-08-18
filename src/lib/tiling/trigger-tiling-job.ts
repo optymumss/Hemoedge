@@ -4,18 +4,29 @@ import { buildTilingScript } from "./build-tiling-script";
 
 /**
  * Boots a sandbox from the pre-verified snapshot (see
- * scripts/prepare-tiling-snapshot.mjs) and launches the tiling script
- * detached inside it — `nohup ... & disown` so the command we await returns
+ * scripts/prepare-tiling-snapshot.mjs) and launches the tiling script inside
+ * it with the SDK's own `detached: true` mode, so the call we await returns
  * in milliseconds instead of blocking on the multi-minute tiling job itself,
  * which would otherwise hold this server action/route open far past any
  * reasonable request timeout. The sandbox reports its own outcome via the
  * callback route; nothing here waits for or polls the result.
+ *
+ * This must be `detached: true` rather than a manual `nohup ... & disown`
+ * shell trick: without it, the SDK's own command tracking considers the
+ * sandbox's work finished the instant the launcher shell returns (which
+ * happens almost immediately, since all it does is background the real
+ * script), so the session can be paused before the backgrounded script gets
+ * anywhere — regardless of how small the file is. That was confirmed live:
+ * a 300MB+ slide and a trivial ~2MB test slide both got orphaned in
+ * "processing" forever with an identical zero-progress signature (no R2
+ * tile output, no callback ever received). `detached: true` keeps the
+ * command itself tracked as still-running for the sandbox's full timeout.
  */
 export async function triggerTilingJob(params: {
   jobId: string;
   slideId: string;
   rawFileUrl: string;
-}): Promise<{ sandboxId?: string; error?: string }> {
+}): Promise<{ sandboxId?: string; cmdId?: string; error?: string }> {
   const snapshotId = process.env.TILING_SANDBOX_SNAPSHOT_ID;
   const appUrl = process.env.APP_URL;
   const callbackSecret = process.env.TILING_CALLBACK_SECRET;
@@ -48,13 +59,14 @@ export async function triggerTilingJob(params: {
     });
 
     await sandbox.writeFiles([{ path: "/tmp/run-tiling.sh", content: Buffer.from(script) }]);
-    await sandbox.runCommand({
+    const command = await sandbox.runCommand({
       cmd: "bash",
-      args: ["-c", "nohup bash /tmp/run-tiling.sh > /tmp/tiling-launch.log 2>&1 & disown"],
+      args: ["/tmp/run-tiling.sh"],
       sudo: true,
+      detached: true,
     });
 
-    return { sandboxId: sandbox.name };
+    return { sandboxId: sandbox.name, cmdId: command.cmdId };
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Couldn't start the tiling sandbox." };
   }
