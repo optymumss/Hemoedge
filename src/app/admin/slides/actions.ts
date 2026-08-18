@@ -122,7 +122,12 @@ async function startTilingJob(
 
   await supabase
     .from("tiling_jobs")
-    .update({ status: "processing", sandbox_id: result.sandboxId, attempts: job.attempts + 1 })
+    .update({
+      status: "processing",
+      sandbox_id: result.sandboxId,
+      cmd_id: result.cmdId,
+      attempts: job.attempts + 1,
+    })
     .eq("id", job.id);
   await supabase.from("slides").update({ tiling_status: "processing" }).eq("id", slideId);
 }

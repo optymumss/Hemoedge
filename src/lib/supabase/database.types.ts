@@ -1623,6 +1623,7 @@ export type Database = {
       tiling_jobs: {
         Row: {
           attempts: number
+          cmd_id: string | null
           created_at: string
           error: string | null
           id: string
@@ -1633,6 +1634,7 @@ export type Database = {
         }
         Insert: {
           attempts?: number
+          cmd_id?: string | null
           created_at?: string
           error?: string | null
           id?: string
@@ -1643,6 +1645,7 @@ export type Database = {
         }
         Update: {
           attempts?: number
+          cmd_id?: string | null
           created_at?: string
           error?: string | null
           id?: string

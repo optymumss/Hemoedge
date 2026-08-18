@@ -7,6 +7,7 @@ import { UploadForm } from "./upload-form";
 import { ViewSlideButton } from "./view-slide-button";
 import { DeleteSlideButton } from "./delete-slide-button";
 import { retryTiling } from "./actions";
+import { reconcileStaleTilingJobs } from "@/lib/tiling/reconcile-stale-jobs";
 
 function formatSize(bytes: number | null) {
   if (!bytes) return "—";
@@ -25,6 +26,7 @@ const TILING_STATUS: Record<string, { label: string; className: string }> = {
 export default async function SlidesPage() {
   const supabase = await createClient();
   const profile = await getCurrentProfile();
+  await reconcileStaleTilingJobs(supabase);
   const { data: slides } = await supabase
     .from("slides")
     .select("id, title, size_bytes, status, tiling_status, created_by, slide_categories(name)")
