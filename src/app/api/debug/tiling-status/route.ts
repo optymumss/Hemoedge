@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Sandbox } from "@vercel/sandbox";
 import { getCurrentProfile } from "@/lib/auth/get-profile";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * TEMPORARY debug route to inspect a live/dead sandbox command's actual
@@ -11,6 +12,24 @@ export async function GET(request: NextRequest) {
   const profile = await getCurrentProfile();
   if (!profile || profile.role !== "super_admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const testJobId = request.nextUrl.searchParams.get("testAdminWriteJobId");
+  if (testJobId) {
+    const admin = createAdminClient();
+    const before = await admin.from("tiling_jobs").select("id, status, updated_at").eq("id", testJobId).single();
+    const write = await admin
+      .from("tiling_jobs")
+      .update({ status: "ready", updated_at: new Date().toISOString() })
+      .eq("id", testJobId)
+      .select("id, status, updated_at");
+    const after = await admin.from("tiling_jobs").select("id, status, updated_at").eq("id", testJobId).single();
+    return NextResponse.json({
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? null,
+      before,
+      write,
+      after,
+    });
   }
 
   const sandboxId = request.nextUrl.searchParams.get("sandboxId");
