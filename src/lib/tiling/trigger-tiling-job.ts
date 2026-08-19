@@ -49,7 +49,16 @@ export async function triggerTilingJob(params: {
       jobId: params.jobId,
       slideId: params.slideId,
       rawFileUrl: params.rawFileUrl,
-      callbackUrl: `${appUrl}/api/tiling/callback`,
+      // APP_URL carries a trailing slash in this project's config; a naive
+      // `${appUrl}/...` join produced a double slash, which Vercel 308s to
+      // the single-slash path. The sandbox's `curl -fsS` doesn't pass `-L`,
+      // so it silently printed the redirect body and moved on -- tiling
+      // completed and tiles landed in R2, but the callback route was never
+      // actually hit, so the job stayed on "processing" forever. Confirmed
+      // live: a fully-tiled test slide's job never left "processing", and
+      // curl -i against the literal double-slash URL reproduced the same
+      // 308 + "Redirecting..." body seen in the sandbox's own log.
+      callbackUrl: `${appUrl.replace(/\/+$/, "")}/api/tiling/callback`,
       callbackSecret,
       r2AccountId,
       r2AccessKeyId,

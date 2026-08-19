@@ -45,7 +45,7 @@ exec >> "$LOG" 2>&1
 report_failure() {
   local err
   err=$(tail -c 2000 "$LOG" 2>/dev/null | sed 's/"/\\\\"/g' | tr '\\n' ' ')
-  curl -fsS -X POST "${callbackUrl}" \\
+  curl -fsSL -X POST "${callbackUrl}" \\
     -H "Content-Type: application/json" \\
     -H "Authorization: Bearer ${callbackSecret}" \\
     -d "{\\"job_id\\":\\"${jobId}\\",\\"slide_id\\":\\"${slideId}\\",\\"status\\":\\"failed\\",\\"error\\":\\"$err\\"}" || true
@@ -67,7 +67,7 @@ aws s3 cp tiles.dzi "s3://${r2BucketName}/${tilesKeyPrefix}/tiles.dzi" \\
   --endpoint-url "$R2_ENDPOINT"
 
 MANIFEST_URL="${r2PublicUrl}/${tilesKeyPrefix}/tiles.dzi"
-curl -fsS -X POST "${callbackUrl}" \\
+curl -fsSL -X POST "${callbackUrl}" \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer ${callbackSecret}" \\
   -d "{\\"job_id\\":\\"${jobId}\\",\\"slide_id\\":\\"${slideId}\\",\\"status\\":\\"ready\\",\\"manifest_url\\":\\"$MANIFEST_URL\\"}"
