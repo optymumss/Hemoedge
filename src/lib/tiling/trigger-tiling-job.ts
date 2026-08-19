@@ -41,7 +41,13 @@ export async function triggerTilingJob(params: {
   try {
     const sandbox = await Sandbox.create({
       source: { type: "snapshot", snapshotId },
-      timeout: 20 * 60 * 1000,
+      // 45 minutes is the max Vercel allows on the Hobby plan (up to 24h on
+      // Pro/Enterprise) -- confirmed live that a real ~300MB WSI file
+      // (download + vips dzsave + tile upload) can run past the previous
+      // 20-minute budget, which killed the sandbox mid-job with no chance
+      // to report back (a hard VM timeout, not a script error, so nothing
+      // in the script itself can catch or report it).
+      timeout: 45 * 60 * 1000,
       resources: { vcpus: 4 },
     });
 

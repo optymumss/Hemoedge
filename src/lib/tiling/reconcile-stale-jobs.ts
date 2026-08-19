@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 /** Vercel Sandbox instances the tiling pipeline creates are capped at this
  * timeout (see trigger-tiling-job.ts); a job that hasn't heard back well
  * past it is never going to. */
-const SANDBOX_TIMEOUT_MINUTES = 20;
+const SANDBOX_TIMEOUT_MINUTES = 45;
 const STALE_AFTER_MINUTES = SANDBOX_TIMEOUT_MINUTES + 5;
 
 /**
