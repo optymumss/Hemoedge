@@ -40,7 +40,7 @@ export function buildTilingScript(params: {
   return `#!/bin/bash
 set -e
 LOG=/tmp/tiling.log
-exec > >(tee -a "$LOG") 2>&1
+exec >> "$LOG" 2>&1
 
 report_failure() {
   local err
