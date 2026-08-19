@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   const sandboxId = request.nextUrl.searchParams.get("sandboxId");
   const cmdId = request.nextUrl.searchParams.get("cmdId");
   if (!sandboxId || !cmdId) {
-    return NextResponse.json({ error: "Missing sandboxId or cmdId" }, { status: 400 });
+    return NextResponse.json({ appUrl: process.env.APP_URL ?? null, error: "Missing sandboxId or cmdId" }, { status: 400 });
   }
 
   try {
