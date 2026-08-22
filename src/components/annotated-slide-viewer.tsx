@@ -5,14 +5,18 @@ import { getSlideViewUrl } from "@/lib/slides/get-slide-view-url";
 import { recordSlideView } from "@/lib/slides/record-slide-view";
 import { getSlideAnnotations, type SlideAnnotation } from "@/lib/slides/get-slide-annotations";
 import { WsiViewer, type WsiHotspot } from "@/components/wsi-viewer";
+import { WbcCounterPanel } from "@/components/wbc-counter-panel";
 
 /**
  * The learner-facing slide viewer: fetches the slide URL and its teaching
  * annotations (if any), and — only when annotations exist — offers an
  * Explore / Teaching mode toggle. Explore hides the pins entirely; Teaching
- * mode shows them and reveals a pin's label/explanation when tapped. Used
- * anywhere a slide is embedded (case studies, module lessons, standalone),
- * since annotations belong to the slide itself rather than one context.
+ * mode shows them and reveals a pin's label/explanation when tapped. Also
+ * offers a WBC Counter toggle (always available, independent of
+ * annotations) for a manual 100-cell differential tally. Used anywhere a
+ * slide is embedded (case studies, module lessons, standalone), since both
+ * annotations and the counter belong to the slide itself rather than one
+ * context.
  */
 export function AnnotatedSlideViewer({
   slideId,
@@ -27,6 +31,7 @@ export function AnnotatedSlideViewer({
   const [annotations, setAnnotations] = useState<SlideAnnotation[]>([]);
   const [mode, setMode] = useState<"explore" | "teaching">("teaching");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [counterOpen, setCounterOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,40 +67,54 @@ export function AnnotatedSlideViewer({
 
   return (
     <div className="flex flex-col gap-2">
-      {annotations.length > 0 && (
-        <div className="flex items-center gap-2">
-          <div
-            className="flex gap-1 rounded-md border border-line-strong bg-surface-sunken p-1"
-            role="group"
-            aria-label="Viewing mode"
-          >
-            <button
-              type="button"
-              onClick={() => {
-                setMode("explore");
-                setSelectedId(null);
-              }}
-              className={`rounded px-2.5 py-1 text-xs font-medium ${
-                mode === "explore" ? "bg-accent text-accent-ink" : "text-ink-dim hover:bg-surface-raised"
-              }`}
+      <div className="flex flex-wrap items-center gap-2">
+        {annotations.length > 0 && (
+          <>
+            <div
+              className="flex gap-1 rounded-md border border-line-strong bg-surface-sunken p-1"
+              role="group"
+              aria-label="Viewing mode"
             >
-              Explore
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("teaching")}
-              className={`rounded px-2.5 py-1 text-xs font-medium ${
-                mode === "teaching" ? "bg-accent text-accent-ink" : "text-ink-dim hover:bg-surface-raised"
-              }`}
-            >
-              Teaching mode
-            </button>
-          </div>
-          {mode === "teaching" && (
-            <span className="text-xs text-ink-faint">Tap a pin to see what it shows.</span>
-          )}
-        </div>
-      )}
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("explore");
+                  setSelectedId(null);
+                }}
+                className={`rounded px-2.5 py-1 text-xs font-medium ${
+                  mode === "explore" ? "bg-accent text-accent-ink" : "text-ink-dim hover:bg-surface-raised"
+                }`}
+              >
+                Explore
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("teaching")}
+                className={`rounded px-2.5 py-1 text-xs font-medium ${
+                  mode === "teaching" ? "bg-accent text-accent-ink" : "text-ink-dim hover:bg-surface-raised"
+                }`}
+              >
+                Teaching mode
+              </button>
+            </div>
+            {mode === "teaching" && (
+              <span className="text-xs text-ink-faint">Tap a pin to see what it shows.</span>
+            )}
+          </>
+        )}
+        <button
+          type="button"
+          onClick={() => setCounterOpen((open) => !open)}
+          aria-pressed={counterOpen}
+          className={`rounded-md border px-2.5 py-1 text-xs font-medium ${
+            counterOpen
+              ? "border-accent bg-accent text-accent-ink"
+              : "border-line-strong text-ink-dim hover:bg-surface-raised"
+          }`}
+        >
+          WBC Counter
+        </button>
+      </div>
       <div className={`${heightClassName} rounded-md bg-black`}>
         <WsiViewer
           imageUrl={url}
@@ -110,6 +129,7 @@ export function AnnotatedSlideViewer({
           {selected.body && <p className="mt-1 text-sm text-ink-dim">{selected.body}</p>}
         </div>
       )}
+      {counterOpen && <WbcCounterPanel />}
     </div>
   );
 }
