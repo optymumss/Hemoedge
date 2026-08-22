@@ -20,9 +20,9 @@ import type OpenSeadragon from "openseadragon";
 // Slides aren't tagged with their scanner's native magnification yet, so
 // this assumes the common default (40x) — the preset buttons are relative
 // to that, matching how a real microscope objective turret works: "80x" is
-// a 2x digital zoom past the 40x capture, "4x" is a 10x zoom-out from it.
+// a 2x digital zoom past the 40x capture.
 const NATIVE_MAGNIFICATION = 40;
-const PRESETS = [4, 10, 20, 40, 80];
+const PRESETS = [10, 20, 40, 80];
 const MAGNIFICATION_TOLERANCE = 0.05;
 
 const TONE_COLOR: Record<string, string> = {
@@ -100,6 +100,21 @@ export function WsiViewer({
       const viewer = OpenSeadragon({
         element: containerRef.current,
         tileSources: dziUrl ?? { type: "image", url: imageUrl },
+        // Forced to the plain 2D canvas rather than OpenSeadragon's default
+        // (WebGL, when available) so "Save view" below can rely on
+        // canvas.toDataURL() working: a WebGL context's drawing buffer is
+        // cleared right after each composite unless preserveDrawingBuffer is
+        // set, so capturing it later (on a button click, not mid-frame)
+        // reliably returns a blank image. The 2D canvas has no such
+        // caveat — its pixel content just sits there until redrawn.
+        drawer: "canvas",
+        // Also required for "Save view": without requesting tiles in CORS
+        // mode, the browser marks the canvas "tainted" the moment a
+        // cross-origin (R2) tile is drawn onto it, and toDataURL() throws
+        // a SecurityError. R2 already answers with
+        // Access-Control-Allow-Origin: *, so Anonymous mode just has to be
+        // requested for the browser to treat the canvas as exportable.
+        crossOriginPolicy: "Anonymous",
         // The overview mini-map isn't useful for a single (non deep-zoom)
         // image — it's just a shrunken duplicate of the same image.
         showNavigator: false,
@@ -213,6 +228,21 @@ export function WsiViewer({
     viewer.viewport.zoomTo(nativeZoom * (magnification / NATIVE_MAGNIFICATION));
   }
 
+  /** Downloads exactly what's currently framed in the viewport — a learner
+   * zooms/pans to an area or point of interest, then Save captures that
+   * view as a PNG to their device. Not the whole slide (which may be
+   * gigapixels): just the rendered canvas, i.e. what's actually on screen. */
+  function handleSave() {
+    const canvas = containerRef.current?.querySelector("canvas");
+    if (!canvas) return;
+    const dataUrl = canvas.toDataURL("image/png");
+    const magnification = activeMagnification ? `-${activeMagnification}x` : "";
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = `wsi-view${magnification}-${Date.now()}.png`;
+    link.click();
+  }
+
   return (
     <div className="flex h-full flex-col gap-2">
       <div className="flex flex-wrap items-center gap-2">
@@ -252,6 +282,16 @@ export function WsiViewer({
         <div className="h-5 w-px bg-white/20" aria-hidden="true" />
         <button id="wsi-fullscreen" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
           {isFullPage ? "Exit fullscreen" : "Fullscreen"}
+        </button>
+        <div className="h-5 w-px bg-white/20" aria-hidden="true" />
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={!ready}
+          className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10 disabled:opacity-40"
+          title="Download the current view as a PNG"
+        >
+          Save
         </button>
       </div>
       <div className="relative min-h-0 flex-1">
