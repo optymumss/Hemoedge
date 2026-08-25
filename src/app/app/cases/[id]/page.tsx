@@ -4,6 +4,7 @@ import { getEffectiveUserId, getActiveImpersonation } from "@/lib/auth/impersona
 import { getQuestionImageUrls } from "@/lib/quiz/question-image-urls";
 import { QuizReview } from "@/components/quiz-review";
 import { MediaPlayer } from "@/components/media-player";
+import { RevealField } from "@/components/reveal-field";
 import { CaseSlideViewer } from "./case-slide-viewer";
 import { QuizForm } from "./quiz-form";
 
@@ -90,7 +91,11 @@ export default async function LearnerCaseDetailPage({
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">{case_.title}</h1>
+      <Link href="/app/cases" className="text-sm text-ink-dim hover:underline">
+        &larr; Back to Cases
+      </Link>
+
+      <h1 className="mt-3 text-xl font-semibold">{case_.title}</h1>
       <p className="mt-1 flex items-center gap-2 text-sm capitalize text-ink-dim">
         {case_.level}
         {case_.case_category && (
@@ -163,35 +168,27 @@ export default async function LearnerCaseDetailPage({
       )}
 
       {case_.final_diagnosis && (
-        <div className="mt-6 max-w-2xl">
-          <h2 className="text-sm font-semibold">Final diagnosis</h2>
-          <p className="mt-1 text-sm text-ink-dim">{case_.final_diagnosis}</p>
-        </div>
+        <RevealField label="Final diagnosis">
+          <p>{case_.final_diagnosis}</p>
+        </RevealField>
       )}
 
       {case_.learning_points && (
-        <div className="mt-6 max-w-2xl">
-          <h2 className="text-sm font-semibold">Key learning points</h2>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-ink-dim">{case_.learning_points}</p>
-        </div>
+        <RevealField label="Key learning points">
+          <p className="whitespace-pre-wrap">{case_.learning_points}</p>
+        </RevealField>
       )}
 
       {case_.escalation_decision && (
-        <div className="mt-6 max-w-2xl">
-          <h2 className="text-sm font-semibold">Escalation decision</h2>
-          <p className="mt-1 text-sm text-ink-dim">
-            {ESCALATION_LABEL[case_.escalation_decision] ?? case_.escalation_decision}
-          </p>
-        </div>
+        <RevealField label="Escalation decision">
+          <p>{ESCALATION_LABEL[case_.escalation_decision] ?? case_.escalation_decision}</p>
+        </RevealField>
       )}
 
       {case_.suggested_report_comment && (
-        <div className="mt-6 max-w-2xl">
-          <h2 className="text-sm font-semibold">Suggested report comment</h2>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-ink-dim">
-            {case_.suggested_report_comment}
-          </p>
-        </div>
+        <RevealField label="Suggested report comment">
+          <p className="whitespace-pre-wrap">{case_.suggested_report_comment}</p>
+        </RevealField>
       )}
 
       {(moduleLinks ?? []).length > 0 && (

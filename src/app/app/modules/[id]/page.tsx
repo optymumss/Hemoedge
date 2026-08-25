@@ -72,28 +72,48 @@ export default async function LearnerModuleDetailPage({
     .eq("status", "published")
     .maybeSingle();
 
+  // WSI slides live on lessons, not the module itself — when any lesson has
+  // one, the lesson tree (which surfaces its slide first) takes priority
+  // over the module's own audio/video, rather than making a learner scroll
+  // past narration to reach the slide.
+  const hasSlide = (lessons ?? []).some((l) => l.slide_id);
+  const moduleMedia = (module_.audio_path || module_.video_path) && (
+    <div className="mt-4">
+      <MediaPlayer
+        audioUrl={module_.audio_path}
+        audioTranscript={module_.audio_transcript}
+        videoUrl={module_.video_path}
+      />
+    </div>
+  );
+  const lessonTree = (lessons ?? []).length > 0 && (
+    <div className="mt-6">
+      <LessonTree lessons={lessons ?? []} />
+    </div>
+  );
+
   return (
     <div>
-      <h1 className="text-xl font-semibold">{module_.title}</h1>
+      <Link href="/app/modules" className="text-sm text-ink-dim hover:underline">
+        &larr; Back to Modules
+      </Link>
+
+      <h1 className="mt-3 text-xl font-semibold">{module_.title}</h1>
       <p className="mt-1 text-sm capitalize text-ink-dim">{module_.level}</p>
       {module_.description && (
         <p className="mt-2 text-sm text-ink-dim">{module_.description}</p>
       )}
 
-      {(module_.audio_path || module_.video_path) && (
-        <div className="mt-4">
-          <MediaPlayer
-            audioUrl={module_.audio_path}
-            audioTranscript={module_.audio_transcript}
-            videoUrl={module_.video_path}
-          />
-        </div>
-      )}
-
-      {(lessons ?? []).length > 0 && (
-        <div className="mt-6">
-          <LessonTree lessons={lessons ?? []} />
-        </div>
+      {hasSlide ? (
+        <>
+          {lessonTree}
+          {moduleMedia}
+        </>
+      ) : (
+        <>
+          {moduleMedia}
+          {lessonTree}
+        </>
       )}
 
       {diffExercise && (
