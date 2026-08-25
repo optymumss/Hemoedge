@@ -15,7 +15,10 @@ type Lesson = {
 };
 
 export function LessonTree({ lessons }: { lessons: Lesson[] }) {
-  const [expandedId, setExpandedId] = useState<string | null>(lessons[0]?.id ?? null);
+  // Auto-expand the first lesson with a slide, so the WSI is what a learner
+  // sees immediately rather than having to find it behind other lessons.
+  const defaultLesson = lessons.find((l) => l.slide_id) ?? lessons[0];
+  const [expandedId, setExpandedId] = useState<string | null>(defaultLesson?.id ?? null);
 
   return (
     <div className="flex flex-col gap-2">
@@ -39,14 +42,16 @@ export function LessonTree({ lessons }: { lessons: Lesson[] }) {
 
             {isExpanded && (
               <div className="border-t border-line px-4 py-3">
-                {lesson.body && (
-                  <p className="whitespace-pre-wrap text-sm text-ink-dim">{lesson.body}</p>
-                )}
-
                 {lesson.slide_id && (
-                  <div className="mt-3">
+                  <div>
                     <AnnotatedSlideViewer slideId={lesson.slide_id} heightClassName="h-[28rem]" />
                   </div>
+                )}
+
+                {lesson.body && (
+                  <p className={`whitespace-pre-wrap text-sm text-ink-dim ${lesson.slide_id ? "mt-3" : ""}`}>
+                    {lesson.body}
+                  </p>
                 )}
 
                 {(lesson.audio_path || lesson.video_path) && (

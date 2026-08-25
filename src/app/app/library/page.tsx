@@ -32,6 +32,14 @@ export default async function LearnerLibraryPage({
     ? (features ?? []).filter((f) => f.cell_types !== null)
     : (features ?? []);
 
+  // Slides aren't tagged by cell lineage, so they sit in their own section
+  // below rather than joining the lineage filter above.
+  const { data: slides } = await supabase
+    .from("slides")
+    .select("id, title, slide_categories(name)")
+    .eq("status", "published")
+    .order("title");
+
   return (
     <div>
       <h1 className="text-xl font-semibold">Library</h1>
@@ -84,6 +92,31 @@ export default async function LearnerLibraryPage({
         {filtered.length === 0 && (
           <p className="col-span-full py-8 text-center text-sm text-ink-faint">
             {activeLineage ? "Nothing published in this category yet." : "Nothing published yet."}
+          </p>
+        )}
+      </div>
+
+      <h2 className="mt-10 text-lg font-semibold">Whole Slide Images</h2>
+      <p className="mt-1 text-sm text-ink-dim">
+        Browse every scanned slide available on the platform.
+      </p>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {(slides ?? []).map((s) => (
+          <Link
+            key={s.id}
+            href={`/app/library/slide/${s.id}`}
+            className="rounded-lg border border-line p-4 hover:border-line-strong hover:bg-surface-raised"
+          >
+            {s.slide_categories?.name && (
+              <span className="text-xs uppercase text-ink-faint">{s.slide_categories.name}</span>
+            )}
+            <h3 className="mt-1 font-medium">{s.title}</h3>
+          </Link>
+        ))}
+        {(slides ?? []).length === 0 && (
+          <p className="col-span-full py-8 text-center text-sm text-ink-faint">
+            No slides published yet.
           </p>
         )}
       </div>
