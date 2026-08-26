@@ -10,7 +10,11 @@ export function ModuleTabs({ moduleId }: { moduleId: string }) {
   const quizHref = `/admin/modules/${moduleId}/quiz`;
 
   const tabs = [
-    { href: detailsHref, label: "Details", active: pathname === detailsHref },
+    {
+      href: detailsHref,
+      label: "Details",
+      active: pathname === detailsHref || pathname === `${detailsHref}/edit`,
+    },
     { href: lessonsHref, label: "Lessons", active: pathname === lessonsHref },
     { href: quizHref, label: "Quiz", active: pathname === quizHref },
   ];

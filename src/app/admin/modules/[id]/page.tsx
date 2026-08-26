@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { addModuleTag, removeModuleTag, addModulePrerequisite, removeModulePrerequisite } from "./actions";
-import { DetailsForm, ModuleMediaFields } from "./details-form";
+import { DetailsSummary, ModuleMediaFields } from "./details-form";
 
 export default async function ModuleDetailsPage({
   params,
@@ -49,7 +49,7 @@ export default async function ModuleDetailsPage({
       <p className="mt-1 text-sm text-ink-dim">Core module fields, tags, and prerequisites.</p>
 
       <div className="mt-6">
-        <DetailsForm module_={module_} />
+        <DetailsSummary module_={module_} />
       </div>
 
       <div className="mt-6 rounded-lg border border-line p-4">

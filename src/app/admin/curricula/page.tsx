@@ -2,7 +2,6 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitForReviewButton } from "@/components/submit-for-review-button";
-import { CurriculumForm } from "./curriculum-form";
 
 export default async function CurriculaPage() {
   const supabase = await createClient();
@@ -13,13 +12,19 @@ export default async function CurriculaPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">Learning Pathways</h1>
-      <p className="mt-1 text-sm text-ink-dim">
-        Ordered sets of modules that lead to a certificate.
-      </p>
-
-      <div className="mt-6 rounded-lg border border-line p-4">
-        <CurriculumForm />
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">Learning Pathways</h1>
+          <p className="mt-1 text-sm text-ink-dim">
+            Ordered sets of modules that lead to a certificate.
+          </p>
+        </div>
+        <Link
+          href="/admin/curricula/new"
+          className="shrink-0 rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink"
+        >
+          + New
+        </Link>
       </div>
 
       <div className="mt-6 overflow-hidden rounded-lg border border-line">

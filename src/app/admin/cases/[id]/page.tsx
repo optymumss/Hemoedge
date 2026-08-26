@@ -9,7 +9,7 @@ import {
   addCaseSlide,
   removeCaseSlide,
 } from "./actions";
-import { DetailsForm, CaseMediaFields } from "./details-form";
+import { DetailsSummary, CaseMediaFields } from "./details-form";
 
 export default async function CaseDetailsPage({
   params,
@@ -33,7 +33,7 @@ export default async function CaseDetailsPage({
     supabase
       .from("cases")
       .select(
-        "id, title, level, description, slide_id, case_context, lab_values, final_diagnosis, learning_points, estimated_time_minutes, cpd_points, case_category, escalation_decision, suggested_report_comment, audio_path, audio_transcript, video_path",
+        "id, title, level, status, description, slide_id, case_context, lab_values, final_diagnosis, learning_points, estimated_time_minutes, cpd_points, case_category, escalation_decision, suggested_report_comment, audio_path, audio_transcript, video_path",
       )
       .eq("id", id)
       .single(),
@@ -67,7 +67,7 @@ export default async function CaseDetailsPage({
       <p className="mt-1 text-sm text-ink-dim">Core case study fields, WSI slide, tags, and linked features.</p>
 
       <div className="mt-6">
-        <DetailsForm case_={case_} slides={slides ?? []} />
+        <DetailsSummary case_={case_} slides={slides ?? []} />
       </div>
 
       <div className="mt-6 rounded-lg border border-line p-4">

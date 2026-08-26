@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { createContentMediaUploadTarget, confirmContentMedia } from "@/lib/media/content-media";
 import { validateMediaFile } from "@/lib/media/media-limits";
@@ -11,6 +12,7 @@ export function FeatureForm({
 }: {
   cellTypes: { id: string; name: string }[];
 }) {
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -127,7 +129,7 @@ export function FeatureForm({
       }
 
       formRef.current?.reset();
-      window.location.reload();
+      router.push(`/admin/features/${created.featureId}`);
     } catch {
       setError("Something went wrong — check your connection and try again.");
     } finally {
@@ -247,7 +249,7 @@ export function FeatureForm({
         disabled={pending}
         className="self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
       >
-        {pending ? "Creating…" : "Create draft feature"}
+        {pending ? "Saving…" : "Save"}
       </button>
       {error && <p className="text-sm text-danger">{error}</p>}
     </form>

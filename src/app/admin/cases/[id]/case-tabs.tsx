@@ -9,7 +9,11 @@ export function CaseTabs({ caseId }: { caseId: string }) {
   const quizHref = `/admin/cases/${caseId}/quiz`;
 
   const tabs = [
-    { href: detailsHref, label: "Details", active: pathname === detailsHref },
+    {
+      href: detailsHref,
+      label: "Details",
+      active: pathname === detailsHref || pathname === `${detailsHref}/edit`,
+    },
     { href: quizHref, label: "Quiz", active: pathname === quizHref },
   ];
 

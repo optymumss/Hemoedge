@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { linkModule, unlinkModule, moveModule, publishNewVersion } from "./actions";
-import { DetailsForm } from "./details-form";
+import { DetailsSummary } from "./details-form";
 
 export default async function PathwayDetailPage({
   params,
@@ -39,9 +39,8 @@ export default async function PathwayDetailPage({
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">{pathway.title}</h1>
-      <p className="mt-1 text-sm text-ink-dim">
-        {pathway.level} · v{pathway.version} · {pathway.pass_threshold}% pass threshold · {pathway.status}
+      <p className="text-sm text-ink-dim">
+        v{pathway.version}
         {pathway.previous_version_id && (
           <>
             {" · "}
@@ -69,7 +68,7 @@ export default async function PathwayDetailPage({
       )}
 
       <div className="mt-6">
-        <DetailsForm pathway={pathway} />
+        <DetailsSummary pathway={pathway} />
       </div>
 
       <div className="mt-6 rounded-lg border border-line p-4">
