@@ -1,8 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { MediaFields } from "@/components/admin/media-fields";
-import { updateCaseDetails, type FormState } from "./actions";
+import { SummaryField } from "@/components/admin/summary-field";
+import { StatusBadge } from "@/components/status-badge";
+import { SubmitForReviewButton } from "@/components/submit-for-review-button";
+import type { FormState } from "./actions";
 
 export type CaseDetails = {
   id: string;
@@ -24,6 +28,10 @@ export type CaseDetails = {
   video_path: string | null;
 };
 
+type CaseFormValues = Partial<CaseDetails> & { id?: string };
+
+const BLANK_CASE: CaseFormValues = {};
+
 const CASE_CATEGORY_SUGGESTIONS = [
   "Anaemia",
   "Leukaemia",
@@ -38,21 +46,25 @@ const ESCALATION_LABEL: Record<string, string> = {
   urgent: "Urgent escalation",
 };
 
+/**
+ * Shared by the "New case study" page and the Details tab's edit page —
+ * same fields either way, just a different action (create vs. update) and
+ * whether `case_` carries existing values.
+ */
 export function DetailsForm({
-  case_,
+  case_ = BLANK_CASE,
   slides,
+  action,
 }: {
-  case_: CaseDetails;
+  case_?: CaseFormValues;
   slides: { id: string; title: string }[];
+  action: (prevState: FormState, formData: FormData) => Promise<FormState>;
 }) {
-  const [state, action, pending] = useActionState<FormState, FormData>(
-    updateCaseDetails,
-    undefined,
-  );
+  const [state, formAction, pending] = useActionState<FormState, FormData>(action, undefined);
 
   return (
-    <form action={action} className="flex flex-col gap-3 rounded-lg border border-line p-4">
-      <input type="hidden" name="id" value={case_.id} />
+    <form action={formAction} className="flex flex-col gap-3 rounded-lg border border-line p-4">
+      {case_.id && <input type="hidden" name="id" value={case_.id} />}
       <div className="flex flex-wrap gap-3">
         <div className="flex flex-1 min-w-64 flex-col gap-1">
           <label className="text-xs text-ink-dim" htmlFor="case-title">Title</label>
@@ -60,7 +72,7 @@ export function DetailsForm({
             id="case-title"
             name="title"
             required
-            defaultValue={case_.title}
+            defaultValue={case_.title ?? ""}
             className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
           />
         </div>
@@ -69,9 +81,13 @@ export function DetailsForm({
           <select
             id="case-level"
             name="level"
-            defaultValue={case_.level}
+            required
+            defaultValue={case_.level ?? ""}
             className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
           >
+            <option value="" disabled>
+              Choose…
+            </option>
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
@@ -113,7 +129,7 @@ export function DetailsForm({
             name="cpd_points"
             type="number"
             min={0}
-            defaultValue={case_.cpd_points}
+            defaultValue={case_.cpd_points ?? 0}
             className="w-32 rounded-md border border-line-strong px-2 py-1.5 text-sm"
           />
         </div>
@@ -218,10 +234,62 @@ export function DetailsForm({
         disabled={pending}
         className="self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
       >
-        {pending ? "Saving…" : "Save details"}
+        {pending ? "Saving…" : "Save"}
       </button>
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
     </form>
+  );
+}
+
+export function DetailsSummary({
+  case_,
+  slides,
+}: {
+  case_: CaseDetails & { status: string };
+  slides: { id: string; title: string }[];
+}) {
+  const slideTitle = slides.find((s) => s.id === case_.slide_id)?.title ?? null;
+
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border border-line p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-semibold">{case_.title}</h2>
+          <StatusBadge status={case_.status} />
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
+          {(case_.status === "draft" || case_.status === "changes_requested") && (
+            <SubmitForReviewButton contentType="case" id={case_.id} path={`/admin/cases/${case_.id}`} />
+          )}
+          <Link
+            href={`/admin/cases/${case_.id}/edit`}
+            className="rounded-md border border-line-strong px-3 py-1.5 text-sm text-ink hover:bg-surface-sunken"
+          >
+            Edit details
+          </Link>
+        </div>
+      </div>
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <SummaryField label="Level" value={<span className="capitalize">{case_.level}</span>} />
+        <SummaryField label="WSI slide" value={slideTitle} />
+        <SummaryField
+          label="Estimated time"
+          value={case_.estimated_time_minutes ? `${case_.estimated_time_minutes} min` : null}
+        />
+        <SummaryField label="CPD points" value={case_.cpd_points} />
+        <SummaryField label="Case category" value={case_.case_category} />
+        <SummaryField
+          label="Escalation decision"
+          value={case_.escalation_decision ? ESCALATION_LABEL[case_.escalation_decision] : null}
+        />
+      </dl>
+      <SummaryField label="Summary" value={case_.description} multiline />
+      <SummaryField label="Case context" value={case_.case_context} multiline />
+      <SummaryField label="FBC / other lab values" value={case_.lab_values} multiline />
+      <SummaryField label="Final diagnosis" value={case_.final_diagnosis} multiline />
+      <SummaryField label="Key learning points" value={case_.learning_points} multiline />
+      <SummaryField label="Suggested report comment" value={case_.suggested_report_comment} multiline />
+    </div>
   );
 }
 

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { updateGuardMessage } from "@/lib/content/update-guard";
 import type { Enums } from "@/lib/supabase/database.types";
 
 export type FormState = { error?: string } | undefined;
@@ -63,13 +64,15 @@ export async function updatePathwayDetails(
       cpd_points: cpdPoints,
       estimated_completion_minutes: estimatedCompletionMinutes,
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id")
+    .single();
 
-  if (error) return { error: error.message };
+  if (error) return { error: updateGuardMessage(error) ?? error.message };
 
   revalidatePath(`/admin/curricula/${id}`);
   revalidatePath("/admin/curricula");
-  return undefined;
+  redirect(`/admin/curricula/${id}`);
 }
 
 export async function linkModule(formData: FormData) {

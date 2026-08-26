@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { updateGuardMessage } from "@/lib/content/update-guard";
 import { slugify } from "@/lib/slugify";
 import type { Enums } from "@/lib/supabase/database.types";
 
@@ -51,13 +53,15 @@ export async function updateModuleDetails(
       estimated_duration_minutes: estimatedDurationMinutes,
       cpd_points: cpdPoints,
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id")
+    .single();
 
-  if (error) return { error: error.message };
+  if (error) return { error: updateGuardMessage(error) ?? error.message };
 
   revalidatePath(`/admin/modules/${id}`);
   revalidatePath("/admin/modules");
-  return undefined;
+  redirect(`/admin/modules/${id}`);
 }
 
 export async function addModuleTag(formData: FormData) {

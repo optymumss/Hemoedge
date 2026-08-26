@@ -1,17 +1,14 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitForReviewButton } from "@/components/submit-for-review-button";
-import { FeatureForm } from "./feature-form";
 
 export default async function FeaturesPage() {
   const supabase = await createClient();
-  const [{ data: features }, { data: cellTypes }] = await Promise.all([
-    supabase
-      .from("features")
-      .select("id, title, definition, status, cell_type_id, image_path, cell_types(name)")
-      .order("created_at", { ascending: false }),
-    supabase.from("cell_types").select("id, name").order("name"),
-  ]);
+  const { data: features } = await supabase
+    .from("features")
+    .select("id, title, definition, status, cell_type_id, image_path, cell_types(name)")
+    .order("created_at", { ascending: false });
 
   const imageUrls = new Map(
     await Promise.all(
@@ -28,13 +25,19 @@ export default async function FeaturesPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">Features</h1>
-      <p className="mt-1 text-sm text-ink-dim">
-        Blood cell morphology reference entries with cropped image examples.
-      </p>
-
-      <div className="mt-6 rounded-lg border border-line p-4">
-        <FeatureForm cellTypes={cellTypes ?? []} />
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">Features</h1>
+          <p className="mt-1 text-sm text-ink-dim">
+            Blood cell morphology reference entries with cropped image examples.
+          </p>
+        </div>
+        <Link
+          href="/admin/features/new"
+          className="shrink-0 rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink"
+        >
+          + New
+        </Link>
       </div>
 
       <div className="mt-6 overflow-hidden rounded-lg border border-line">
@@ -63,7 +66,11 @@ export default async function FeaturesPage() {
                     <span className="text-ink-faint">—</span>
                   )}
                 </td>
-                <td className="px-4 py-2 font-medium">{f.title}</td>
+                <td className="px-4 py-2 font-medium">
+                  <Link href={`/admin/features/${f.id}`} className="hover:underline">
+                    {f.title}
+                  </Link>
+                </td>
                 <td className="px-4 py-2 text-ink-dim">
                   {f.cell_types?.name ?? "—"}
                 </td>

@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
-import { ModuleForm } from "./module-form";
 
 type ModuleSummary = {
   id: string;
@@ -22,7 +21,6 @@ export function ModulesLibraryShell({
 }) {
   const pathname = usePathname();
   const [query, setQuery] = useState("");
-  const [creating, setCreating] = useState(false);
 
   const activeId = useMemo(() => {
     const match = pathname.match(/^\/admin\/modules\/([^/]+)/);
@@ -47,21 +45,13 @@ export function ModulesLibraryShell({
             <span className="text-xs font-semibold uppercase tracking-wide text-ink-dim">
               Module library
             </span>
-            <button
-              type="button"
-              onClick={() => setCreating((v) => !v)}
+            <Link
+              href="/admin/modules/new"
               className="rounded-md border border-line-strong px-2 py-1 text-xs text-ink hover:bg-surface-sunken"
-              aria-expanded={creating}
             >
-              {creating ? "Cancel" : "+ New"}
-            </button>
+              + New
+            </Link>
           </div>
-
-          {creating && (
-            <div className="border-b border-line p-3">
-              <ModuleForm />
-            </div>
-          )}
 
           <div className="border-b border-line p-2">
             <input

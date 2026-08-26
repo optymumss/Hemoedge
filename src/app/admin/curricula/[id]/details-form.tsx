@@ -1,7 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
-import { updatePathwayDetails, type FormState } from "./actions";
+import { SummaryField } from "@/components/admin/summary-field";
+import { StatusBadge } from "@/components/status-badge";
+import { SubmitForReviewButton } from "@/components/submit-for-review-button";
+import type { FormState } from "./actions";
 
 const PATHWAY_TYPE_LABEL: Record<string, string> = {
   full_pathway: "Full pathway",
@@ -25,15 +29,27 @@ export type PathwayDetails = {
   version: number;
 };
 
-export function DetailsForm({ pathway }: { pathway: PathwayDetails }) {
-  const [state, action, pending] = useActionState<FormState, FormData>(
-    updatePathwayDetails,
-    undefined,
-  );
+type PathwayFormValues = Partial<PathwayDetails> & { id?: string };
+
+const BLANK_PATHWAY: PathwayFormValues = { pass_threshold: 70, version: 1 };
+
+/**
+ * Shared by the "New pathway" page and the detail page's edit page — same
+ * fields either way, just a different action (create vs. update) and
+ * whether `pathway` carries existing values.
+ */
+export function DetailsForm({
+  pathway = BLANK_PATHWAY,
+  action,
+}: {
+  pathway?: PathwayFormValues;
+  action: (prevState: FormState, formData: FormData) => Promise<FormState>;
+}) {
+  const [state, formAction, pending] = useActionState<FormState, FormData>(action, undefined);
 
   return (
-    <form action={action} className="flex flex-col gap-3 rounded-lg border border-line p-4">
-      <input type="hidden" name="id" value={pathway.id} />
+    <form action={formAction} className="flex flex-col gap-3 rounded-lg border border-line p-4">
+      {pathway.id && <input type="hidden" name="id" value={pathway.id} />}
       <div className="flex flex-wrap gap-3">
         <div className="flex flex-1 min-w-64 flex-col gap-1">
           <label className="text-xs text-ink-dim" htmlFor="pathway-title">Pathway title</label>
@@ -41,7 +57,7 @@ export function DetailsForm({ pathway }: { pathway: PathwayDetails }) {
             id="pathway-title"
             name="title"
             required
-            defaultValue={pathway.title}
+            defaultValue={pathway.title ?? ""}
             className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
           />
         </div>
@@ -50,9 +66,13 @@ export function DetailsForm({ pathway }: { pathway: PathwayDetails }) {
           <select
             id="pathway-level"
             name="level"
-            defaultValue={pathway.level}
+            required
+            defaultValue={pathway.level ?? ""}
             className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
           >
+            <option value="" disabled>
+              Choose…
+            </option>
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
@@ -82,7 +102,7 @@ export function DetailsForm({ pathway }: { pathway: PathwayDetails }) {
             type="number"
             min={1}
             max={100}
-            defaultValue={pathway.pass_threshold}
+            defaultValue={pathway.pass_threshold ?? 70}
             className="w-24 rounded-md border border-line-strong px-2 py-1.5 text-sm"
           />
         </div>
@@ -104,13 +124,13 @@ export function DetailsForm({ pathway }: { pathway: PathwayDetails }) {
             name="cpd_points"
             type="number"
             min={0}
-            defaultValue={pathway.cpd_points}
+            defaultValue={pathway.cpd_points ?? 0}
             className="w-44 rounded-md border border-line-strong px-2 py-1.5 text-sm"
           />
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-xs text-ink-dim">Version</span>
-          <p className="px-2 py-1.5 text-sm text-ink-dim">v{pathway.version} (automatic)</p>
+          <p className="px-2 py-1.5 text-sm text-ink-dim">v{pathway.version ?? 1} (automatic)</p>
         </div>
       </div>
 
@@ -140,7 +160,7 @@ export function DetailsForm({ pathway }: { pathway: PathwayDetails }) {
           <input
             type="checkbox"
             name="certificate_awarded"
-            defaultChecked={pathway.certificate_awarded}
+            defaultChecked={pathway.certificate_awarded ?? false}
             className="accent-accent"
           />
           Certificate awarded on completion
@@ -162,9 +182,56 @@ export function DetailsForm({ pathway }: { pathway: PathwayDetails }) {
         disabled={pending}
         className="self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
       >
-        {pending ? "Saving…" : "Save details"}
+        {pending ? "Saving…" : "Save"}
       </button>
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
     </form>
+  );
+}
+
+export function DetailsSummary({ pathway }: { pathway: PathwayDetails & { status: string } }) {
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border border-line p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-semibold">{pathway.title}</h2>
+          <StatusBadge status={pathway.status} />
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
+          {(pathway.status === "draft" || pathway.status === "changes_requested") && (
+            <SubmitForReviewButton
+              contentType="curriculum"
+              id={pathway.id}
+              path={`/admin/curricula/${pathway.id}`}
+            />
+          )}
+          <Link
+            href={`/admin/curricula/${pathway.id}/edit`}
+            className="rounded-md border border-line-strong px-3 py-1.5 text-sm text-ink hover:bg-surface-sunken"
+          >
+            Edit details
+          </Link>
+        </div>
+      </div>
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <SummaryField label="Competency level" value={<span className="capitalize">{pathway.level}</span>} />
+        <SummaryField
+          label="Pathway type"
+          value={pathway.pathway_type ? PATHWAY_TYPE_LABEL[pathway.pathway_type] : null}
+        />
+        <SummaryField label="Pass threshold" value={`${pathway.pass_threshold}%`} />
+        <SummaryField
+          label="Estimated completion"
+          value={pathway.estimated_completion_minutes ? `${pathway.estimated_completion_minutes} min` : null}
+        />
+        <SummaryField label="CPD points" value={pathway.cpd_points} />
+        <SummaryField
+          label="Certificate"
+          value={pathway.certificate_awarded ? pathway.certificate_title || "Awarded" : "Not awarded"}
+        />
+      </dl>
+      <SummaryField label="Short description" value={pathway.description} multiline />
+      <SummaryField label="Learning outcomes" value={pathway.learning_outcomes} multiline />
+    </div>
   );
 }

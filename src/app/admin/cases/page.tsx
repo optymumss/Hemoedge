@@ -2,7 +2,6 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitForReviewButton } from "@/components/submit-for-review-button";
-import { CaseForm } from "./case-form";
 
 export default async function CasesPage() {
   const supabase = await createClient();
@@ -13,13 +12,19 @@ export default async function CasesPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">Case Studies</h1>
-      <p className="mt-1 text-sm text-ink-dim">
-        Real-world clinical scenarios built around a WSI slide, with case context, lab values, and a knowledge check.
-      </p>
-
-      <div className="mt-6 rounded-lg border border-line p-4">
-        <CaseForm />
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">Case Studies</h1>
+          <p className="mt-1 text-sm text-ink-dim">
+            Real-world clinical scenarios built around a WSI slide, with case context, lab values, and a knowledge check.
+          </p>
+        </div>
+        <Link
+          href="/admin/cases/new"
+          className="shrink-0 rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink"
+        >
+          + New
+        </Link>
       </div>
 
       <div className="mt-6 overflow-hidden rounded-lg border border-line">
@@ -43,7 +48,7 @@ export default async function CasesPage() {
                 <td className="px-4 py-2 text-right">
                   <div className="flex items-center justify-end gap-3">
                     <Link href={`/admin/cases/${c.id}`} className="text-xs text-ink-dim underline">
-                      Edit details
+                      View
                     </Link>
                     <Link href={`/admin/cases/${c.id}/quiz`} className="text-xs text-ink-dim underline">
                       Manage quiz
