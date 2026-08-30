@@ -32,16 +32,22 @@ function emptyCounts(): Record<CategoryCode, number> {
 }
 
 /**
- * A manual 100-cell WBC differential tally: a learner reviews the whole
- * slide image themselves (panning/zooming with the viewer above) and clicks
- * a category button for each white cell they classify, rather than clicking
- * points on the image — this mirrors counting at a real microscope, where
- * the tool is a side counter, not a pin-placement exercise. Purely a
- * client-side scratch tool: counts reset when the panel is closed or the
- * page reloads, same as the viewer's "Save view" button has no server-side
- * record either.
+ * A manual 100-cell WBC differential tally, docked as an overlay inside the
+ * WSI viewer itself (see wsi-viewer.tsx) rather than a panel below it — a
+ * learner needs to count while their eyes stay on the slide, not scroll
+ * down to a separate block every time they classify a cell. Sits in the
+ * viewer's own letterboxed space, narrow enough that panning/zooming the
+ * rest of the image still works underneath it.
+ *
+ * A learner reviews the whole slide image themselves (panning/zooming with
+ * the viewer) and clicks a category for each white cell they classify,
+ * rather than clicking points on the image — this mirrors counting at a
+ * real microscope, where the tool is a side counter, not a pin-placement
+ * exercise. Purely a client-side scratch tool: counts reset when the panel
+ * is closed or the page reloads, same as the viewer's "Save view" button
+ * has no server-side record either.
  */
-export function WbcCounterPanel() {
+export function WbcCounterPanel({ onClose }: { onClose?: () => void }) {
   const [counts, setCounts] = useState<Record<CategoryCode, number>>(emptyCounts);
   const [wbcTotal, setWbcTotal] = useState("");
 
@@ -65,62 +71,73 @@ export function WbcCounterPanel() {
   }
 
   return (
-    <div className="rounded-md border border-line-strong bg-surface-sunken p-3">
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="text-sm font-medium text-ink">Manual WBC differential count</p>
-          <p className="text-xs text-ink-faint">
-            Scan the slide above and click a category for each white cell you classify. Percentages
-            update live; enter an FBC WBC count below to see absolute counts too.
-          </p>
+    <div className="flex h-full flex-col gap-2 overflow-y-auto border-l border-white/15 bg-black/85 p-2 text-white backdrop-blur-sm">
+      <div className="flex items-start justify-between gap-1">
+        <p className={`text-xs font-medium ${atTarget ? "text-success" : "text-white"}`} role="status">
+          {total}/{TARGET_COUNT} counted
+        </p>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <button
+            type="button"
+            onClick={reset}
+            className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-white/70 hover:bg-white/10"
+          >
+            Reset
+          </button>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close WBC counter"
+              className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-white/70 hover:bg-white/10"
+            >
+              ×
+            </button>
+          )}
         </div>
-        <button
-          type="button"
-          onClick={reset}
-          className="shrink-0 rounded-md border border-line-strong px-2 py-1 text-xs text-ink-dim hover:bg-surface-raised"
-        >
-          Reset count
-        </button>
       </div>
 
-      <p className={`mt-3 text-sm font-medium ${atTarget ? "text-success" : "text-ink"}`} role="status">
-        {total} / {TARGET_COUNT} counted{atTarget ? " — differential complete" : ""}
-      </p>
-
-      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-5" role="group" aria-label="Cell category counts">
+      <div className="flex flex-col gap-0.5" role="group" aria-label="Cell category counts">
         {CATEGORIES.map(({ code, label }) => {
           const count = counts[code];
           const pct = total > 0 ? (count / total) * 100 : 0;
           return (
-            <div key={code} className="rounded-md border border-line-strong bg-surface-raised p-2 text-center">
+            <div
+              key={code}
+              className="flex items-center gap-1 rounded border border-white/10 bg-white/5 pl-1.5 pr-1 py-0.5"
+            >
               <button
                 type="button"
                 onClick={() => increment(code)}
                 disabled={atTarget}
                 title={label}
-                className="w-full rounded px-1 py-1 text-xs font-semibold text-ink hover:bg-accent hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-ink"
+                className="flex-1 rounded px-1 py-0.5 text-left text-[10px] font-semibold leading-tight text-white hover:bg-accent hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-white"
               >
                 {code}
               </button>
-              <p className="mt-1 text-lg font-semibold text-ink">{count}</p>
-              <p className="text-[11px] text-ink-faint">{total > 0 ? `${pct.toFixed(1)}%` : "—"}</p>
+              <span className="w-5 shrink-0 text-right text-[11px] font-semibold tabular-nums text-white">
+                {count}
+              </span>
+              <span className="w-9 shrink-0 text-right text-[9px] tabular-nums text-white/50">
+                {total > 0 ? `${pct.toFixed(0)}%` : "—"}
+              </span>
               <button
                 type="button"
                 onClick={() => decrement(code)}
                 disabled={count === 0}
                 aria-label={`Remove one ${label} count`}
-                className="mt-1 text-[11px] text-ink-faint underline disabled:cursor-not-allowed disabled:opacity-40"
+                className="shrink-0 rounded px-1 text-[10px] leading-none text-white/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
               >
-                −1
+                −
               </button>
             </div>
           );
         })}
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line-strong pt-3">
-        <label htmlFor="wbc-counter-total" className="text-xs text-ink-dim">
-          Total WBC count from FBC (×10⁹/L), optional:
+      <div className="mt-auto flex flex-col gap-1 border-t border-white/15 pt-1.5">
+        <label htmlFor="wbc-counter-total" className="text-[9px] leading-tight text-white/50">
+          FBC WBC total (×10⁹/L)
         </label>
         <input
           id="wbc-counter-total"
@@ -130,22 +147,18 @@ export function WbcCounterPanel() {
           value={wbcTotal}
           onChange={(e) => setWbcTotal(e.target.value)}
           placeholder="e.g. 7.2"
-          className="w-24 rounded-md border border-line-strong bg-surface-raised px-2 py-1 text-xs text-ink"
+          className="w-full rounded border border-white/20 bg-white/5 px-1.5 py-0.5 text-[10px] text-white"
         />
-      </div>
-
-      {hasWbcValue && total > 0 && (
-        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-ink-dim sm:grid-cols-5">
-          {CATEGORIES.map(({ code }) => {
-            const absolute = (counts[code] / total) * wbcValue;
-            return (
-              <p key={code}>
-                {code}: {absolute.toFixed(2)} ×10⁹/L
+        {hasWbcValue && total > 0 && (
+          <div className="mt-0.5 flex flex-col gap-0.5 text-[9px] text-white/60">
+            {CATEGORIES.filter((c) => counts[c.code] > 0).map(({ code }) => (
+              <p key={code} className="tabular-nums">
+                {code}: {((counts[code] / total) * wbcValue).toFixed(2)}
               </p>
-            );
-          })}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

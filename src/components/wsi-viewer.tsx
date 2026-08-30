@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type OpenSeadragon from "openseadragon";
+import { WbcCounterPanel } from "@/components/wbc-counter-panel";
 
 /**
  * Pan/zoom/rotate viewing via OpenSeadragon. Uses a real tiled deep-zoom
@@ -45,6 +46,7 @@ export function WsiViewer({
   hotspots,
   onImageClick,
   onHotspotClick,
+  enableWbcCounter = false,
 }: {
   imageUrl: string;
   /** DeepZoom manifest URL for a tiled pyramid — used instead of imageUrl
@@ -68,6 +70,13 @@ export function WsiViewer({
    * Leaving this unset preserves the WBC diff counter's existing behavior
    * where clicks pass through pins to the underlying canvas. */
   onHotspotClick?: (id: string) => void;
+  /** Surfaces a "WBC Counter" toggle in the toolbar, docked as an overlay
+   * inside the viewer itself (see WbcCounterPanel) instead of a separate
+   * block elsewhere on the page — a learner needs to keep scanning the
+   * slide while tallying cells, not scroll away from it to use the
+   * counter. Off by default: the admin's quick raw-file preview has no use
+   * for it, so only the learner-facing AnnotatedSlideViewer enables it. */
+  enableWbcCounter?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
@@ -79,6 +88,7 @@ export function WsiViewer({
   const [loadError, setLoadError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [isFullPage, setIsFullPage] = useState(false);
+  const [counterOpen, setCounterOpen] = useState(false);
 
   useEffect(() => {
     onImageClickRef.current = onImageClick;
@@ -293,12 +303,34 @@ export function WsiViewer({
         >
           Save
         </button>
+        {enableWbcCounter && (
+          <>
+            <div className="h-5 w-px bg-white/20" aria-hidden="true" />
+            <button
+              type="button"
+              onClick={() => setCounterOpen((open) => !open)}
+              aria-pressed={counterOpen}
+              className={`rounded-md border px-2 py-1 text-xs font-medium ${
+                counterOpen
+                  ? "border-accent bg-accent text-accent-ink"
+                  : "border-line-strong text-white/80 hover:bg-white/10"
+              }`}
+            >
+              WBC Counter
+            </button>
+          </>
+        )}
       </div>
       <div className="relative min-h-0 flex-1">
         <div ref={containerRef} className="h-full rounded-md bg-black" />
         {loadError && (
           <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/90 px-6 text-center text-sm text-white/80">
             {loadError}
+          </div>
+        )}
+        {enableWbcCounter && counterOpen && (
+          <div className="absolute inset-y-0 right-0 w-1/3 min-w-[168px] max-w-[220px] rounded-r-md">
+            <WbcCounterPanel onClose={() => setCounterOpen(false)} />
           </div>
         )}
       </div>

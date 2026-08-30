@@ -133,10 +133,9 @@ export default async function LearnerCaseDetailPage({
       )}
 
       {case_.lab_values && (
-        <div className="mt-6 max-w-2xl">
-          <h2 className="text-sm font-semibold">FBC / lab values</h2>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-ink-dim">{case_.lab_values}</p>
-        </div>
+        <RevealField label="FBC / lab values">
+          <p className="whitespace-pre-wrap">{case_.lab_values}</p>
+        </RevealField>
       )}
 
       {(case_.audio_path || case_.video_path) && (
