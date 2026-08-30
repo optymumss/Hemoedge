@@ -20,7 +20,7 @@ export default async function ModuleDetailsPage({
     supabase
       .from("modules")
       .select(
-        "id, title, level, description, module_type, learning_objectives, teaching_notes, estimated_duration_minutes, cpd_points, audio_path, audio_transcript, video_path",
+        "id, title, level, status, description, module_type, learning_objectives, teaching_notes, estimated_duration_minutes, cpd_points, audio_path, audio_transcript, video_path",
       )
       .eq("id", id)
       .single(),

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { MediaFields } from "@/components/admin/media-fields";
 import { SummaryField } from "@/components/admin/summary-field";
+import { StatusBadge } from "@/components/status-badge";
+import { SubmitForReviewButton } from "@/components/submit-for-review-button";
 import type { FormState } from "./actions";
 
 export const MODULE_TYPE_LABEL: Record<string, string> = {
@@ -163,17 +165,29 @@ export function DetailsForm({
   );
 }
 
-export function DetailsSummary({ module_ }: { module_: ModuleDetails }) {
+export function DetailsSummary({ module_ }: { module_: ModuleDetails & { status: string } }) {
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-line p-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">{module_.title}</h2>
-        <Link
-          href={`/admin/modules/${module_.id}/edit`}
-          className="rounded-md border border-line-strong px-3 py-1.5 text-sm text-ink hover:bg-surface-sunken"
-        >
-          Edit details
-        </Link>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-semibold">{module_.title}</h2>
+          <StatusBadge status={module_.status} />
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
+          {(module_.status === "draft" || module_.status === "changes_requested") && (
+            <SubmitForReviewButton
+              contentType="module"
+              id={module_.id}
+              path={`/admin/modules/${module_.id}`}
+            />
+          )}
+          <Link
+            href={`/admin/modules/${module_.id}/edit`}
+            className="rounded-md border border-line-strong px-3 py-1.5 text-sm text-ink hover:bg-surface-sunken"
+          >
+            Edit details
+          </Link>
+        </div>
       </div>
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <SummaryField label="Competency level" value={<span className="capitalize">{module_.level}</span>} />
