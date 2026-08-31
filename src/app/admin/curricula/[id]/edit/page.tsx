@@ -26,7 +26,11 @@ export default async function EditCurriculumPage({
     <div>
       <h1 className="text-lg font-semibold">Edit details</h1>
       <div className="mt-6">
-        <DetailsForm pathway={pathway} action={updatePathwayDetails} />
+        <DetailsForm
+          pathway={pathway}
+          action={updatePathwayDetails}
+          cancelHref={`/admin/curricula/${pathway.id}`}
+        />
       </div>
     </div>
   );

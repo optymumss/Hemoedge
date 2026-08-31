@@ -41,9 +41,11 @@ const BLANK_PATHWAY: PathwayFormValues = { pass_threshold: 70, version: 1 };
 export function DetailsForm({
   pathway = BLANK_PATHWAY,
   action,
+  cancelHref,
 }: {
   pathway?: PathwayFormValues;
   action: (prevState: FormState, formData: FormData) => Promise<FormState>;
+  cancelHref?: string;
 }) {
   const [state, formAction, pending] = useActionState<FormState, FormData>(action, undefined);
 
@@ -177,13 +179,23 @@ export function DetailsForm({
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
-      >
-        {pending ? "Saving…" : "Save"}
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          type="submit"
+          disabled={pending}
+          className="self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-50"
+        >
+          {pending ? "Saving…" : "Save"}
+        </button>
+        {cancelHref && (
+          <Link
+            href={cancelHref}
+            className="rounded-md border border-line-strong px-3 py-1.5 text-sm text-ink hover:bg-surface-sunken"
+          >
+            Cancel
+          </Link>
+        )}
+      </div>
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
     </form>
   );

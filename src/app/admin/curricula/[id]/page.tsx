@@ -39,7 +39,11 @@ export default async function PathwayDetailPage({
 
   return (
     <div>
-      <p className="text-sm text-ink-dim">
+      <Link href="/admin/curricula" className="text-sm text-ink-dim hover:underline">
+        &larr; Back to Learning Pathways
+      </Link>
+
+      <p className="mt-3 text-sm text-ink-dim">
         v{pathway.version}
         {pathway.previous_version_id && (
           <>

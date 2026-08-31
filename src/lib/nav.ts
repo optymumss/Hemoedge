@@ -38,7 +38,7 @@ export const adminNav: NavSection[] = [
   {
     section: "Assessments",
     items: [
-      { label: "WBC Diff Counter", href: "/admin/wbc-diff" },
+      { label: "Manual Diff Counter", href: "/admin/wbc-diff" },
       { label: "Grading Queue", href: "/admin/grading-queue" },
     ],
   },
