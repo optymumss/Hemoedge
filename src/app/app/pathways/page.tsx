@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getLearnerOrgId } from "@/lib/learner/get-learner-org";
 import { getEffectiveUserId } from "@/lib/auth/impersonation";
 
-export default async function CompetencyPage() {
+export default async function LearningPathwaysPage() {
   const supabase = await createClient();
   const userId = await getEffectiveUserId();
   const orgId = await getLearnerOrgId();
@@ -74,7 +74,7 @@ export default async function CompetencyPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">Competency Pathway</h1>
+      <h1 className="text-xl font-semibold">Learning Pathways</h1>
       <p className="mt-1 text-sm text-ink-dim">
         Complete every module in a stage at or above its pass threshold to earn a certificate.
       </p>

@@ -16,7 +16,7 @@ export default async function CertificatesPage() {
     <div>
       <h1 className="text-xl font-semibold">Certificates</h1>
       <p className="mt-1 text-sm text-ink-dim">
-        Earned by completing every module in a competency stage.
+        Earned by completing every module in a learning pathway stage.
       </p>
 
       <div className="mt-6 flex flex-col gap-3">
@@ -39,8 +39,8 @@ export default async function CertificatesPage() {
         {(certificates ?? []).length === 0 && (
           <div className="py-8 text-center text-sm text-ink-faint">
             <p>No certificates earned yet.</p>
-            <Link href="/app/competency" className="mt-1 inline-block text-accent hover:underline">
-              View your competency pathway
+            <Link href="/app/pathways" className="mt-1 inline-block text-accent hover:underline">
+              View your learning pathways
             </Link>
           </div>
         )}

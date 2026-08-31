@@ -23,13 +23,24 @@ const ICON_PATHS: Record<string, React.ReactNode> = {
       strokeLinejoin="round"
     />
   ),
-  Competency: (
+  "Learning Pathways": (
     <path
       d="M8 2 3 3.6v3.9c0 3.2 2.1 5.9 5 6.5 2.9-.6 5-3.3 5-6.5V3.6L8 2Z"
       stroke="currentColor"
       strokeWidth="1.4"
       strokeLinejoin="round"
     />
+  ),
+  Competencies: (
+    <>
+      <path
+        d="M3 3.5A1.5 1.5 0 0 1 4.5 2h5.8L13 4.7v8.8a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 13.5v-10Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      <path d="M5.5 8.2 7 9.7l3.5-3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </>
   ),
   Certificates: (
     <>

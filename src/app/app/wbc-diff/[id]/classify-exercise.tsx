@@ -111,7 +111,13 @@ export function ClassifyExercise({
         Click each highlighted cell and classify it. {Object.keys(answers).length}/{hotspots.length} classified.
       </p>
       <div className="h-[32rem] rounded-md bg-black">
-        <WsiViewer imageUrl={url} dziUrl={dziUrl} hotspots={viewerHotspots} onImageClick={handleImageClick} />
+        <WsiViewer
+          imageUrl={url}
+          dziUrl={dziUrl}
+          hotspots={viewerHotspots}
+          onImageClick={handleImageClick}
+          enableWbcCounter
+        />
       </div>
 
       {activeHotspotId && !result && (
