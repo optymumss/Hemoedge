@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ExerciseTabs } from "./tabs";
 
@@ -22,7 +23,10 @@ export default async function ExerciseLayout({
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">{exercise.title}</h1>
+      <Link href="/admin/wbc-diff" className="text-sm text-ink-dim hover:underline">
+        &larr; Back to Manual Diff Counter
+      </Link>
+      <h1 className="mt-3 text-xl font-semibold">{exercise.title}</h1>
       <div className="mt-4">
         <ExerciseTabs exerciseId={exercise.id} />
       </div>

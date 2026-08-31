@@ -35,7 +35,11 @@ export default async function EditFeaturePage({
       <h1 className="text-lg font-semibold">Edit details</h1>
 
       <div className="mt-6 flex flex-col gap-6">
-        <FeatureDetailsForm feature={feature} cellTypes={cellTypes ?? []} />
+        <FeatureDetailsForm
+          feature={feature}
+          cellTypes={cellTypes ?? []}
+          cancelHref={`/admin/features/${feature.id}`}
+        />
         <FeatureImageField featureId={feature.id} imageUrl={imageUrl} />
         <div className="rounded-lg border border-line p-4">
           <h2 className="text-sm font-semibold">Media</h2>

@@ -211,15 +211,6 @@ function EditRow({
               className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
             />
           </div>
-          <label className="flex items-center gap-2 pb-1.5 text-sm text-ink">
-            <input
-              type="checkbox"
-              name="is_wbc_diff_countable"
-              defaultChecked={cellType.is_wbc_diff_countable}
-              className="accent-accent"
-            />
-            Countable in WBC diff
-          </label>
           <button
             type="submit"
             disabled={pending}

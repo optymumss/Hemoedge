@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CaseTabs } from "./case-tabs";
 
 export default async function CaseLayout({
@@ -11,7 +12,12 @@ export default async function CaseLayout({
 
   return (
     <div>
-      <CaseTabs caseId={id} />
+      <Link href="/admin/cases" className="text-sm text-ink-dim hover:underline">
+        &larr; Back to Case Studies
+      </Link>
+      <div className="mt-3">
+        <CaseTabs caseId={id} />
+      </div>
       <div className="mt-6">{children}</div>
     </div>
   );

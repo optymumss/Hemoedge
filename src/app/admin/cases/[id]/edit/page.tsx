@@ -29,7 +29,12 @@ export default async function EditCasePage({
     <div>
       <h1 className="text-lg font-semibold">Edit details</h1>
       <div className="mt-6">
-        <DetailsForm case_={case_} slides={slides ?? []} action={updateCaseDetails} />
+        <DetailsForm
+          case_={case_}
+          slides={slides ?? []}
+          action={updateCaseDetails}
+          cancelHref={`/admin/cases/${case_.id}`}
+        />
       </div>
     </div>
   );

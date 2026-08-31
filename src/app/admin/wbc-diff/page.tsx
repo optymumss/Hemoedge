@@ -16,7 +16,7 @@ export default async function WbcDiffPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">WBC Differential Counter</h1>
+      <h1 className="text-xl font-semibold">Manual Diff Counter</h1>
       <p className="mt-1 text-sm text-ink-dim">
         Spatial classification exercises: learners click through a curated set of cells on a
         slide and classify each one, scored against your ground truth.

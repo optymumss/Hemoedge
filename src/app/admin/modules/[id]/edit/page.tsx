@@ -26,7 +26,11 @@ export default async function EditModulePage({
     <div>
       <h1 className="text-lg font-semibold">Edit details</h1>
       <div className="mt-6">
-        <DetailsForm module_={module_} action={updateModuleDetails} />
+        <DetailsForm
+          module_={module_}
+          action={updateModuleDetails}
+          cancelHref={`/admin/modules/${module_.id}`}
+        />
       </div>
     </div>
   );
