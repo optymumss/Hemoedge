@@ -80,7 +80,7 @@ export function AnnotatedSlideViewer({
               mode === "explore" ? "bg-accent text-accent-ink" : "text-ink-dim hover:bg-surface-raised"
             }`}
           >
-            Explore
+            Explore Mode
           </button>
           <button
             type="button"
@@ -89,7 +89,7 @@ export function AnnotatedSlideViewer({
               mode === "teaching" ? "bg-accent text-accent-ink" : "text-ink-dim hover:bg-surface-raised"
             }`}
           >
-            Teaching mode
+            Teaching Mode
           </button>
         </div>
         {mode === "teaching" && (

@@ -89,7 +89,7 @@ export const appNav: NavSection[] = [
   },
   {
     section: "Tools",
-    items: [{ label: "WBC Diff Counter", href: "/app/wbc-diff" }],
+    items: [{ label: "Manual Diff Counter", href: "/app/wbc-diff" }],
   },
 ];
 

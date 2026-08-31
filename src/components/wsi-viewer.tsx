@@ -70,7 +70,7 @@ export function WsiViewer({
    * Leaving this unset preserves the WBC diff counter's existing behavior
    * where clicks pass through pins to the underlying canvas. */
   onHotspotClick?: (id: string) => void;
-  /** Surfaces a "WBC Counter" toggle in the toolbar, docked as an overlay
+  /** Surfaces a "Manual Diff Counter" toggle in the toolbar, docked as an overlay
    * inside the viewer itself (see WbcCounterPanel) instead of a separate
    * block elsewhere on the page — a learner needs to keep scanning the
    * slide while tallying cells, not scroll away from it to use the
@@ -316,7 +316,7 @@ export function WsiViewer({
                   : "border-line-strong text-white/80 hover:bg-white/10"
               }`}
             >
-              WBC Counter
+              Manual Diff Counter
             </button>
           </>
         )}

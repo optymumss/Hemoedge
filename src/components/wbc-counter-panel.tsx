@@ -88,7 +88,7 @@ export function WbcCounterPanel({ onClose }: { onClose?: () => void }) {
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close WBC counter"
+              aria-label="Close manual diff counter"
               className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-white/70 hover:bg-white/10"
             >
               ×

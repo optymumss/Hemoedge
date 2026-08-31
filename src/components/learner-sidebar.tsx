@@ -51,7 +51,7 @@ const ICON_PATHS: Record<string, React.ReactNode> = {
       <path d="M2.5 6h11M6 6v7.5" stroke="currentColor" strokeWidth="1.4" />
     </>
   ),
-  "WBC Diff Counter": (
+  "Manual Diff Counter": (
     <path
       d="M11.5 2.5 4.6 9.4a1 1 0 0 0 0 1.4l.6.6a1 1 0 0 0 1.4 0l6.9-6.9-2-2Z"
       stroke="currentColor"

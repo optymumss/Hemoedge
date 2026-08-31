@@ -9,7 +9,7 @@ import { getWeakAreas } from "@/lib/learner/weak-areas";
 const QUICK_LINKS = [
   { label: "Modules", href: "/app/modules", blurb: "Structured learning content" },
   { label: "Case Studies", href: "/app/cases", blurb: "Apply skills to real scenarios" },
-  { label: "WBC Diff Counter", href: "/app/wbc-diff", blurb: "Practice cell classification" },
+  { label: "Manual Diff Counter", href: "/app/wbc-diff", blurb: "Practice cell classification" },
   { label: "Library", href: "/app/library", blurb: "Browse the slide collection" },
 ];
 
