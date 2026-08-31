@@ -11,7 +11,7 @@ export default async function LearnerWbcDiffPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">WBC Differential Counter</h1>
+      <h1 className="text-xl font-semibold">Manual Diff Counter</h1>
       <p className="mt-1 text-sm text-ink-dim">
         Practice classifying white cells on real slides. Click through each pin, pick a cell
         type, and see how you scored against the reference count.
