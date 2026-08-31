@@ -76,7 +76,8 @@ export const appNav: NavSection[] = [
     items: [
       { label: "Dashboard", href: "/app" },
       { label: "Cases", href: "/app/cases" },
-      { label: "Competency", href: "/app/competency" },
+      { label: "Learning Pathways", href: "/app/pathways" },
+      { label: "Competencies", href: "/app/competencies" },
       { label: "Certificates", href: "/app/certificates" },
     ],
   },

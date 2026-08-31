@@ -61,7 +61,7 @@ export async function submitQuizAttempt(
   }
 
   revalidatePath(`/app/modules/${moduleId}`);
-  revalidatePath("/app/competency");
+  revalidatePath("/app/pathways");
   revalidatePath("/app/certificates");
   return undefined;
 }
