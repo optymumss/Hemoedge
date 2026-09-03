@@ -33,7 +33,7 @@ export default async function CaseDetailsPage({
     supabase
       .from("cases")
       .select(
-        "id, title, level, status, description, slide_id, case_context, lab_values, final_diagnosis, learning_points, estimated_time_minutes, cpd_points, case_category, escalation_decision, suggested_report_comment, audio_path, audio_transcript, video_path",
+        "id, title, level, status, description, slide_id, case_context, lab_values, final_diagnosis, learning_points, estimated_time_minutes, cpd_points, case_category, escalation_decision, suggested_report_comment, expected_rbc_findings, expected_wbc_findings, expected_platelet_findings, expected_abnormal_findings, critical_findings, audio_path, audio_transcript, video_path",
       )
       .eq("id", id)
       .single(),

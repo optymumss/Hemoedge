@@ -23,6 +23,11 @@ export type CaseDetails = {
   case_category: string | null;
   escalation_decision: string | null;
   suggested_report_comment: string | null;
+  expected_rbc_findings: string | null;
+  expected_wbc_findings: string | null;
+  expected_platelet_findings: string | null;
+  expected_abnormal_findings: string | null;
+  critical_findings: string | null;
   audio_path: string | null;
   audio_transcript: string | null;
   video_path: string | null;
@@ -231,6 +236,76 @@ export function DetailsForm({
         />
       </div>
 
+      <div className="rounded-md border border-line-strong p-3">
+        <h3 className="text-sm font-semibold">Structured report answer key</h3>
+        <p className="mt-1 text-xs text-ink-dim">
+          What a learner&apos;s structured report is graded against — the expected findings per
+          section, plus anything critical they must not miss.
+        </p>
+        <div className="mt-3 flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-ink-dim" htmlFor="case-expected-rbc">
+              Expected RBC morphology findings
+            </label>
+            <textarea
+              id="case-expected-rbc"
+              name="expected_rbc_findings"
+              rows={2}
+              defaultValue={case_.expected_rbc_findings ?? ""}
+              className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-ink-dim" htmlFor="case-expected-wbc">
+              Expected WBC morphology findings
+            </label>
+            <textarea
+              id="case-expected-wbc"
+              name="expected_wbc_findings"
+              rows={2}
+              defaultValue={case_.expected_wbc_findings ?? ""}
+              className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-ink-dim" htmlFor="case-expected-platelet">
+              Expected platelet morphology findings
+            </label>
+            <textarea
+              id="case-expected-platelet"
+              name="expected_platelet_findings"
+              rows={2}
+              defaultValue={case_.expected_platelet_findings ?? ""}
+              className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-ink-dim" htmlFor="case-expected-abnormal">
+              Expected abnormal cells, parasites, or significant flags
+            </label>
+            <textarea
+              id="case-expected-abnormal"
+              name="expected_abnormal_findings"
+              rows={2}
+              defaultValue={case_.expected_abnormal_findings ?? ""}
+              className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-ink-dim" htmlFor="case-critical-findings">
+              Critical findings (must not miss)
+            </label>
+            <textarea
+              id="case-critical-findings"
+              name="critical_findings"
+              rows={2}
+              defaultValue={case_.critical_findings ?? ""}
+              className="w-full rounded-md border border-line-strong px-2 py-1.5 text-sm"
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="flex items-center gap-2">
         <button
           type="submit"
@@ -301,6 +376,19 @@ export function DetailsSummary({
       <SummaryField label="Final diagnosis" value={case_.final_diagnosis} multiline />
       <SummaryField label="Key learning points" value={case_.learning_points} multiline />
       <SummaryField label="Suggested report comment" value={case_.suggested_report_comment} multiline />
+      <SummaryField label="Expected RBC morphology findings" value={case_.expected_rbc_findings} multiline />
+      <SummaryField label="Expected WBC morphology findings" value={case_.expected_wbc_findings} multiline />
+      <SummaryField
+        label="Expected platelet morphology findings"
+        value={case_.expected_platelet_findings}
+        multiline
+      />
+      <SummaryField
+        label="Expected abnormal findings"
+        value={case_.expected_abnormal_findings}
+        multiline
+      />
+      <SummaryField label="Critical findings" value={case_.critical_findings} multiline />
     </div>
   );
 }
