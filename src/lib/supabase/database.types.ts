@@ -169,6 +169,75 @@ export type Database = {
           },
         ]
       }
+      case_report_submissions: {
+        Row: {
+          abnormal_findings: string
+          ai_feedback: string
+          ai_missed_findings: Json
+          ai_score: number
+          case_id: string
+          created_at: string
+          escalation_correct: boolean
+          escalation_decision: string
+          id: string
+          overall_interpretation: string
+          platelet_morphology: string
+          rbc_morphology: string
+          report_comment: string
+          user_id: string
+          wbc_morphology: string
+        }
+        Insert: {
+          abnormal_findings: string
+          ai_feedback: string
+          ai_missed_findings?: Json
+          ai_score: number
+          case_id: string
+          created_at?: string
+          escalation_correct: boolean
+          escalation_decision: string
+          id?: string
+          overall_interpretation: string
+          platelet_morphology: string
+          rbc_morphology: string
+          report_comment: string
+          user_id: string
+          wbc_morphology: string
+        }
+        Update: {
+          abnormal_findings?: string
+          ai_feedback?: string
+          ai_missed_findings?: Json
+          ai_score?: number
+          case_id?: string
+          created_at?: string
+          escalation_correct?: boolean
+          escalation_decision?: string
+          id?: string
+          overall_interpretation?: string
+          platelet_morphology?: string
+          rbc_morphology?: string
+          report_comment?: string
+          user_id?: string
+          wbc_morphology?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_report_submissions_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_report_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_slides: {
         Row: {
           case_id: string
@@ -238,9 +307,14 @@ export type Database = {
           cpd_points: number
           created_at: string
           created_by: string
+          critical_findings: string | null
           description: string | null
           escalation_decision: string | null
           estimated_time_minutes: number | null
+          expected_abnormal_findings: string | null
+          expected_platelet_findings: string | null
+          expected_rbc_findings: string | null
+          expected_wbc_findings: string | null
           final_diagnosis: string | null
           id: string
           lab_values: string | null
@@ -261,9 +335,14 @@ export type Database = {
           cpd_points?: number
           created_at?: string
           created_by: string
+          critical_findings?: string | null
           description?: string | null
           escalation_decision?: string | null
           estimated_time_minutes?: number | null
+          expected_abnormal_findings?: string | null
+          expected_platelet_findings?: string | null
+          expected_rbc_findings?: string | null
+          expected_wbc_findings?: string | null
           final_diagnosis?: string | null
           id?: string
           lab_values?: string | null
@@ -284,9 +363,14 @@ export type Database = {
           cpd_points?: number
           created_at?: string
           created_by?: string
+          critical_findings?: string | null
           description?: string | null
           escalation_decision?: string | null
           estimated_time_minutes?: number | null
+          expected_abnormal_findings?: string | null
+          expected_platelet_findings?: string | null
+          expected_rbc_findings?: string | null
+          expected_wbc_findings?: string | null
           final_diagnosis?: string | null
           id?: string
           lab_values?: string | null

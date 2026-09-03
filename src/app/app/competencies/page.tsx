@@ -16,11 +16,10 @@ function statusFromScores(scores: number[]): Status {
 
 /**
  * Competency areas that already have a real signal to compute from are
- * scored below. "Abnormal cell recognition" and "Morphology reporting"
- * have no dedicated content taxonomy or assessment yet, so they stay
- * "Not yet assessed" rather than being backed by a fabricated proxy —
- * revisit once there's a real signal (e.g. tagged abnormal-finding
- * content, a scored reporting exercise) to compute them from.
+ * scored below. "Abnormal cell recognition" has no dedicated content
+ * taxonomy or assessment yet, so it stays "Not yet assessed" rather than
+ * being backed by a fabricated proxy — revisit once there's a real signal
+ * (e.g. a scored pinned WSI identification exercise) to compute it from.
  */
 export default async function CompetenciesPage() {
   const supabase = await createClient();
@@ -30,18 +29,20 @@ export default async function CompetenciesPage() {
   const cases = await getPublishedContent("cases", "case", orgId);
   const caseIds = cases.map((c) => c.id);
 
-  const [{ data: caseFeatureLinks }, { data: attempts }, { data: wbcAttempts }] = await Promise.all([
-    caseIds.length > 0
-      ? supabase
-          .from("case_features")
-          .select("case_id, features(cell_type_id, cell_types(lineage))")
-          .in("case_id", caseIds)
-      : Promise.resolve({ data: [] as { case_id: string; features: { cell_type_id: string | null; cell_types: { lineage: string } | null } | null }[] }),
-    caseIds.length > 0
-      ? supabase.from("quiz_attempts").select("case_id, score").eq("user_id", userId!).in("case_id", caseIds)
-      : Promise.resolve({ data: [] as { case_id: string | null; score: number }[] }),
-    supabase.from("wbc_diff_attempts").select("exercise_id, accuracy_pct").eq("user_id", userId!),
-  ]);
+  const [{ data: caseFeatureLinks }, { data: attempts }, { data: wbcAttempts }, { data: reportSubmissions }] =
+    await Promise.all([
+      caseIds.length > 0
+        ? supabase
+            .from("case_features")
+            .select("case_id, features(cell_type_id, cell_types(lineage))")
+            .in("case_id", caseIds)
+        : Promise.resolve({ data: [] as { case_id: string; features: { cell_type_id: string | null; cell_types: { lineage: string } | null } | null }[] }),
+      caseIds.length > 0
+        ? supabase.from("quiz_attempts").select("case_id, score").eq("user_id", userId!).in("case_id", caseIds)
+        : Promise.resolve({ data: [] as { case_id: string | null; score: number }[] }),
+      supabase.from("wbc_diff_attempts").select("exercise_id, accuracy_pct").eq("user_id", userId!),
+      supabase.from("case_report_submissions").select("case_id, ai_score").eq("user_id", userId!),
+    ]);
 
   const bestByCase = new Map<string, number>();
   for (const a of attempts ?? []) {
@@ -73,13 +74,19 @@ export default async function CompetenciesPage() {
   }
   const manualDiffScores = Array.from(bestByExercise.values());
 
+  const bestReportScoreByCase = new Map<string, number>();
+  for (const s of reportSubmissions ?? []) {
+    bestReportScoreByCase.set(s.case_id, Math.max(bestReportScoreByCase.get(s.case_id) ?? 0, s.ai_score));
+  }
+  const reportScores = Array.from(bestReportScoreByCase.values());
+
   const rows: { area: string; status: Status }[] = [
     { area: "RBC morphology", status: statusFromScores(scoresForLineage("red_cell")) },
     { area: "WBC morphology", status: statusFromScores(scoresForLineage("white_cell")) },
     { area: "Platelet morphology", status: statusFromScores(scoresForLineage("platelet")) },
     { area: "Abnormal cell recognition", status: "Not yet assessed" },
     { area: "Manual differential", status: statusFromScores(manualDiffScores) },
-    { area: "Morphology reporting", status: "Not yet assessed" },
+    { area: "Morphology reporting", status: statusFromScores(reportScores) },
   ];
 
   return (
