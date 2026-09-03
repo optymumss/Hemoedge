@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/lib/supabase/database.types";
+import { CATEGORIES, type CategoryCode } from "@/lib/wbc-categories";
+import { updateGuardMessage } from "@/lib/content/update-guard";
 
 export type FormState = { error?: string } | undefined;
 
@@ -48,5 +50,38 @@ export async function updateExerciseDetails(
 
   revalidatePath(`/admin/wbc-diff/${id}`);
   revalidatePath("/admin/wbc-diff");
+  return undefined;
+}
+
+export async function updateReferenceDifferential(
+  _prevState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const id = String(formData.get("id") ?? "");
+  if (!id) return { error: "Missing exercise id." };
+
+  const reference: Partial<Record<CategoryCode, number>> = {};
+  for (const { code } of CATEGORIES) {
+    const raw = String(formData.get(code) ?? "").trim();
+    if (raw === "") return { error: `Enter a value for ${code}.` };
+    const value = Number(raw);
+    if (!Number.isFinite(value) || value < 0) {
+      return { error: `${code} must be zero or more.` };
+    }
+    reference[code] = value;
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("wbc_diff_exercises")
+    .update({ reference_differential: reference })
+    .eq("id", id)
+    .select("id")
+    .single();
+
+  if (error) return { error: updateGuardMessage(error) ?? error.message };
+
+  revalidatePath(`/admin/wbc-diff/${id}`);
+  revalidatePath(`/admin/wbc-diff/${id}/reference`);
   return undefined;
 }

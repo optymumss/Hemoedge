@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getEffectiveUserId } from "@/lib/auth/impersonation";
-import { ClassifyExercise } from "./classify-exercise";
+import type { CategoryCode } from "@/lib/wbc-categories";
+import { PracticeExercise } from "./practice-exercise";
 
 export default async function LearnerWbcDiffExercisePage({
   params,
@@ -12,7 +13,7 @@ export default async function LearnerWbcDiffExercisePage({
 
   const { data: exercise } = await supabase
     .from("wbc_diff_exercises")
-    .select("id, title, level, instructions, slide_id")
+    .select("id, title, level, instructions, slide_id, reference_differential")
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
@@ -20,14 +21,6 @@ export default async function LearnerWbcDiffExercisePage({
   if (!exercise) {
     return <p className="text-sm text-ink-dim">Exercise not found or not yet published.</p>;
   }
-
-  const [{ data: hotspots }, { data: cellTypes }] = await Promise.all([
-    supabase
-      .from("wbc_diff_hotspots")
-      .select("id, x_pct, y_pct, tolerance_pct")
-      .eq("exercise_id", id),
-    supabase.from("cell_types").select("id, name").eq("is_wbc_diff_countable", true).order("name"),
-  ]);
 
   const userId = await getEffectiveUserId();
   const { data: attempts } = await supabase
@@ -38,6 +31,10 @@ export default async function LearnerWbcDiffExercisePage({
     .order("created_at", { ascending: false })
     .limit(1);
   const lastAttempt = attempts?.[0];
+
+  const referenceDifferential = exercise.reference_differential as Partial<
+    Record<CategoryCode, number>
+  > | null;
 
   return (
     <div>
@@ -54,12 +51,17 @@ export default async function LearnerWbcDiffExercisePage({
       )}
 
       <div className="mt-6">
-        <ClassifyExercise
-          exerciseId={exercise.id}
-          slideId={exercise.slide_id}
-          hotspots={hotspots ?? []}
-          cellTypes={cellTypes ?? []}
-        />
+        {referenceDifferential ? (
+          <PracticeExercise
+            exerciseId={exercise.id}
+            slideId={exercise.slide_id}
+            referenceDifferential={referenceDifferential}
+          />
+        ) : (
+          <p className="text-sm text-ink-faint">
+            This exercise isn&apos;t ready for practice yet — check back soon.
+          </p>
+        )}
       </div>
     </div>
   );

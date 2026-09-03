@@ -18,5 +18,5 @@ export const CONTENT_TYPE_LABEL: Record<ContentType, string> = {
   module: "Module",
   case: "Case Study",
   curriculum: "Learning Pathway",
-  wbc_diff_exercise: "WBC Diff Exercise",
+  wbc_diff_exercise: "Manual Diff Exercise",
 };

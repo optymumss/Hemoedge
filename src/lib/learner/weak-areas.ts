@@ -1,18 +1,22 @@
 import { createClient } from "@/lib/supabase/server";
+import { CATEGORY_LABEL, type CategoryCode } from "@/lib/wbc-categories";
 
 export type WeakArea = { label: string; accuracyPct: number; attempts: number };
 
 const MIN_ATTEMPTS = 2;
 const WEAK_THRESHOLD_PCT = 70;
 const MAX_RESULTS = 5;
+/** A learner's per-category tally within this many points of the exercise's
+ * reference differential counts as "correct" for weak-area purposes. */
+const CATEGORY_TOLERANCE = 5;
 
 /**
- * Aggregates a learner's wrong answers into weak feature/cell-type areas —
+ * Aggregates a learner's wrong answers into weak feature/category areas —
  * quiz questions tagged with a feature (feature_id is optional; only tagged
- * questions can contribute here) and WBC diff hotspot attempts (already
- * tagged with a cell type by nature of the exercise). Areas with fewer than
- * MIN_ATTEMPTS are dropped so one lucky/unlucky guess doesn't show up as a
- * strength or weakness.
+ * questions can contribute here) and Manual Diff Counter practice attempts
+ * (each category's tally compared against that exercise's reference
+ * differential). Areas with fewer than MIN_ATTEMPTS are dropped so one
+ * lucky/unlucky guess doesn't show up as a strength or weakness.
  */
 export async function getWeakAreas(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -56,34 +60,24 @@ export async function getWeakAreas(
 
   const { data: diffAttempts } = await supabase
     .from("wbc_diff_attempts")
-    .select("results")
+    .select("results, wbc_diff_exercises(reference_differential)")
     .eq("user_id", userId);
 
-  const cellTypeTotals = new Map<string, { correct: number; total: number }>();
   for (const attempt of diffAttempts ?? []) {
-    const results = (attempt.results as Record<string, { correct: number; total: number }>) ?? {};
-    for (const [cellTypeId, r] of Object.entries(results)) {
-      const bucket = cellTypeTotals.get(cellTypeId) ?? { correct: 0, total: 0 };
-      bucket.correct += r.correct;
-      bucket.total += r.total;
-      cellTypeTotals.set(cellTypeId, bucket);
-    }
-  }
+    const results = (attempt.results as Partial<Record<CategoryCode, number>>) ?? {};
+    const reference = (attempt.wbc_diff_exercises?.reference_differential as Partial<
+      Record<CategoryCode, number>
+    >) ?? null;
+    if (!reference) continue;
 
-  if (cellTypeTotals.size > 0) {
-    const { data: cellTypes } = await supabase
-      .from("cell_types")
-      .select("id, name")
-      .in("id", Array.from(cellTypeTotals.keys()));
-
-    for (const ct of cellTypes ?? []) {
-      const bucket = cellTypeTotals.get(ct.id);
-      if (!bucket) continue;
-      const existing = tally.get(ct.name) ?? { correct: 0, total: 0 };
-      tally.set(ct.name, {
-        correct: existing.correct + bucket.correct,
-        total: existing.total + bucket.total,
-      });
+    for (const [code, learnerValue] of Object.entries(results) as [CategoryCode, number][]) {
+      const referenceValue = reference[code];
+      if (referenceValue === undefined) continue;
+      const label = CATEGORY_LABEL[code];
+      const bucket = tally.get(label) ?? { correct: 0, total: 0 };
+      bucket.total += 1;
+      if (Math.abs(learnerValue - referenceValue) <= CATEGORY_TOLERANCE) bucket.correct += 1;
+      tally.set(label, bucket);
     }
   }
 

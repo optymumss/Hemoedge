@@ -5,6 +5,7 @@ import { getSlideViewUrl } from "@/lib/slides/get-slide-view-url";
 import { recordSlideView } from "@/lib/slides/record-slide-view";
 import { getSlideAnnotations, type SlideAnnotation } from "@/lib/slides/get-slide-annotations";
 import { WsiViewer, type WsiHotspot } from "@/components/wsi-viewer";
+import type { WbcCounterPanel } from "@/components/wbc-counter-panel";
 
 /**
  * The learner-facing slide viewer: fetches the slide URL and its teaching
@@ -15,19 +16,31 @@ import { WsiViewer, type WsiHotspot } from "@/components/wsi-viewer";
  * than only appearing once a content manager has authored some. The WBC
  * Counter itself now lives inside WsiViewer's own toolbar (see
  * enableWbcCounter there) rather than as a separate block on this page.
+ * `teachingLocked` and the `wbcCounter*` props below are for the Manual
+ * Diff Counter practice exercise's graded flow; unset, this behaves exactly
+ * as it does embedded in a case or module.
  */
 export function AnnotatedSlideViewer({
   slideId,
   heightClassName = "h-[32rem]",
+  teachingLocked = false,
+  wbcCounterDefaultOpen = false,
+  wbcCounterProps,
 }: {
   slideId: string;
   heightClassName?: string;
+  /** Disables the Teaching Mode button — used by the Manual Diff Counter
+   * practice exercise so a learner can't peek at teaching labels for the
+   * slide's cells before they've submitted their own tally. */
+  teachingLocked?: boolean;
+  wbcCounterDefaultOpen?: boolean;
+  wbcCounterProps?: Omit<React.ComponentProps<typeof WbcCounterPanel>, "onClose">;
 }) {
   const [url, setUrl] = useState<string | null>(null);
   const [dziUrl, setDziUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [annotations, setAnnotations] = useState<SlideAnnotation[]>([]);
-  const [mode, setMode] = useState<"explore" | "teaching">("teaching");
+  const [mode, setMode] = useState<"explore" | "teaching">(teachingLocked ? "explore" : "teaching");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -85,14 +98,19 @@ export function AnnotatedSlideViewer({
           <button
             type="button"
             onClick={() => setMode("teaching")}
-            className={`rounded px-2.5 py-1 text-xs font-medium ${
+            disabled={teachingLocked}
+            title={teachingLocked ? "Available after you submit" : undefined}
+            className={`rounded px-2.5 py-1 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-40 ${
               mode === "teaching" ? "bg-accent text-accent-ink" : "text-ink-dim hover:bg-surface-raised"
             }`}
           >
             Teaching Mode
           </button>
         </div>
-        {mode === "teaching" && (
+        {teachingLocked && (
+          <span className="text-xs text-ink-faint">Teaching Mode unlocks after you submit.</span>
+        )}
+        {!teachingLocked && mode === "teaching" && (
           <span className="text-xs text-ink-faint">
             {annotations.length > 0
               ? "Tap a pin to see what it shows."
@@ -107,6 +125,8 @@ export function AnnotatedSlideViewer({
           hotspots={hotspots}
           onHotspotClick={mode === "teaching" ? (id) => setSelectedId(id) : undefined}
           enableWbcCounter
+          wbcCounterDefaultOpen={wbcCounterDefaultOpen}
+          wbcCounterProps={wbcCounterProps}
         />
       </div>
       {mode === "teaching" && selected && (
