@@ -6,11 +6,11 @@ import { usePathname } from "next/navigation";
 export function ExerciseTabs({ exerciseId }: { exerciseId: string }) {
   const pathname = usePathname();
   const detailsHref = `/admin/wbc-diff/${exerciseId}`;
-  const hotspotsHref = `/admin/wbc-diff/${exerciseId}/hotspots`;
+  const referenceHref = `/admin/wbc-diff/${exerciseId}/reference`;
 
   const tabs = [
     { href: detailsHref, label: "Details", active: pathname === detailsHref },
-    { href: hotspotsHref, label: "Hotspots", active: pathname === hotspotsHref },
+    { href: referenceHref, label: "Reference differential", active: pathname === referenceHref },
   ];
 
   return (

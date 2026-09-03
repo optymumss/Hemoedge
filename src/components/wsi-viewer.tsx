@@ -47,6 +47,8 @@ export function WsiViewer({
   onImageClick,
   onHotspotClick,
   enableWbcCounter = false,
+  wbcCounterDefaultOpen = false,
+  wbcCounterProps,
 }: {
   imageUrl: string;
   /** DeepZoom manifest URL for a tiled pyramid — used instead of imageUrl
@@ -77,6 +79,16 @@ export function WsiViewer({
    * counter. Off by default: the admin's quick raw-file preview has no use
    * for it, so only the learner-facing AnnotatedSlideViewer enables it. */
   enableWbcCounter?: boolean;
+  /** Opens the Manual Diff Counter panel immediately instead of requiring a
+   * toolbar click — used by the Manual Diff Counter practice exercise,
+   * where counting *is* the point of the page, unlike the case/module
+   * viewer where it's an optional aid. */
+  wbcCounterDefaultOpen?: boolean;
+  /** Extra props forwarded to the counter panel — the practice exercise
+   * uses these to mask the running breakdown until submission, show the
+   * reference differential afterward, freeze counting once submitted, and
+   * read the live tally. Unset for the plain scratch-tool usage. */
+  wbcCounterProps?: Omit<React.ComponentProps<typeof WbcCounterPanel>, "onClose">;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
@@ -88,7 +100,7 @@ export function WsiViewer({
   const [loadError, setLoadError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [isFullPage, setIsFullPage] = useState(false);
-  const [counterOpen, setCounterOpen] = useState(false);
+  const [counterOpen, setCounterOpen] = useState(wbcCounterDefaultOpen);
 
   useEffect(() => {
     onImageClickRef.current = onImageClick;
@@ -330,7 +342,7 @@ export function WsiViewer({
         )}
         {enableWbcCounter && counterOpen && (
           <div className="absolute inset-y-0 right-0 w-1/3 min-w-[168px] max-w-[220px] rounded-r-md">
-            <WbcCounterPanel onClose={() => setCounterOpen(false)} />
+            <WbcCounterPanel onClose={() => setCounterOpen(false)} {...wbcCounterProps} />
           </div>
         )}
       </div>

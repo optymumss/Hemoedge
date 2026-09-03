@@ -1,44 +1,13 @@
 "use client";
 
-import { useState } from "react";
-
-/**
- * The standard manual WBC differential categories, in reporting order.
- * Fixed (not the admin-managed `cell_types` taxonomy used by the WBC Diff
- * Counter *exercise*, /admin/wbc-diff — that's a different tool: a scored
- * quiz against curated ground-truth pins. This is a free-tally counting aid
- * a learner runs against their own eyes while scanning any slide, so its
- * categories are a fixed clinical convention rather than authored content.
- */
-const WBC_CATEGORIES = [
-  { code: "NEUT", label: "Neutrophils" },
-  { code: "LYMPH", label: "Lymphocytes" },
-  { code: "MONO", label: "Monocytes" },
-  { code: "EOSINO", label: "Eosinophils" },
-  { code: "BASO", label: "Basophils" },
-  { code: "METAMYELO", label: "Metamyelocytes" },
-  { code: "MYELO", label: "Myelocytes" },
-  { code: "PROMYELO", label: "Promyelocytes" },
-  { code: "BLAST", label: "Blasts" },
-] as const;
-
-/**
- * NRBCs are red cells, not white cells — a haematologist doesn't count them
- * into the 100-cell WBC differential, but reports how many were seen
- * *alongside* it, conventionally as "NRBC/100 WBCs". So it gets its own
- * tally here, separate from the differential total below.
- */
-const NRBC = { code: "NRBC", label: "Nucleated red cells" } as const;
-
-const CATEGORIES = [...WBC_CATEGORIES, NRBC];
-
-type CategoryCode = (typeof CATEGORIES)[number]["code"];
-
-const TARGET_COUNT = 100;
-
-function emptyCounts(): Record<CategoryCode, number> {
-  return Object.fromEntries(CATEGORIES.map((c) => [c.code, 0])) as Record<CategoryCode, number>;
-}
+import { useEffect, useState } from "react";
+import {
+  WBC_CATEGORIES,
+  NRBC,
+  TARGET_COUNT,
+  emptyCounts,
+  type CategoryCode,
+} from "@/lib/wbc-categories";
 
 /**
  * A manual 100-cell WBC differential tally, docked as an overlay inside the
@@ -52,11 +21,32 @@ function emptyCounts(): Record<CategoryCode, number> {
  * the viewer) and clicks a category for each white cell they classify,
  * rather than clicking points on the image — this mirrors counting at a
  * real microscope, where the tool is a side counter, not a pin-placement
- * exercise. Purely a client-side scratch tool: counts reset when the panel
- * is closed or the page reloads, same as the viewer's "Save view" button
- * has no server-side record either.
+ * exercise. As a free-standing scratch tool (the default), counts reset
+ * when the panel is closed or the page reloads, same as the viewer's
+ * "Save view" button has no server-side record either.
+ *
+ * The optional props below turn it into a graded exam mode for the Manual
+ * Diff Counter practice exercise: `hideBreakdown` masks the per-category
+ * counts/percentages while the learner is still counting (only the running
+ * total shows), `referenceDifferential` reveals the expected values for
+ * comparison once revealed, `disabled` freezes further counting after
+ * submission, and `onCountsChange` lets a parent page read the live tally
+ * to submit it. None of this affects the plain scratch-tool usage in
+ * cases/modules, which passes none of them.
  */
-export function WbcCounterPanel({ onClose }: { onClose?: () => void }) {
+export function WbcCounterPanel({
+  onClose,
+  hideBreakdown = false,
+  referenceDifferential,
+  disabled = false,
+  onCountsChange,
+}: {
+  onClose?: () => void;
+  hideBreakdown?: boolean;
+  referenceDifferential?: Partial<Record<CategoryCode, number>>;
+  disabled?: boolean;
+  onCountsChange?: (counts: Record<CategoryCode, number>) => void;
+}) {
   const [counts, setCounts] = useState<Record<CategoryCode, number>>(emptyCounts);
   const [wbcTotal, setWbcTotal] = useState("");
 
@@ -66,16 +56,24 @@ export function WbcCounterPanel({ onClose }: { onClose?: () => void }) {
   const wbcValue = Number(wbcTotal);
   const hasWbcValue = wbcTotal.trim() !== "" && Number.isFinite(wbcValue) && wbcValue > 0;
 
+  useEffect(() => {
+    onCountsChange?.(counts);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [counts]);
+
   function increment(code: CategoryCode) {
+    if (disabled) return;
     if (code !== NRBC.code && total >= TARGET_COUNT) return;
     setCounts((prev) => ({ ...prev, [code]: prev[code] + 1 }));
   }
 
   function decrement(code: CategoryCode) {
+    if (disabled) return;
     setCounts((prev) => ({ ...prev, [code]: Math.max(0, prev[code] - 1) }));
   }
 
   function reset() {
+    if (disabled) return;
     setCounts(emptyCounts());
     setWbcTotal("");
   }
@@ -87,13 +85,15 @@ export function WbcCounterPanel({ onClose }: { onClose?: () => void }) {
           {total}/{TARGET_COUNT} counted
         </p>
         <div className="flex shrink-0 items-center gap-1.5">
-          <button
-            type="button"
-            onClick={reset}
-            className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-white/70 hover:bg-white/10"
-          >
-            Reset
-          </button>
+          {!disabled && (
+            <button
+              type="button"
+              onClick={reset}
+              className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-white/70 hover:bg-white/10"
+            >
+              Reset
+            </button>
+          )}
           {onClose && (
             <button
               type="button"
@@ -111,6 +111,7 @@ export function WbcCounterPanel({ onClose }: { onClose?: () => void }) {
         {WBC_CATEGORIES.map(({ code, label }) => {
           const count = counts[code];
           const pct = total > 0 ? (count / total) * 100 : 0;
+          const ref = referenceDifferential?.[code];
           return (
             <div
               key={code}
@@ -119,22 +120,27 @@ export function WbcCounterPanel({ onClose }: { onClose?: () => void }) {
               <button
                 type="button"
                 onClick={() => increment(code)}
-                disabled={atTarget}
+                disabled={disabled || atTarget}
                 title={label}
                 className="flex-1 rounded px-1 py-0.5 text-left text-[10px] font-semibold leading-tight text-white hover:bg-accent hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-white"
               >
                 {code}
               </button>
               <span className="w-5 shrink-0 text-right text-[11px] font-semibold tabular-nums text-white">
-                {count}
+                {hideBreakdown ? "—" : count}
               </span>
               <span className="w-9 shrink-0 text-right text-[9px] tabular-nums text-white/50">
-                {total > 0 ? `${pct.toFixed(0)}%` : "—"}
+                {hideBreakdown ? "—" : total > 0 ? `${pct.toFixed(0)}%` : "—"}
               </span>
+              {ref !== undefined && (
+                <span className="w-12 shrink-0 text-right text-[9px] tabular-nums text-info">
+                  ref {ref}%
+                </span>
+              )}
               <button
                 type="button"
                 onClick={() => decrement(code)}
-                disabled={count === 0}
+                disabled={disabled || count === 0}
                 aria-label={`Remove one ${label} count`}
                 className="shrink-0 rounded px-1 text-[10px] leading-none text-white/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
               >
@@ -155,21 +161,27 @@ export function WbcCounterPanel({ onClose }: { onClose?: () => void }) {
           <button
             type="button"
             onClick={() => increment(NRBC.code)}
+            disabled={disabled}
             title={NRBC.label}
-            className="flex-1 rounded px-1 py-0.5 text-left text-[10px] font-semibold leading-tight text-white hover:bg-accent hover:text-accent-ink"
+            className="flex-1 rounded px-1 py-0.5 text-left text-[10px] font-semibold leading-tight text-white hover:bg-accent hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-white"
           >
             {NRBC.code}
           </button>
           <span className="w-5 shrink-0 text-right text-[11px] font-semibold tabular-nums text-white">
-            {nrbcCount}
+            {hideBreakdown ? "—" : nrbcCount}
           </span>
           <span className="w-14 shrink-0 text-right text-[9px] tabular-nums text-white/50">
-            /{TARGET_COUNT} WBCs
+            {hideBreakdown ? "" : `/${TARGET_COUNT} WBCs`}
           </span>
+          {referenceDifferential?.[NRBC.code] !== undefined && (
+            <span className="w-16 shrink-0 text-right text-[9px] tabular-nums text-info">
+              ref {referenceDifferential[NRBC.code]}
+            </span>
+          )}
           <button
             type="button"
             onClick={() => decrement(NRBC.code)}
-            disabled={nrbcCount === 0}
+            disabled={disabled || nrbcCount === 0}
             aria-label={`Remove one ${NRBC.label} count`}
             className="shrink-0 rounded px-1 text-[10px] leading-none text-white/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
           >
@@ -178,30 +190,33 @@ export function WbcCounterPanel({ onClose }: { onClose?: () => void }) {
         </div>
       </div>
 
-      <div className="mt-auto flex flex-col gap-1 border-t border-white/15 pt-1.5">
-        <label htmlFor="wbc-counter-total" className="text-[9px] leading-tight text-white/50">
-          FBC WBC total (×10⁹/L)
-        </label>
-        <input
-          id="wbc-counter-total"
-          type="number"
-          min="0"
-          step="0.1"
-          value={wbcTotal}
-          onChange={(e) => setWbcTotal(e.target.value)}
-          placeholder="e.g. 7.2"
-          className="w-full rounded border border-white/20 bg-white/5 px-1.5 py-0.5 text-[10px] text-white"
-        />
-        {hasWbcValue && total > 0 && (
-          <div className="mt-0.5 flex flex-col gap-0.5 text-[9px] text-white/60">
-            {WBC_CATEGORIES.filter((c) => counts[c.code] > 0).map(({ code }) => (
-              <p key={code} className="tabular-nums">
-                {code}: {((counts[code] / total) * wbcValue).toFixed(2)}
-              </p>
-            ))}
-          </div>
-        )}
-      </div>
+      {!hideBreakdown && (
+        <div className="mt-auto flex flex-col gap-1 border-t border-white/15 pt-1.5">
+          <label htmlFor="wbc-counter-total" className="text-[9px] leading-tight text-white/50">
+            FBC WBC total (×10⁹/L)
+          </label>
+          <input
+            id="wbc-counter-total"
+            type="number"
+            min="0"
+            step="0.1"
+            value={wbcTotal}
+            onChange={(e) => setWbcTotal(e.target.value)}
+            disabled={disabled}
+            placeholder="e.g. 7.2"
+            className="w-full rounded border border-white/20 bg-white/5 px-1.5 py-0.5 text-[10px] text-white disabled:opacity-50"
+          />
+          {hasWbcValue && total > 0 && (
+            <div className="mt-0.5 flex flex-col gap-0.5 text-[9px] text-white/60">
+              {WBC_CATEGORIES.filter((c) => counts[c.code] > 0).map(({ code }) => (
+                <p key={code} className="tabular-nums">
+                  {code}: {((counts[code] / total) * wbcValue).toFixed(2)}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
