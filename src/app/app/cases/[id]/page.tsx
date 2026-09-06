@@ -69,7 +69,7 @@ export default async function LearnerCaseDetailPage({
   const impersonation = await getActiveImpersonation();
   const { data: attempts } = await supabase
     .from("quiz_attempts")
-    .select("score, passed, answers, pending_manual_grading, manual_grades")
+    .select("score, passed, answers, ai_grades")
     .eq("case_id", id)
     .eq("user_id", userId!)
     .order("created_at", { ascending: false })
@@ -229,16 +229,10 @@ export default async function LearnerCaseDetailPage({
       {lastAttempt && (
         <div
           className={`mt-6 rounded-md px-3 py-2 text-sm ${
-            lastAttempt.pending_manual_grading
-              ? "bg-warning-soft text-warning-soft-ink"
-              : lastAttempt.passed
-                ? "bg-success-soft text-success-soft-ink"
-                : "bg-warning-soft text-warning-soft-ink"
+            lastAttempt.passed ? "bg-success-soft text-success-soft-ink" : "bg-warning-soft text-warning-soft-ink"
           }`}
         >
-          {lastAttempt.pending_manual_grading
-            ? "Last attempt: pending review of your short-answer responses"
-            : `Last attempt: ${lastAttempt.score}% — ${lastAttempt.passed ? "Passed" : "Not passed yet"}`}
+          {`Last attempt: ${lastAttempt.score}% — ${lastAttempt.passed ? "Passed" : "Not passed yet"}`}
         </div>
       )}
 
@@ -251,7 +245,7 @@ export default async function LearnerCaseDetailPage({
             imageUrl: reviewImageUrls.get(q.id) ?? null,
           }))}
           answers={lastAttempt.answers as Record<string, string> | null}
-          manualGrades={lastAttempt.manual_grades as Record<string, boolean> | null}
+          aiGrades={lastAttempt.ai_grades as Record<string, boolean> | null}
         />
       )}
 

@@ -40,7 +40,6 @@ export const adminNav: NavSection[] = [
     items: [
       { label: "Manual Diff Counter", href: "/admin/wbc-diff" },
       { label: "Cell Identification", href: "/admin/cell-id" },
-      { label: "Grading Queue", href: "/admin/grading-queue" },
     ],
   },
   {

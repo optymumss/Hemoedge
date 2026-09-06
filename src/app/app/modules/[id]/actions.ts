@@ -28,7 +28,7 @@ export async function submitQuizAttempt(
 
   const { data: questions } = await supabase
     .from("quiz_questions")
-    .select("id, question_type, correct_choice_id, correct_choice_ids")
+    .select("id, question_type, correct_choice_id, correct_choice_ids, question_text, model_answer")
     .eq("module_id", moduleId);
 
   if (!questions || questions.length === 0) {
@@ -36,11 +36,9 @@ export async function submitQuizAttempt(
   }
 
   const passThreshold = await getModulePassThreshold(supabase, moduleId);
-  const { answers, score, passed, pendingManualGrading } = computeAttempt(
-    questions,
-    formData,
-    passThreshold,
-  );
+  const result = await computeAttempt(questions, formData, passThreshold);
+  if ("error" in result) return result;
+  const { answers, score, passed, aiGrades } = result;
 
   const { error } = await supabase.from("quiz_attempts").insert({
     user_id: user.id,
@@ -48,17 +46,12 @@ export async function submitQuizAttempt(
     score,
     passed,
     answers,
-    pending_manual_grading: pendingManualGrading,
+    ai_grades: aiGrades,
   });
 
   if (error) return { error: error.message };
 
-  // Issuing a certificate off a score that's still waiting on manual grading
-  // would be premature — the grading queue recomputes and re-checks this
-  // once the pending short-answer questions are graded.
-  if (!pendingManualGrading) {
-    await checkAndIssueCertificates(supabase, user.id, moduleId);
-  }
+  await checkAndIssueCertificates(supabase, user.id, moduleId);
 
   revalidatePath(`/app/modules/${moduleId}`);
   revalidatePath("/app/pathways");

@@ -26,6 +26,9 @@ export function parseQuestionForm(formData: FormData): ParsedQuestion | { error:
   if (!questionText) return { error: "Question text is required." };
 
   if (questionType === "short_answer") {
+    if (!modelAnswer) {
+      return { error: "A model answer is required for short-answer questions — AI grades against it." };
+    }
     return {
       question_text: questionText,
       question_type: questionType,

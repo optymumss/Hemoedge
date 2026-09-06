@@ -13,20 +13,19 @@ export type ReviewQuestion = {
 export function QuizReview({
   questions,
   answers,
-  manualGrades,
+  aiGrades,
 }: {
   questions: ReviewQuestion[];
   answers: Record<string, string> | null;
-  manualGrades: Record<string, boolean> | null;
+  aiGrades: Record<string, boolean> | null;
 }) {
   return (
     <div className="mt-4 flex flex-col gap-3">
       {questions.map((q, i) => {
         const yourAnswer = answers?.[q.id] ?? "";
-        let verdict: "correct" | "incorrect" | "pending";
+        let verdict: "correct" | "incorrect";
         if (q.question_type === "short_answer") {
-          const grade = manualGrades?.[q.id];
-          verdict = grade === true ? "correct" : grade === false ? "incorrect" : "pending";
+          verdict = aiGrades?.[q.id] === true ? "correct" : "incorrect";
         } else if (q.question_type === "multi_select") {
           const correct = new Set(q.correct_choice_ids ?? []);
           const chosen = new Set(yourAnswer.split(",").filter(Boolean));
@@ -42,16 +41,8 @@ export function QuizReview({
           <div key={q.id} className="rounded-lg border border-line p-4">
             <p className="text-sm font-medium">
               {i + 1}. {q.question_text}{" "}
-              <span
-                className={
-                  verdict === "correct"
-                    ? "text-success-soft-ink"
-                    : verdict === "incorrect"
-                      ? "text-danger"
-                      : "text-warning-soft-ink"
-                }
-              >
-                {verdict === "correct" ? "✓ Correct" : verdict === "incorrect" ? "✗ Incorrect" : "Pending review"}
+              <span className={verdict === "correct" ? "text-success-soft-ink" : "text-danger"}>
+                {verdict === "correct" ? "✓ Correct" : "✗ Incorrect"}
               </span>
             </p>
             {q.imageUrl && (

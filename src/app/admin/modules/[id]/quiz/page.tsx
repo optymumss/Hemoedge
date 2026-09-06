@@ -73,7 +73,7 @@ export default async function ModuleQuestionsPage({
               )}
               {q.question_type === "short_answer" ? (
                 <p className="mt-2 text-xs text-ink-faint">
-                  Free-text response — graded manually from the Grading Queue.
+                  Free-text response — AI-graded against the model answer below.
                 </p>
               ) : (
                 <ul className="mt-2 flex flex-col gap-1 text-sm text-ink-dim">

@@ -1469,38 +1469,35 @@ export type Database = {
       }
       quiz_attempts: {
         Row: {
+          ai_grades: Json | null
           answers: Json
           case_id: string | null
           created_at: string
           id: string
-          manual_grades: Json | null
           module_id: string | null
           passed: boolean
-          pending_manual_grading: boolean
           score: number
           user_id: string
         }
         Insert: {
+          ai_grades?: Json | null
           answers: Json
           case_id?: string | null
           created_at?: string
           id?: string
-          manual_grades?: Json | null
           module_id?: string | null
           passed: boolean
-          pending_manual_grading?: boolean
           score: number
           user_id: string
         }
         Update: {
+          ai_grades?: Json | null
           answers?: Json
           case_id?: string | null
           created_at?: string
           id?: string
-          manual_grades?: Json | null
           module_id?: string | null
           passed?: boolean
-          pending_manual_grading?: boolean
           score?: number
           user_id?: string
         }
