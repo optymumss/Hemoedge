@@ -7,6 +7,7 @@ import { MediaPlayer } from "@/components/media-player";
 import { RevealField } from "@/components/reveal-field";
 import { CaseSlideViewer } from "./case-slide-viewer";
 import { QuizForm } from "./quiz-form";
+import { ReportBuilder } from "./report-builder";
 
 const ESCALATION_LABEL: Record<string, string> = {
   routine: "Routine",
@@ -136,6 +137,14 @@ export default async function LearnerCaseDetailPage({
         <RevealField label="FBC / lab values">
           <p className="whitespace-pre-wrap">{case_.lab_values}</p>
         </RevealField>
+      )}
+
+      {impersonation ? (
+        <p className="mt-6 text-sm text-ink-faint">
+          The structured report builder is disabled while viewing as another user.
+        </p>
+      ) : (
+        <ReportBuilder caseId={case_.id} />
       )}
 
       {(case_.audio_path || case_.video_path) && (

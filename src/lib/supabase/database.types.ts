@@ -169,6 +169,75 @@ export type Database = {
           },
         ]
       }
+      case_report_submissions: {
+        Row: {
+          abnormal_findings: string
+          ai_feedback: string
+          ai_missed_findings: Json
+          ai_score: number
+          case_id: string
+          created_at: string
+          escalation_correct: boolean
+          escalation_decision: string
+          id: string
+          overall_interpretation: string
+          platelet_morphology: string
+          rbc_morphology: string
+          report_comment: string
+          user_id: string
+          wbc_morphology: string
+        }
+        Insert: {
+          abnormal_findings: string
+          ai_feedback: string
+          ai_missed_findings?: Json
+          ai_score: number
+          case_id: string
+          created_at?: string
+          escalation_correct: boolean
+          escalation_decision: string
+          id?: string
+          overall_interpretation: string
+          platelet_morphology: string
+          rbc_morphology: string
+          report_comment: string
+          user_id: string
+          wbc_morphology: string
+        }
+        Update: {
+          abnormal_findings?: string
+          ai_feedback?: string
+          ai_missed_findings?: Json
+          ai_score?: number
+          case_id?: string
+          created_at?: string
+          escalation_correct?: boolean
+          escalation_decision?: string
+          id?: string
+          overall_interpretation?: string
+          platelet_morphology?: string
+          rbc_morphology?: string
+          report_comment?: string
+          user_id?: string
+          wbc_morphology?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_report_submissions_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_report_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_slides: {
         Row: {
           case_id: string
@@ -238,9 +307,14 @@ export type Database = {
           cpd_points: number
           created_at: string
           created_by: string
+          critical_findings: string | null
           description: string | null
           escalation_decision: string | null
           estimated_time_minutes: number | null
+          expected_abnormal_findings: string | null
+          expected_platelet_findings: string | null
+          expected_rbc_findings: string | null
+          expected_wbc_findings: string | null
           final_diagnosis: string | null
           id: string
           lab_values: string | null
@@ -261,9 +335,14 @@ export type Database = {
           cpd_points?: number
           created_at?: string
           created_by: string
+          critical_findings?: string | null
           description?: string | null
           escalation_decision?: string | null
           estimated_time_minutes?: number | null
+          expected_abnormal_findings?: string | null
+          expected_platelet_findings?: string | null
+          expected_rbc_findings?: string | null
+          expected_wbc_findings?: string | null
           final_diagnosis?: string | null
           id?: string
           lab_values?: string | null
@@ -284,9 +363,14 @@ export type Database = {
           cpd_points?: number
           created_at?: string
           created_by?: string
+          critical_findings?: string | null
           description?: string | null
           escalation_decision?: string | null
           estimated_time_minutes?: number | null
+          expected_abnormal_findings?: string | null
+          expected_platelet_findings?: string | null
+          expected_rbc_findings?: string | null
+          expected_wbc_findings?: string | null
           final_diagnosis?: string | null
           id?: string
           lab_values?: string | null
@@ -312,6 +396,167 @@ export type Database = {
             columns: ["slide_id"]
             isOneToOne: false
             referencedRelation: "slides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cell_id_attempts: {
+        Row: {
+          accuracy_pct: number
+          created_at: string
+          exercise_id: string
+          id: string
+          results: Json
+          user_id: string
+        }
+        Insert: {
+          accuracy_pct: number
+          created_at?: string
+          exercise_id: string
+          id?: string
+          results: Json
+          user_id: string
+        }
+        Update: {
+          accuracy_pct?: number
+          created_at?: string
+          exercise_id?: string
+          id?: string
+          results?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cell_id_attempts_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "cell_id_exercises"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cell_id_attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cell_id_exercises: {
+        Row: {
+          case_id: string | null
+          cpd_points: number
+          created_at: string
+          created_by: string
+          id: string
+          instructions: string | null
+          level: Database["public"]["Enums"]["content_level"]
+          module_id: string | null
+          slide_id: string
+          status: Database["public"]["Enums"]["content_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          case_id?: string | null
+          cpd_points?: number
+          created_at?: string
+          created_by: string
+          id?: string
+          instructions?: string | null
+          level: Database["public"]["Enums"]["content_level"]
+          module_id?: string | null
+          slide_id: string
+          status?: Database["public"]["Enums"]["content_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          case_id?: string | null
+          cpd_points?: number
+          created_at?: string
+          created_by?: string
+          id?: string
+          instructions?: string | null
+          level?: Database["public"]["Enums"]["content_level"]
+          module_id?: string | null
+          slide_id?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cell_id_exercises_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cell_id_exercises_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cell_id_exercises_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cell_id_exercises_slide_id_fkey"
+            columns: ["slide_id"]
+            isOneToOne: false
+            referencedRelation: "slides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cell_id_hotspots: {
+        Row: {
+          cell_type_id: string
+          created_at: string
+          exercise_id: string
+          id: string
+          tolerance_pct: number
+          x_pct: number
+          y_pct: number
+        }
+        Insert: {
+          cell_type_id: string
+          created_at?: string
+          exercise_id: string
+          id?: string
+          tolerance_pct?: number
+          x_pct: number
+          y_pct: number
+        }
+        Update: {
+          cell_type_id?: string
+          created_at?: string
+          exercise_id?: string
+          id?: string
+          tolerance_pct?: number
+          x_pct?: number
+          y_pct?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cell_id_hotspots_cell_type_id_fkey"
+            columns: ["cell_type_id"]
+            isOneToOne: false
+            referencedRelation: "cell_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cell_id_hotspots_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "cell_id_exercises"
             referencedColumns: ["id"]
           },
         ]

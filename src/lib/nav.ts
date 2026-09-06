@@ -39,6 +39,7 @@ export const adminNav: NavSection[] = [
     section: "Assessments",
     items: [
       { label: "Manual Diff Counter", href: "/admin/wbc-diff" },
+      { label: "Cell Identification", href: "/admin/cell-id" },
       { label: "Grading Queue", href: "/admin/grading-queue" },
     ],
   },
@@ -90,7 +91,10 @@ export const appNav: NavSection[] = [
   },
   {
     section: "Tools",
-    items: [{ label: "Manual Diff Counter", href: "/app/wbc-diff" }],
+    items: [
+      { label: "Manual Diff Counter", href: "/app/wbc-diff" },
+      { label: "Cell Identification", href: "/app/cell-id" },
+    ],
   },
 ];
 

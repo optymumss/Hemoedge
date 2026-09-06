@@ -30,6 +30,11 @@ export async function updateCaseDetails(
   const caseCategory = String(formData.get("case_category") ?? "").trim() || null;
   const escalationDecision = String(formData.get("escalation_decision") ?? "").trim() || null;
   const suggestedReportComment = String(formData.get("suggested_report_comment") ?? "").trim() || null;
+  const expectedRbcFindings = String(formData.get("expected_rbc_findings") ?? "").trim() || null;
+  const expectedWbcFindings = String(formData.get("expected_wbc_findings") ?? "").trim() || null;
+  const expectedPlateletFindings = String(formData.get("expected_platelet_findings") ?? "").trim() || null;
+  const expectedAbnormalFindings = String(formData.get("expected_abnormal_findings") ?? "").trim() || null;
+  const criticalFindings = String(formData.get("critical_findings") ?? "").trim() || null;
 
   if (!id || !title) return { error: "Title is required." };
   if (!LEVELS.includes(level)) return { error: "Choose a level." };
@@ -64,6 +69,11 @@ export async function updateCaseDetails(
       case_category: caseCategory,
       escalation_decision: escalationDecision,
       suggested_report_comment: suggestedReportComment,
+      expected_rbc_findings: expectedRbcFindings,
+      expected_wbc_findings: expectedWbcFindings,
+      expected_platelet_findings: expectedPlateletFindings,
+      expected_abnormal_findings: expectedAbnormalFindings,
+      critical_findings: criticalFindings,
     })
     .eq("id", id)
     .select("id")
