@@ -85,14 +85,19 @@ export function QuestionEditorFields({ features }: { features: FeatureOption[] }
 
       {type === "short_answer" && (
         <p className="text-xs text-ink-faint">
-          The learner types a free-text response — grade it afterward from the Grading Queue.
+          The learner types a free-text response — AI grades it against the model answer below.
         </p>
       )}
 
       <textarea
         name="model_answer"
         rows={2}
-        placeholder="Model answer (optional) — shown to the learner after they submit, and as grading guidance for short answers"
+        required={type === "short_answer"}
+        placeholder={
+          type === "short_answer"
+            ? "Model answer (required) — the AI grades the learner's free text against this"
+            : "Model answer (optional) — shown to the learner after they submit"
+        }
         className="rounded-md border border-line-strong px-2 py-1.5 text-sm"
       />
     </>

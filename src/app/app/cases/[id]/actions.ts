@@ -132,14 +132,16 @@ export async function submitQuizAttempt(
 
   const { data: questions } = await supabase
     .from("quiz_questions")
-    .select("id, question_type, correct_choice_id, correct_choice_ids")
+    .select("id, question_type, correct_choice_id, correct_choice_ids, question_text, model_answer")
     .eq("case_id", caseId);
 
   if (!questions || questions.length === 0) {
     return { error: "No questions to score." };
   }
 
-  const { answers, score, passed, pendingManualGrading } = computeAttempt(questions, formData);
+  const result = await computeAttempt(questions, formData);
+  if ("error" in result) return result;
+  const { answers, score, passed, aiGrades } = result;
 
   const { error } = await supabase.from("quiz_attempts").insert({
     user_id: user.id,
@@ -147,7 +149,7 @@ export async function submitQuizAttempt(
     score,
     passed,
     answers,
-    pending_manual_grading: pendingManualGrading,
+    ai_grades: aiGrades,
   });
 
   if (error) return { error: error.message };
