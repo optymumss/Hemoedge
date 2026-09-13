@@ -3,11 +3,14 @@
 /*
  * Field Clarity — HemoEdge's design system.
  *
- * One precise accent (a clinical instrument blue), a considered neutral
- * scale with a faint cool-blue bias (not default Tailwind gray), and a
- * slightly more generous radius scale than Tailwind's defaults. Semantic
- * status colors (danger/success/warning) stay separate from the accent —
- * they mean something specific and shouldn't compete with it.
+ * One precise accent (a clinical wine/crimson — HemoEdge's brand red), a
+ * considered neutral scale with a faint cool-blue bias (not default
+ * Tailwind gray), and a slightly more generous radius scale than
+ * Tailwind's defaults. The accent is deliberately a deeper, more magenta
+ * red than --danger's brighter alert red, so a "brand" button and an
+ * "error" state never read as the same color. Semantic status colors
+ * (danger/success/warning) stay separate from the accent — they mean
+ * something specific and shouldn't compete with it.
  *
  * Tokens are consumed through Tailwind utilities (bg-surface, text-ink,
  * border-line, bg-accent, ...) so every usage across the app repaints
@@ -25,10 +28,10 @@
   --surface-sunken: #f2f3f6;
   --line: #e2e4ea;
   --line-strong: #c7cad4;
-  --accent: #2454e8;
+  --accent: #9e2a46;
   --accent-ink: #ffffff;
-  --accent-soft: #e8edfd;
-  --accent-soft-ink: #1c3fb8;
+  --accent-soft: #fbe9ee;
+  --accent-soft-ink: #7a1f37;
   --danger: #c22a2a;
   --danger-ink: #ffffff;
   --danger-soft: #fbeaea;
@@ -54,10 +57,10 @@
     --surface-sunken: #1a1d26;
     --line: #262a35;
     --line-strong: #383d4a;
-    --accent: #6d93ff;
-    --accent-ink: #0b1330;
-    --accent-soft: #1c2648;
-    --accent-soft-ink: #b7c7ff;
+    --accent: #e78aa0;
+    --accent-ink: #3a0f1a;
+    --accent-soft: #3a1620;
+    --accent-soft-ink: #f2b4c4;
     --danger: #e5776f;
     --danger-ink: #2a0f0d;
     --danger-soft: #3a1f1e;
@@ -83,10 +86,10 @@
   --surface-sunken: #1a1d26;
   --line: #262a35;
   --line-strong: #383d4a;
-  --accent: #6d93ff;
-  --accent-ink: #0b1330;
-  --accent-soft: #1c2648;
-  --accent-soft-ink: #b7c7ff;
+  --accent: #e78aa0;
+  --accent-ink: #3a0f1a;
+  --accent-soft: #3a1620;
+  --accent-soft-ink: #f2b4c4;
   --danger: #e5776f;
   --danger-ink: #2a0f0d;
   --danger-soft: #3a1f1e;
@@ -111,10 +114,10 @@
   --surface-sunken: #f2f3f6;
   --line: #e2e4ea;
   --line-strong: #c7cad4;
-  --accent: #2454e8;
+  --accent: #9e2a46;
   --accent-ink: #ffffff;
-  --accent-soft: #e8edfd;
-  --accent-soft-ink: #1c3fb8;
+  --accent-soft: #fbe9ee;
+  --accent-soft-ink: #7a1f37;
   --danger: #c22a2a;
   --danger-ink: #ffffff;
   --danger-soft: #fbeaea;
