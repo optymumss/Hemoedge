@@ -11,7 +11,7 @@ export function CertificateProgressRing({ progress }: { progress: CertificatePro
       <p className="self-start text-xs font-semibold uppercase tracking-wide text-ink-dim">
         Learning &amp; Certificate Progress
       </p>
-      <svg width="112" height="112" viewBox="0 0 96 96" className="-rotate-90">
+      <svg width="112" height="112" viewBox="0 0 96 96" className="-rotate-90" aria-hidden="true">
         <circle cx="48" cy="48" r={radius} fill="none" stroke="var(--line)" strokeWidth="8" />
         <circle
           cx="48"

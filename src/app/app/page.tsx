@@ -34,7 +34,7 @@ export default async function LearnerHome() {
       supabase.from("slide_views").select("id", { count: "exact", head: true }).eq("user_id", userId!),
       supabase.from("certificates").select("id", { count: "exact", head: true }).eq("user_id", userId!),
       getStudyRecommendation(supabase, userId!, orgId),
-      getCertificateProgress(supabase, userId!),
+      getCertificateProgress(supabase, userId!, orgId),
       supabase
         .from("quiz_attempts")
         .select("id, score, passed, created_at, module_id, case_id, modules(title), cases(title)")
@@ -55,7 +55,6 @@ export default async function LearnerHome() {
     title: a.modules?.title ?? a.cases?.title ?? "Untitled",
     score: a.score,
     passed: a.passed,
-    createdAt: a.created_at,
   }));
 
   // The recommendation's slide comes from whichever module/case it points
@@ -70,7 +69,7 @@ export default async function LearnerHome() {
       .order("position")
       .limit(1)
       .maybeSingle();
-    if (data?.slide_id) previewSlide = { slideId: data.slide_id, title: recommendation.title };
+    if (data?.slide_id) previewSlide = { slideId: data.slide_id, title: data.title ?? recommendation.title };
   } else if (recommendation.kind === "case") {
     const { data } = await supabase.from("cases").select("slide_id").eq("id", recommendation.id).maybeSingle();
     if (data?.slide_id) previewSlide = { slideId: data.slide_id, title: recommendation.title };
@@ -106,7 +105,12 @@ export default async function LearnerHome() {
               href={recommendation.href}
               className="mt-4 inline-block rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-ink"
             >
-              {recommendation.kind === "module" ? "Continue module" : "Start now"} &rarr;
+              {recommendation.kind === "module"
+                ? recommendation.reason === "pathway"
+                  ? "Continue module"
+                  : "Start module"
+                : "Start now"}{" "}
+              &rarr;
             </Link>
           </div>
           {previewSlide && (

@@ -48,20 +48,35 @@ export function pickCertificateProgress(curricula: CurriculumForProgress[]): Cer
 export async function getCertificateProgress(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
+  orgId: string | null,
 ): Promise<CertificateProgress | null> {
-  const { data: curricula } = await supabase
+  let curriculumIds: string[] | null = null;
+  if (orgId) {
+    const { data: selections } = await supabase
+      .from("org_catalog_selections")
+      .select("content_id")
+      .eq("org_id", orgId)
+      .eq("content_type", "curriculum");
+    curriculumIds = (selections ?? []).map((s) => s.content_id);
+    if (curriculumIds.length === 0) return null;
+  }
+
+  const baseQuery = supabase
     .from("curricula")
     .select("id, title, certificate_awarded, pass_threshold")
     .eq("status", "published")
-    .eq("certificate_awarded", true);
+    .eq("certificate_awarded", true)
+    .order("title");
+
+  const { data: curricula } = await (curriculumIds ? baseQuery.in("id", curriculumIds) : baseQuery);
 
   if (!curricula || curricula.length === 0) return null;
 
-  const curriculumIds = curricula.map((c) => c.id);
+  const fetchedCurriculumIds = curricula.map((c) => c.id);
   const { data: links } = await supabase
     .from("curriculum_modules")
     .select("curriculum_id, module_id")
-    .in("curriculum_id", curriculumIds);
+    .in("curriculum_id", fetchedCurriculumIds);
 
   const moduleIds = Array.from(new Set((links ?? []).map((l) => l.module_id)));
   const { data: attempts } =

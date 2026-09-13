@@ -1,20 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
+import { getCompetencyRows } from "./competency-rows";
+import { getPublishedContent } from "@/lib/learner/published-content";
 import {
   pickStudyRecommendation,
   type CompetencyArea,
   type CompetencyCandidate,
-  type CompetencyRow,
   type PathwayModule,
   type StudyRecommendation,
 } from "./study-recommendation";
-
-const PROFICIENT_THRESHOLD = 70;
-
-function statusFromScores(scores: number[]): "Proficient" | "Developing" | "Not yet assessed" {
-  if (scores.length === 0) return "Not yet assessed";
-  const avg = scores.reduce((sum, s) => sum + s, 0) / scores.length;
-  return avg >= PROFICIENT_THRESHOLD ? "Proficient" : "Developing";
-}
 
 async function getAssignedPathwayModules(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -75,72 +68,10 @@ async function getAssignedPathwayModules(
   }));
 }
 
-async function getCompetencyRows(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string,
-): Promise<CompetencyRow[]> {
-  const { data: caseFeatureLinks } = await supabase
-    .from("case_features")
-    .select("case_id, features(cell_type_id, cell_types(lineage))");
-  const { data: quizAttempts } = await supabase.from("quiz_attempts").select("case_id, score").eq("user_id", userId);
-  const { data: wbcAttempts } = await supabase
-    .from("wbc_diff_attempts")
-    .select("accuracy_pct")
-    .eq("user_id", userId);
-  const { data: cellIdAttempts } = await supabase
-    .from("cell_id_attempts")
-    .select("accuracy_pct")
-    .eq("user_id", userId);
-  const { data: reportSubmissions } = await supabase
-    .from("case_report_submissions")
-    .select("ai_score")
-    .eq("user_id", userId);
-
-  const bestByCase = new Map<string, number>();
-  for (const a of quizAttempts ?? []) {
-    if (!a.case_id) continue;
-    bestByCase.set(a.case_id, Math.max(bestByCase.get(a.case_id) ?? 0, a.score));
-  }
-
-  const caseIdsByLineage: Record<"red_cell" | "white_cell" | "platelet", Set<string>> = {
-    red_cell: new Set(),
-    white_cell: new Set(),
-    platelet: new Set(),
-  };
-  for (const link of caseFeatureLinks ?? []) {
-    const lineage = link.features?.cell_types?.lineage;
-    if (lineage === "red_cell" || lineage === "white_cell" || lineage === "platelet") {
-      caseIdsByLineage[lineage].add(link.case_id);
-    }
-  }
-  function scoresForLineage(lineage: "red_cell" | "white_cell" | "platelet"): number[] {
-    return Array.from(caseIdsByLineage[lineage])
-      .map((id) => bestByCase.get(id))
-      .filter((s): s is number => s !== undefined);
-  }
-
-  return [
-    { area: "RBC morphology", status: statusFromScores(scoresForLineage("red_cell")) },
-    { area: "WBC morphology", status: statusFromScores(scoresForLineage("white_cell")) },
-    { area: "Platelet morphology", status: statusFromScores(scoresForLineage("platelet")) },
-    {
-      area: "Abnormal cell recognition",
-      status: statusFromScores((cellIdAttempts ?? []).map((a) => Number(a.accuracy_pct))),
-    },
-    {
-      area: "Manual differential",
-      status: statusFromScores((wbcAttempts ?? []).map((a) => Number(a.accuracy_pct))),
-    },
-    {
-      area: "Morphology reporting",
-      status: statusFromScores((reportSubmissions ?? []).map((s) => s.ai_score)),
-    },
-  ];
-}
-
 async function getCompetencyCandidates(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
+  orgId: string | null,
   weakAreas: CompetencyArea[],
 ): Promise<Partial<Record<CompetencyArea, CompetencyCandidate>>> {
   const candidates: Partial<Record<CompetencyArea, CompetencyCandidate>> = {};
@@ -153,6 +84,13 @@ async function getCompetencyCandidates(
 
   const morphologyAreas = weakAreas.filter((area) => lineageByArea[area]);
   const otherAreas = weakAreas.filter((area) => !lineageByArea[area]);
+
+  const usesCaseCandidates = morphologyAreas.length > 0 || otherAreas.includes("Morphology reporting");
+  const orgCaseIds = usesCaseCandidates
+    ? orgId
+      ? new Set((await getPublishedContent("cases", "case", orgId)).map((c) => c.id))
+      : null
+    : null;
 
   if (morphologyAreas.length > 0) {
     const { data: attemptedCaseIds } = await supabase
@@ -179,7 +117,8 @@ async function getCompetencyCandidates(
         (c) =>
           c.features?.cell_types?.lineage === lineage &&
           c.cases?.status === "published" &&
-          !attempted.has(c.case_id),
+          !attempted.has(c.case_id) &&
+          (orgCaseIds === null || orgCaseIds.has(c.case_id)),
       );
       if (match?.cases) {
         candidates[area] = {
@@ -243,7 +182,9 @@ async function getCompetencyCandidates(
           .eq("user_id", userId);
         const attemptedIds = new Set((attempted ?? []).map((a) => a.case_id));
         const { data: cases } = await supabase.from("cases").select("id, title").eq("status", "published");
-        const match = (cases ?? []).find((c) => !attemptedIds.has(c.id));
+        const match = (cases ?? []).find(
+          (c) => !attemptedIds.has(c.id) && (orgCaseIds === null || orgCaseIds.has(c.id)),
+        );
         if (match) {
           candidates[area] = { kind: "case", id: match.id, title: match.title, href: `/app/cases/${match.id}` };
         }
@@ -256,15 +197,28 @@ async function getCompetencyCandidates(
 
 async function getDefaultModule(
   supabase: Awaited<ReturnType<typeof createClient>>,
+  orgId: string | null,
 ): Promise<{ moduleId: string; title: string } | null> {
-  const { data } = await supabase
+  let moduleIds: string[] | null = null;
+  if (orgId) {
+    const { data: selections } = await supabase
+      .from("org_catalog_selections")
+      .select("content_id")
+      .eq("org_id", orgId)
+      .eq("content_type", "module");
+    moduleIds = (selections ?? []).map((s) => s.content_id);
+    if (moduleIds.length === 0) return null;
+  }
+
+  const query = supabase
     .from("modules")
     .select("id, title")
     .eq("status", "published")
     .eq("module_type", "foundation")
     .order("created_at")
-    .limit(1)
-    .maybeSingle();
+    .limit(1);
+
+  const { data } = await (moduleIds ? query.in("id", moduleIds) : query).maybeSingle();
   return data ? { moduleId: data.id, title: data.title } : null;
 }
 
@@ -275,13 +229,13 @@ export async function getStudyRecommendation(
 ): Promise<StudyRecommendation> {
   const [pathwayModules, competencyRows] = await Promise.all([
     getAssignedPathwayModules(supabase, userId, orgId),
-    getCompetencyRows(supabase, userId),
+    getCompetencyRows(supabase, userId, orgId),
   ]);
 
   const weakAreas = competencyRows.filter((r) => r.status !== "Proficient").map((r) => r.area);
   const [competencyCandidates, defaultModule] = await Promise.all([
-    getCompetencyCandidates(supabase, userId, weakAreas),
-    getDefaultModule(supabase),
+    getCompetencyCandidates(supabase, userId, orgId, weakAreas),
+    getDefaultModule(supabase, orgId),
   ]);
 
   return pickStudyRecommendation({ pathwayModules, competencyRows, competencyCandidates, defaultModule });

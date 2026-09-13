@@ -31,7 +31,13 @@ export async function WsiPreviewCard({
       </div>
       <div className="h-40 bg-surface-sunken">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt={slideTitle} className="h-full w-full object-cover" />
+        <img
+          src={url}
+          alt={slideTitle}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover"
+        />
       </div>
       <p className="px-3 py-2 text-sm font-medium text-ink">{slideTitle}</p>
     </Link>

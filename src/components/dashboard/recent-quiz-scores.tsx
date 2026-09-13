@@ -1,13 +1,11 @@
 export function RecentQuizScores({
   attempts,
 }: {
-  attempts: { id: string; title: string; score: number; passed: boolean; createdAt: string }[];
+  attempts: { id: string; title: string; score: number; passed: boolean }[];
 }) {
   return (
     <div className="rounded-lg border border-line p-4">
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Recent Quiz Scores</p>
-      </div>
+      <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Recent Quiz Scores</p>
       <div className="mt-3 flex flex-col gap-3">
         {attempts.map((a) => (
           <div key={a.id}>
