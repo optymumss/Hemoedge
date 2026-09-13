@@ -151,25 +151,30 @@ async function getCompetencyCandidates(
     "Platelet morphology": "platelet",
   };
 
-  for (const area of weakAreas) {
-    const lineage = lineageByArea[area];
-    if (lineage) {
-      const { data: attemptedCaseIds } = await supabase
-        .from("quiz_attempts")
-        .select("case_id")
-        .eq("user_id", userId)
-        .not("case_id", "is", null);
-      const attempted = new Set((attemptedCaseIds ?? []).map((a) => a.case_id));
+  const morphologyAreas = weakAreas.filter((area) => lineageByArea[area]);
+  const otherAreas = weakAreas.filter((area) => !lineageByArea[area]);
 
-      // Fetched unfiltered and matched in JS rather than filtering the
-      // embedded `features.cell_types.lineage` path server-side — Supabase's
-      // embedded-resource filter syntax is finicky to get right against the
-      // generated types, and this table is small enough that filtering
-      // client-side is simpler and just as fast.
-      const { data: candidateCases } = await supabase
-        .from("case_features")
-        .select("case_id, cases(id, title, status), features(cell_types(lineage))");
+  if (morphologyAreas.length > 0) {
+    const { data: attemptedCaseIds } = await supabase
+      .from("quiz_attempts")
+      .select("case_id")
+      .eq("user_id", userId)
+      .not("case_id", "is", null);
+    const attempted = new Set((attemptedCaseIds ?? []).map((a) => a.case_id));
 
+    // Fetched unfiltered and matched in JS rather than filtering the
+    // embedded `features.cell_types.lineage` path server-side — Supabase's
+    // embedded-resource filter syntax is finicky to get right against the
+    // generated types, and this table is small enough that filtering
+    // client-side is simpler and just as fast. Fetched once here (rather
+    // than per weak area) since it's the same unfiltered dataset regardless
+    // of which lineage we're matching against.
+    const { data: candidateCases } = await supabase
+      .from("case_features")
+      .select("case_id, cases(id, title, status), features(cell_types(lineage))");
+
+    for (const area of morphologyAreas) {
+      const lineage = lineageByArea[area]!;
       const match = (candidateCases ?? []).find(
         (c) =>
           c.features?.cell_types?.lineage === lineage &&
@@ -184,62 +189,67 @@ async function getCompetencyCandidates(
           href: `/app/cases/${match.cases.id}`,
         };
       }
-      continue;
-    }
-
-    if (area === "Abnormal cell recognition") {
-      const { data: attempted } = await supabase.from("cell_id_attempts").select("exercise_id").eq("user_id", userId);
-      const attemptedIds = new Set((attempted ?? []).map((a) => a.exercise_id));
-      const { data: exercises } = await supabase
-        .from("cell_id_exercises")
-        .select("id, title")
-        .eq("status", "published");
-      const match = (exercises ?? []).find((e) => !attemptedIds.has(e.id));
-      if (match) {
-        candidates[area] = {
-          kind: "exercise",
-          exerciseKind: "cell-id",
-          id: match.id,
-          title: match.title,
-          href: `/app/cell-id/${match.id}`,
-        };
-      }
-      continue;
-    }
-
-    if (area === "Manual differential") {
-      const { data: attempted } = await supabase.from("wbc_diff_attempts").select("exercise_id").eq("user_id", userId);
-      const attemptedIds = new Set((attempted ?? []).map((a) => a.exercise_id));
-      const { data: exercises } = await supabase
-        .from("wbc_diff_exercises")
-        .select("id, title")
-        .eq("status", "published");
-      const match = (exercises ?? []).find((e) => !attemptedIds.has(e.id));
-      if (match) {
-        candidates[area] = {
-          kind: "exercise",
-          exerciseKind: "wbc-diff",
-          id: match.id,
-          title: match.title,
-          href: `/app/wbc-diff/${match.id}`,
-        };
-      }
-      continue;
-    }
-
-    if (area === "Morphology reporting") {
-      const { data: attempted } = await supabase
-        .from("case_report_submissions")
-        .select("case_id")
-        .eq("user_id", userId);
-      const attemptedIds = new Set((attempted ?? []).map((a) => a.case_id));
-      const { data: cases } = await supabase.from("cases").select("id, title").eq("status", "published");
-      const match = (cases ?? []).find((c) => !attemptedIds.has(c.id));
-      if (match) {
-        candidates[area] = { kind: "case", id: match.id, title: match.title, href: `/app/cases/${match.id}` };
-      }
     }
   }
+
+  // The remaining areas each query a disjoint set of tables, so resolve them
+  // concurrently rather than awaiting one area at a time.
+  await Promise.all(
+    otherAreas.map(async (area) => {
+      if (area === "Abnormal cell recognition") {
+        const { data: attempted } = await supabase.from("cell_id_attempts").select("exercise_id").eq("user_id", userId);
+        const attemptedIds = new Set((attempted ?? []).map((a) => a.exercise_id));
+        const { data: exercises } = await supabase
+          .from("cell_id_exercises")
+          .select("id, title")
+          .eq("status", "published");
+        const match = (exercises ?? []).find((e) => !attemptedIds.has(e.id));
+        if (match) {
+          candidates[area] = {
+            kind: "exercise",
+            exerciseKind: "cell-id",
+            id: match.id,
+            title: match.title,
+            href: `/app/cell-id/${match.id}`,
+          };
+        }
+        return;
+      }
+
+      if (area === "Manual differential") {
+        const { data: attempted } = await supabase.from("wbc_diff_attempts").select("exercise_id").eq("user_id", userId);
+        const attemptedIds = new Set((attempted ?? []).map((a) => a.exercise_id));
+        const { data: exercises } = await supabase
+          .from("wbc_diff_exercises")
+          .select("id, title")
+          .eq("status", "published");
+        const match = (exercises ?? []).find((e) => !attemptedIds.has(e.id));
+        if (match) {
+          candidates[area] = {
+            kind: "exercise",
+            exerciseKind: "wbc-diff",
+            id: match.id,
+            title: match.title,
+            href: `/app/wbc-diff/${match.id}`,
+          };
+        }
+        return;
+      }
+
+      if (area === "Morphology reporting") {
+        const { data: attempted } = await supabase
+          .from("case_report_submissions")
+          .select("case_id")
+          .eq("user_id", userId);
+        const attemptedIds = new Set((attempted ?? []).map((a) => a.case_id));
+        const { data: cases } = await supabase.from("cases").select("id, title").eq("status", "published");
+        const match = (cases ?? []).find((c) => !attemptedIds.has(c.id));
+        if (match) {
+          candidates[area] = { kind: "case", id: match.id, title: match.title, href: `/app/cases/${match.id}` };
+        }
+      }
+    }),
+  );
 
   return candidates;
 }
