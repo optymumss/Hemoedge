@@ -29,7 +29,7 @@ export async function WsiPreviewCard({
         <span className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Whole Slide Viewer</span>
         <span className="text-xs text-accent">Open in viewer &rarr;</span>
       </div>
-      <div className="h-40 bg-black">
+      <div className="h-40 bg-surface-sunken">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={url} alt={slideTitle} className="h-full w-full object-cover" />
       </div>
