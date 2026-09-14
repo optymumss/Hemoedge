@@ -4,7 +4,11 @@ import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { getActiveImpersonation, getEffectiveUserId } from "@/lib/auth/impersonation";
 import { getLearnerOrgId } from "@/lib/learner/get-learner-org";
 import { getPublishedContent } from "@/lib/learner/published-content";
-import { getWeakAreas } from "@/lib/learner/weak-areas";
+import { getStudyRecommendation } from "@/lib/learner/get-study-recommendation";
+import { getCertificateProgress } from "@/lib/learner/certificate-progress";
+import { WsiPreviewCard } from "@/components/dashboard/wsi-preview-card";
+import { CertificateProgressRing } from "@/components/dashboard/certificate-progress-ring";
+import { RecentQuizScores } from "@/components/dashboard/recent-quiz-scores";
 
 const QUICK_LINKS = [
   { label: "Modules", href: "/app/modules", blurb: "Structured learning content" },
@@ -23,19 +27,21 @@ export default async function LearnerHome() {
     : profile?.fullName || profile?.email;
   const orgId = await getLearnerOrgId();
 
-  const [modules, cases, slideViewsResult, certificatesResult, weakAreas] = await Promise.all([
-    getPublishedContent("modules", "module", orgId),
-    getPublishedContent("cases", "case", orgId),
-    supabase
-      .from("slide_views")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId!),
-    supabase
-      .from("certificates")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId!),
-    getWeakAreas(supabase, userId!),
-  ]);
+  const [modules, cases, slideViewsResult, certificatesResult, recommendation, certificateProgress, recentAttempts] =
+    await Promise.all([
+      getPublishedContent("modules", "module", orgId),
+      getPublishedContent("cases", "case", orgId),
+      supabase.from("slide_views").select("id", { count: "exact", head: true }).eq("user_id", userId!),
+      supabase.from("certificates").select("id", { count: "exact", head: true }).eq("user_id", userId!),
+      getStudyRecommendation(supabase, userId!, orgId),
+      getCertificateProgress(supabase, userId!, orgId),
+      supabase
+        .from("quiz_attempts")
+        .select("id, score, passed, created_at, module_id, case_id, modules(title), cases(title)")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(5),
+    ]);
 
   const stats = [
     { label: "Modules available", value: modules.length },
@@ -44,13 +50,36 @@ export default async function LearnerHome() {
     { label: "Certificates earned", value: certificatesResult.count ?? 0 },
   ];
 
+  const quizScores = (recentAttempts.data ?? []).map((a) => ({
+    id: a.id,
+    title: a.modules?.title ?? a.cases?.title ?? "Untitled",
+    score: a.score,
+    passed: a.passed,
+  }));
+
+  // The recommendation's slide comes from whichever module/case it points
+  // at, so the WSI preview always matches "what to study next."
+  let previewSlide: { slideId: string; title: string } | null = null;
+  if (recommendation.kind === "module") {
+    const { data } = await supabase
+      .from("lessons")
+      .select("slide_id, title")
+      .eq("module_id", recommendation.id)
+      .not("slide_id", "is", null)
+      .order("position")
+      .limit(1)
+      .maybeSingle();
+    if (data?.slide_id) previewSlide = { slideId: data.slide_id, title: data.title ?? recommendation.title };
+  } else if (recommendation.kind === "case") {
+    const { data } = await supabase.from("cases").select("slide_id").eq("id", recommendation.id).maybeSingle();
+    if (data?.slide_id) previewSlide = { slideId: data.slide_id, title: recommendation.title };
+  }
+
   return (
     <div>
       <h1 className="text-xl font-semibold">Welcome, {displayName}</h1>
       <p className="mt-2 max-w-xl text-sm text-ink-dim">
-        {orgId
-          ? "Here's what your organization has assigned."
-          : "Here's what's available to study."}
+        {orgId ? "Here's what your organization has assigned." : "Here's what's available to study."}
       </p>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -62,39 +91,51 @@ export default async function LearnerHome() {
         ))}
       </div>
 
-      {weakAreas.length > 0 && (
-        <>
-          <h2 className="mt-8 text-sm font-semibold uppercase tracking-wider text-ink-faint">
-            Where you&apos;re weak
-          </h2>
-          <div className="mt-3 flex flex-col gap-2">
-            {weakAreas.map((area) => (
-              <div
-                key={area.label}
-                className="flex items-center justify-between rounded-lg border border-line p-3"
-              >
-                <span className="text-sm font-medium text-ink">{area.label}</span>
-                <span className="text-xs text-warning-soft-ink">
-                  {area.accuracyPct}% correct · {area.attempts} attempts
-                </span>
-              </div>
-            ))}
+      {recommendation.kind !== "none" && (
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-lg border border-line p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">
+              {recommendation.reason === "pathway" ? "Continue Learning" : "Study Next"}
+            </p>
+            <p className="mt-2 text-lg font-medium text-ink">{recommendation.title}</p>
+            {"context" in recommendation && recommendation.context && (
+              <p className="mt-1 text-sm text-ink-dim">{recommendation.context}</p>
+            )}
+            <Link
+              href={recommendation.href}
+              className="mt-4 inline-block rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-ink"
+            >
+              {recommendation.kind === "module"
+                ? recommendation.reason === "pathway"
+                  ? "Continue module"
+                  : "Start module"
+                : "Start now"}{" "}
+              &rarr;
+            </Link>
           </div>
-        </>
+          {previewSlide && (
+            <WsiPreviewCard slideId={previewSlide.slideId} slideTitle={previewSlide.title} href={recommendation.href} />
+          )}
+        </div>
       )}
 
-      <h2 className="mt-8 text-sm font-semibold uppercase tracking-wider text-ink-faint">
-        Continue learning
-      </h2>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        {certificateProgress && (
+          <div className="lg:col-span-1">
+            <CertificateProgressRing progress={certificateProgress} />
+          </div>
+        )}
+        <div className={certificateProgress ? "lg:col-span-2" : "lg:col-span-3"}>
+          <RecentQuizScores attempts={quizScores} />
+        </div>
+      </div>
+
+      <h2 className="mt-8 text-sm font-semibold uppercase tracking-wider text-ink-faint">Quick access</h2>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {QUICK_LINKS.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="rounded-lg border border-line p-4 transition-colors hover:bg-surface-raised"
-          >
-            <p className="text-sm font-medium text-ink">{link.label}</p>
-            <p className="mt-1 text-xs text-ink-dim">{link.blurb}</p>
+          <Link key={link.href} href={link.href} className="rounded-lg border border-line p-4 hover:border-line-strong">
+            <p className="font-medium text-ink">{link.label}</p>
+            <p className="mt-1 text-sm text-ink-dim">{link.blurb}</p>
           </Link>
         ))}
       </div>
