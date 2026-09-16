@@ -31,7 +31,7 @@ export default async function AdminLayout({
       {impersonation && <ImpersonationBanner name={identity} />}
       <div className="flex flex-1 flex-col md:flex-row">
         <Sidebar
-          title="HemoEdge Admin"
+          tagline="PLATFORM ADMIN"
           identity={identity}
           role={ROLE_LABELS[effectiveRole]}
           sections={sections}

@@ -31,7 +31,7 @@ export default async function OrgLayout({
       {impersonation && <ImpersonationBanner name={identity} />}
       <div className="flex flex-1 flex-col md:flex-row">
         <Sidebar
-          title="Organization Portal"
+          tagline="ORGANIZATION"
           identity={identity}
           role={ROLE_LABELS[effectiveRole]}
           sections={sections}

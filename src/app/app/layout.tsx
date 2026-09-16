@@ -2,7 +2,7 @@ import { getCurrentProfile } from "@/lib/auth/get-profile";
 import { getActiveImpersonation } from "@/lib/auth/impersonation";
 import { appNav, visibleFor } from "@/lib/nav";
 import { ROLE_LABELS } from "@/lib/auth/roles";
-import { LearnerSidebar } from "@/components/learner-sidebar";
+import { Sidebar } from "@/components/sidebar";
 import { TutorWidget } from "@/components/tutor-widget";
 import { ImpersonationBanner } from "@/components/impersonation-banner";
 import { logout } from "@/app/login/actions";
@@ -31,7 +31,8 @@ export default async function LearnerLayout({
       </a>
       {impersonation && <ImpersonationBanner name={identity} />}
       <div className="flex flex-1 flex-col md:flex-row">
-        <LearnerSidebar
+        <Sidebar
+          tagline="BLOOD FILM LEARNING"
           identity={identity}
           role={ROLE_LABELS[effectiveRole]}
           sections={sections}
