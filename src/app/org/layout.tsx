@@ -3,6 +3,7 @@ import { getActiveImpersonation } from "@/lib/auth/impersonation";
 import { orgNav, visibleFor } from "@/lib/nav";
 import { ROLE_LABELS } from "@/lib/auth/roles";
 import { Sidebar } from "@/components/sidebar";
+import { Header } from "@/components/header";
 import { ImpersonationBanner } from "@/components/impersonation-banner";
 import { logout } from "@/app/login/actions";
 
@@ -38,8 +39,9 @@ export default async function OrgLayout({
           settingsHref="/org/settings"
           onLogout={logout}
         />
-        <main id="main-content" className="flex-1 overflow-y-auto px-4 py-6 sm:px-8 sm:py-8">
-          {children}
+        <main id="main-content" className="flex flex-1 flex-col overflow-y-auto">
+          <Header identity={identity} />
+          <div className="px-4 py-6 sm:px-8 sm:py-8">{children}</div>
         </main>
       </div>
     </div>
