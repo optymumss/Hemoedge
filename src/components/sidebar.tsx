@@ -10,7 +10,7 @@ function BrandMark({ tagline }: { tagline: string }) {
   return (
     <div className="flex items-center gap-2">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-        <path d="M10 2c3 4 6 7.2 6 10.5a6 6 0 1 1-12 0C4 9.2 7 6 10 2Z" fill="var(--accent)" />
+        <path d="M10 2c3 4 6 7.2 6 10.5a6 6 0 1 1-12 0C4 9.2 7 6 10 2Z" fill="var(--sidebar-accent)" />
       </svg>
       <div className="leading-tight">
         <p className="text-sm font-semibold tracking-tight text-sidebar-ink">HemoEdge</p>
@@ -110,7 +110,7 @@ export function Sidebar({
                         aria-current={active ? "page" : undefined}
                         className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors ${
                           active
-                            ? "bg-accent text-accent-ink font-medium"
+                            ? "bg-sidebar-accent text-sidebar-accent-ink font-medium"
                             : "text-sidebar-ink hover:bg-sidebar-bg-raised"
                         }`}
                       >
@@ -128,7 +128,7 @@ export function Sidebar({
         <div className="mt-6 flex items-center gap-2.5 border-t border-sidebar-border pt-4">
           <span
             aria-hidden="true"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-semibold text-accent-soft-ink"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent-soft text-xs font-semibold text-sidebar-ink"
           >
             {initial}
           </span>
@@ -141,7 +141,7 @@ export function Sidebar({
             aria-current={pathname === settingsHref ? "page" : undefined}
             aria-label="Settings"
             className={`rounded-md p-1.5 hover:bg-sidebar-bg-raised ${
-              pathname === settingsHref ? "text-accent" : "text-sidebar-ink-dim hover:text-sidebar-ink"
+              pathname === settingsHref ? "text-sidebar-accent" : "text-sidebar-ink-dim hover:text-sidebar-ink"
             }`}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">

@@ -39,10 +39,10 @@ export default async function AdminLayout({
           settingsHref="/admin/settings"
           onLogout={logout}
         />
-        <main id="main-content" className="flex flex-1 flex-col overflow-y-auto">
+        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
           <Header identity={identity} />
-          <div className="px-4 py-6 sm:px-8 sm:py-8">{children}</div>
-        </main>
+          <main id="main-content" className="px-4 py-6 sm:px-8 sm:py-8">{children}</main>
+        </div>
       </div>
     </div>
   );

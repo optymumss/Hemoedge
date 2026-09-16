@@ -50,6 +50,9 @@
   --sidebar-ink: #f5e9ec;
   --sidebar-ink-dim: #c9a3ad;
   --sidebar-border: #582030;
+  --sidebar-accent: #c2405f;
+  --sidebar-accent-ink: #ffffff;
+  --sidebar-accent-soft: #5c2231;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -169,6 +172,9 @@
   --color-sidebar-ink: var(--sidebar-ink);
   --color-sidebar-ink-dim: var(--sidebar-ink-dim);
   --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-ink: var(--sidebar-accent-ink);
+  --color-sidebar-accent-soft: var(--sidebar-accent-soft);
 
   /* A touch more generous than Tailwind's defaults — reads calmer at this
      content density than the tighter default scale. */

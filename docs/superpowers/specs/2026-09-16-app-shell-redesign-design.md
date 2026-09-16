@@ -107,7 +107,7 @@ New tokens added to `src/app/globals.css`, defined once on `:root` and **not** o
 }
 ```
 
-`Sidebar` swaps its Tailwind classes from the theme-responsive `bg-surface-sunken`/`text-ink`/`border-line` to the new `bg-sidebar-bg`/`text-sidebar-ink`/`border-sidebar-border` (and `bg-sidebar-bg-raised` for the mobile top bar). The active nav item keeps `bg-accent text-accent-ink` (already theme-invariant enough — the accent token already provides sufficient contrast against the dark sidebar in both modes since it's a single fixed maroon/rose value per mode, and the sidebar no longer changes with the mode so `--accent`'s light-mode value, the wine/crimson `#9e2a46`, is what always shows against `--sidebar-bg` `#3a0f1a` — verified for contrast during implementation).
+`Sidebar` swaps its Tailwind classes from the theme-responsive `bg-surface-sunken`/`text-ink`/`border-line` to the new `bg-sidebar-bg`/`text-sidebar-ink`/`border-sidebar-border` (and `bg-sidebar-bg-raised` for the mobile top bar). The sidebar's accent-colored elements (brand mark, active nav item, avatar chip, active settings link) use three dedicated theme-invariant tokens — `--sidebar-accent`, `--sidebar-accent-ink`, `--sidebar-accent-soft` — added to `:root` alongside the other five `--sidebar-*` tokens, rather than the app-wide `--accent` token. This is necessary because `--accent` is overridden in both the `prefers-color-scheme: dark` block and the `[data-theme="dark"]` block, so it does change with theme; reusing it would have made these elements shift color between modes even though the rest of the sidebar stays fixed.
 
 The `ThemeToggle` is removed from the sidebar (it doesn't make sense inside a component that no longer changes with the toggle) and moves into the new `Header`.
 
