@@ -17,7 +17,7 @@
 - Sparkline: exactly 30 points, oldest first, one per **UTC calendar day**, covering `date(now) - 29 days` through `date(now)` inclusive. Today's (partial) UTC day is bucket 29 (the last point) and accumulates normally.
 - `percentChange` is `null` when `previousPeriodCount === 0` — never `Infinity` or `NaN`.
 - `direction` is `"up"` when `absoluteChange > 0`, `"down"` when `< 0`, `"flat"` when `0`. No inverted-polarity concept — all 4 metrics treat "up" as positive.
-- If any one metric's query fails, that metric alone falls back to a flat/zero trend (`FLAT_TREND` below) — one failing query must never throw or zero out the other three metrics.
+- If any one metric's query fails, that metric alone falls back to a flat/zero trend (`FLAT_TREND` below) — one failing query must never throw or zero out the other three metrics. Because all 4 metrics resolve under one `Promise.all`, each per-metric function must catch its own exceptions internally (not just check the Supabase `{ error }` field) — an uncaught throw in one function rejects the whole `Promise.all` and takes down all 4.
 - Org-scoped "available" metrics (modules, cases) must use `org_catalog_selections.created_at` for the "became available" timestamp when `orgId` is set, and `modules.created_at`/`cases.created_at` when it is not — matching `getPublishedContent()`'s existing `status = 'published'` + org-catalog-selection filter exactly, so a trend can never disagree with the headline count it describes.
 - Full spec: `docs/superpowers/specs/2026-09-16-trend-tracking-design.md`.
 
@@ -257,40 +257,47 @@ async function getContentAvailabilityTrend(
   sixtyDaysAgoIso: string,
   now: Date,
 ): Promise<TrendWithSparkline> {
-  if (orgId) {
-    const { data: selections, error } = await supabase
-      .from("org_catalog_selections")
-      .select("content_id, created_at")
-      .eq("org_id", orgId)
-      .eq("content_type", contentType)
+  try {
+    if (orgId) {
+      const { data: selections, error } = await supabase
+        .from("org_catalog_selections")
+        .select("content_id, created_at")
+        .eq("org_id", orgId)
+        .eq("content_type", contentType)
+        .gte("created_at", sixtyDaysAgoIso);
+      if (error) return FLAT_TREND;
+      if (!selections || selections.length === 0) return buildTrend([], now);
+
+      const { data: published, error: pubError } = await supabase
+        .from(table)
+        .select("id")
+        .eq("status", "published")
+        .in(
+          "id",
+          selections.map((s) => s.content_id),
+        );
+      if (pubError) return FLAT_TREND;
+
+      const publishedIds = new Set((published ?? []).map((p) => p.id));
+      const timestamps = selections
+        .filter((s) => publishedIds.has(s.content_id))
+        .map((s) => new Date(s.created_at));
+      return buildTrend(timestamps, now);
+    }
+
+    const { data, error } = await supabase
+      .from(table)
+      .select("created_at")
+      .eq("status", "published")
       .gte("created_at", sixtyDaysAgoIso);
     if (error) return FLAT_TREND;
-    if (!selections || selections.length === 0) return buildTrend([], now);
-
-    const { data: published, error: pubError } = await supabase
-      .from(table)
-      .select("id")
-      .eq("status", "published")
-      .in(
-        "id",
-        selections.map((s) => s.content_id),
-      );
-    if (pubError) return FLAT_TREND;
-
-    const publishedIds = new Set((published ?? []).map((p) => p.id));
-    const timestamps = selections
-      .filter((s) => publishedIds.has(s.content_id))
-      .map((s) => new Date(s.created_at));
-    return buildTrend(timestamps, now);
+    return buildTrend((data ?? []).map((r) => new Date(r.created_at)), now);
+  } catch {
+    // A thrown exception (network failure, unexpected client error) must
+    // not reject the Promise.all in getDashboardTrends and zero out the
+    // other 3 metrics — this metric alone degrades to flat/zero.
+    return FLAT_TREND;
   }
-
-  const { data, error } = await supabase
-    .from(table)
-    .select("created_at")
-    .eq("status", "published")
-    .gte("created_at", sixtyDaysAgoIso);
-  if (error) return FLAT_TREND;
-  return buildTrend((data ?? []).map((r) => new Date(r.created_at)), now);
 }
 
 async function getSlidesReviewedTrend(
@@ -299,13 +306,17 @@ async function getSlidesReviewedTrend(
   sixtyDaysAgoIso: string,
   now: Date,
 ): Promise<TrendWithSparkline> {
-  const { data, error } = await supabase
-    .from("slide_views")
-    .select("viewed_at")
-    .eq("user_id", userId)
-    .gte("viewed_at", sixtyDaysAgoIso);
-  if (error) return FLAT_TREND;
-  return buildTrend((data ?? []).map((r) => new Date(r.viewed_at)), now);
+  try {
+    const { data, error } = await supabase
+      .from("slide_views")
+      .select("viewed_at")
+      .eq("user_id", userId)
+      .gte("viewed_at", sixtyDaysAgoIso);
+    if (error) return FLAT_TREND;
+    return buildTrend((data ?? []).map((r) => new Date(r.viewed_at)), now);
+  } catch {
+    return FLAT_TREND;
+  }
 }
 
 async function getCertificatesEarnedTrend(
@@ -314,13 +325,17 @@ async function getCertificatesEarnedTrend(
   sixtyDaysAgoIso: string,
   now: Date,
 ): Promise<TrendWithSparkline> {
-  const { data, error } = await supabase
-    .from("certificates")
-    .select("issued_at")
-    .eq("user_id", userId)
-    .gte("issued_at", sixtyDaysAgoIso);
-  if (error) return FLAT_TREND;
-  return buildTrend((data ?? []).map((r) => new Date(r.issued_at)), now);
+  try {
+    const { data, error } = await supabase
+      .from("certificates")
+      .select("issued_at")
+      .eq("user_id", userId)
+      .gte("issued_at", sixtyDaysAgoIso);
+    if (error) return FLAT_TREND;
+    return buildTrend((data ?? []).map((r) => new Date(r.issued_at)), now);
+  } catch {
+    return FLAT_TREND;
+  }
 }
 
 export async function getDashboardTrends(
