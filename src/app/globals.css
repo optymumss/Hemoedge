@@ -45,6 +45,14 @@
   --info: #1d5fa8;
   --info-soft: #e8f1fb;
   --info-soft-ink: #184e8a;
+  --sidebar-bg: #3a0f1a;
+  --sidebar-bg-raised: #4a1522;
+  --sidebar-ink: #f5e9ec;
+  --sidebar-ink-dim: #c9a3ad;
+  --sidebar-border: #582030;
+  --sidebar-accent: #c2405f;
+  --sidebar-accent-ink: #ffffff;
+  --sidebar-accent-soft: #5c2231;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -159,6 +167,14 @@
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
   --color-info-soft-ink: var(--info-soft-ink);
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-bg-raised: var(--sidebar-bg-raised);
+  --color-sidebar-ink: var(--sidebar-ink);
+  --color-sidebar-ink-dim: var(--sidebar-ink-dim);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-ink: var(--sidebar-accent-ink);
+  --color-sidebar-accent-soft: var(--sidebar-accent-soft);
 
   /* A touch more generous than Tailwind's defaults — reads calmer at this
      content density than the tighter default scale. */
