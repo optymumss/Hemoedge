@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeTrendDelta, buildSparkline, buildTrend, DAY_MS } from "./trend-math";
+import { computeTrendDelta, buildSparkline, buildTrend, DAY_MS, computePassRateTrend, flatPassRateTrend } from "./trend-math";
 
 describe("computeTrendDelta", () => {
   it("computes a positive delta when the current period is higher", () => {
@@ -114,5 +114,62 @@ describe("buildTrend", () => {
     const result = buildTrend([today], now);
     expect(result.sparkline.points).toHaveLength(30);
     expect(result.sparkline.points[29]).toBe(1);
+  });
+});
+
+describe("computePassRateTrend", () => {
+  it("computes a positive percentage-point change", () => {
+    const result = computePassRateTrend(8, 10, 6, 10);
+    expect(result.currentPassRate).toBe(80);
+    expect(result.previousPassRate).toBe(60);
+    expect(result.percentagePointChange).toBe(20);
+    expect(result.direction).toBe("up");
+  });
+
+  it("computes a negative percentage-point change", () => {
+    const result = computePassRateTrend(5, 10, 8, 10);
+    expect(result.percentagePointChange).toBe(-30);
+    expect(result.direction).toBe("down");
+  });
+
+  it("is flat when the pass rate is unchanged", () => {
+    const result = computePassRateTrend(7, 10, 7, 10);
+    expect(result.percentagePointChange).toBe(0);
+    expect(result.direction).toBe("flat");
+  });
+
+  it("returns null and flat when the current period has zero attempts", () => {
+    const result = computePassRateTrend(0, 0, 6, 10);
+    expect(result.currentPassRate).toBeNull();
+    expect(result.percentagePointChange).toBeNull();
+    expect(result.direction).toBe("flat");
+  });
+
+  it("returns null and flat when the previous period has zero attempts", () => {
+    const result = computePassRateTrend(5, 5, 0, 0);
+    expect(result.previousPassRate).toBeNull();
+    expect(result.percentagePointChange).toBeNull();
+    expect(result.direction).toBe("flat");
+  });
+
+  it("returns null and flat when both periods have zero attempts", () => {
+    const result = computePassRateTrend(0, 0, 0, 0);
+    expect(result.currentPassRate).toBeNull();
+    expect(result.previousPassRate).toBeNull();
+    expect(result.direction).toBe("flat");
+  });
+});
+
+describe("flatPassRateTrend", () => {
+  it("returns a fresh, fully null/zero trend on each call", () => {
+    const a = flatPassRateTrend();
+    const b = flatPassRateTrend();
+    expect(a).not.toBe(b);
+    expect(a.currentPassRate).toBeNull();
+    expect(a.previousPassRate).toBeNull();
+    expect(a.percentagePointChange).toBeNull();
+    expect(a.direction).toBe("flat");
+    expect(a.sparkline.points).toHaveLength(30);
+    expect(a.sparkline.points.every((p) => p === 0)).toBe(true);
   });
 });
