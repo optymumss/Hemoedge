@@ -6,6 +6,7 @@ import { getLearnerOrgId } from "@/lib/learner/get-learner-org";
 import { getPublishedContent } from "@/lib/learner/published-content";
 import { getStudyRecommendation } from "@/lib/learner/get-study-recommendation";
 import { getCertificateProgress } from "@/lib/learner/certificate-progress";
+import { computeSlideProgress, type SlideProgress } from "@/lib/learner/module-slide-progress";
 import { WsiPreviewCard } from "@/components/dashboard/wsi-preview-card";
 import { CertificateProgressRing } from "@/components/dashboard/certificate-progress-ring";
 import { RecentQuizScores } from "@/components/dashboard/recent-quiz-scores";
@@ -58,18 +59,34 @@ export default async function LearnerHome() {
   }));
 
   // The recommendation's slide comes from whichever module/case it points
-  // at, so the WSI preview always matches "what to study next."
+  // at, so the WSI viewer always matches "what to study next." For a
+  // module recommendation, also compute real per-slide progress for the
+  // Continue Learning card — fetching all the module's lesson slides (not
+  // just the first) both gives us previewSlide and lets us cross-reference
+  // slide_views for the progress bar in one pass.
   let previewSlide: { slideId: string; title: string } | null = null;
+  let slideProgress: SlideProgress | null = null;
   if (recommendation.kind === "module") {
-    const { data } = await supabase
+    const { data: lessons } = await supabase
       .from("lessons")
       .select("slide_id, title")
       .eq("module_id", recommendation.id)
       .not("slide_id", "is", null)
-      .order("position")
-      .limit(1)
-      .maybeSingle();
-    if (data?.slide_id) previewSlide = { slideId: data.slide_id, title: data.title ?? recommendation.title };
+      .order("position");
+    const lessonRows = lessons ?? [];
+    if (lessonRows.length > 0) {
+      const firstSlideId = lessonRows[0].slide_id as string;
+      previewSlide = { slideId: firstSlideId, title: lessonRows[0].title ?? recommendation.title };
+
+      const lessonSlideIds = lessonRows.map((l) => l.slide_id as string);
+      const { data: views } = await supabase
+        .from("slide_views")
+        .select("slide_id")
+        .eq("user_id", userId!)
+        .in("slide_id", lessonSlideIds);
+      const viewedSlideIds = new Set((views ?? []).map((v) => v.slide_id));
+      slideProgress = computeSlideProgress(lessonSlideIds, viewedSlideIds);
+    }
   } else if (recommendation.kind === "case") {
     const { data } = await supabase.from("cases").select("slide_id").eq("id", recommendation.id).maybeSingle();
     if (data?.slide_id) previewSlide = { slideId: data.slide_id, title: recommendation.title };
@@ -100,6 +117,16 @@ export default async function LearnerHome() {
             <p className="mt-2 text-lg font-medium text-ink">{recommendation.title}</p>
             {"context" in recommendation && recommendation.context && (
               <p className="mt-1 text-sm text-ink-dim">{recommendation.context}</p>
+            )}
+            {slideProgress && (
+              <div className="mt-3">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-sunken">
+                  <div className="h-full rounded-full bg-accent" style={{ width: `${slideProgress.percent}%` }} />
+                </div>
+                <p className="mt-1 text-xs text-ink-dim">
+                  {slideProgress.completed} of {slideProgress.total} slides completed &middot; {slideProgress.percent}%
+                </p>
+              </div>
             )}
             <Link
               href={recommendation.href}
