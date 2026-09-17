@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeTrendDelta, buildSparkline } from "./trend-math";
+import { computeTrendDelta, buildSparkline, buildTrend, DAY_MS } from "./trend-math";
 
 describe("computeTrendDelta", () => {
   it("computes a positive delta when the current period is higher", () => {
@@ -76,5 +76,43 @@ describe("buildSparkline", () => {
     const evening = new Date(Date.UTC(2026, 8, 16, 23, 0, 0));
     const result = buildSparkline([morning, evening], now);
     expect(result.points[29]).toBe(2);
+  });
+});
+
+describe("buildTrend", () => {
+  const now = new Date(Date.UTC(2026, 8, 16, 12, 0, 0)); // 2026-09-16 12:00 UTC
+
+  it("counts a timestamp at exactly now as neither period (current period's exclusive upper edge)", () => {
+    const result = buildTrend([now], now);
+    expect(result.currentPeriodCount).toBe(0);
+    expect(result.previousPeriodCount).toBe(0);
+  });
+
+  it("counts a timestamp at exactly now - 30 days as current (the current period's inclusive lower edge)", () => {
+    const exactlyThirtyDaysAgo = new Date(now.getTime() - 30 * DAY_MS);
+    const result = buildTrend([exactlyThirtyDaysAgo], now);
+    expect(result.currentPeriodCount).toBe(1);
+    expect(result.previousPeriodCount).toBe(0);
+  });
+
+  it("counts a timestamp at exactly now - 60 days as previous (the previous period's inclusive lower edge)", () => {
+    const exactlySixtyDaysAgo = new Date(now.getTime() - 60 * DAY_MS);
+    const result = buildTrend([exactlySixtyDaysAgo], now);
+    expect(result.currentPeriodCount).toBe(0);
+    expect(result.previousPeriodCount).toBe(1);
+  });
+
+  it("excludes a timestamp older than now - 60 days from both periods", () => {
+    const olderThanSixtyDays = new Date(now.getTime() - 61 * DAY_MS);
+    const result = buildTrend([olderThanSixtyDays], now);
+    expect(result.currentPeriodCount).toBe(0);
+    expect(result.previousPeriodCount).toBe(0);
+  });
+
+  it("builds a sparkline alongside the delta from the same timestamps", () => {
+    const today = new Date(Date.UTC(2026, 8, 16, 3, 0, 0));
+    const result = buildTrend([today], now);
+    expect(result.sparkline.points).toHaveLength(30);
+    expect(result.sparkline.points[29]).toBe(1);
   });
 });

@@ -48,7 +48,7 @@ To avoid off-by-one ambiguity at implementation time:
 
 - **Current period**: `[now - 30 days, now)`.
 - **Previous period**: `[now - 60 days, now - 30 days)`.
-- **Sparkline days**: bucketed by **UTC calendar date** (not local time, since this runs server-side with no reliable per-learner timezone — same rationale as leaving the timezone-correctness of `getGreeting`'s clock source as a known, separately-tracked limitation from sub-project A). 30 buckets, oldest first: `date(now) - 29 days` through `date(now)` inclusive. A timestamp's bucket is `floor((now - timestamp) / 1 day)` days back from today's UTC date; today's (partial) UTC day is bucket 0 and accumulates normally, it is not excluded or specially marked.
+- **Sparkline days**: bucketed by **UTC calendar date** (not local time, since this runs server-side with no reliable per-learner timezone — same rationale as leaving the timezone-correctness of `getGreeting`'s clock source as a known, separately-tracked limitation from sub-project A). 30 buckets, oldest first: `date(now) - 29 days` through `date(now)` inclusive, so index 0 is the oldest day and index 29 is today. A timestamp's bucket is `daysAgo = (utcDateOnly(now) - utcDateOnly(timestamp)) / 1 day`, mapped to array index `29 - daysAgo`; today's (partial) UTC day has `daysAgo = 0` → index 29, and accumulates normally — it is not excluded or specially marked. Bucketing compares UTC calendar dates only (not elapsed milliseconds), so two timestamps on the same UTC date always land in the same bucket regardless of time-of-day.
 
 ### Pure math (`trend-math.ts`)
 

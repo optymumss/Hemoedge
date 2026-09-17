@@ -1,7 +1,8 @@
 import type { createClient } from "@/lib/supabase/server";
-import { computeTrendDelta, buildSparkline, type TrendDelta, type Sparkline } from "./trend-math";
+import { buildTrend, flatTrend, DAY_MS } from "./trend-math";
+import type { TrendWithSparkline } from "./trend-math";
 
-export type TrendWithSparkline = TrendDelta & { sparkline: Sparkline };
+export type { TrendWithSparkline };
 
 export interface DashboardTrends {
   modulesAvailable: TrendWithSparkline;
@@ -10,34 +11,21 @@ export interface DashboardTrends {
   certificatesEarned: TrendWithSparkline;
 }
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+/** Defensive bound against PostgREST's default max-rows cap silently
+ * truncating a heavy user's/org's raw-timestamp fetch without an error.
+ * 10000 rows over a 60-day window is far beyond any realistic activity
+ * volume for these metrics in this app. */
+const RAW_ROW_LIMIT = 10000;
 
-const FLAT_TREND: TrendWithSparkline = {
-  currentPeriodCount: 0,
-  previousPeriodCount: 0,
-  absoluteChange: 0,
-  percentChange: null,
-  direction: "flat",
-  sparkline: { points: new Array(30).fill(0) },
-};
-
-function buildTrend(timestamps: Date[], now: Date): TrendWithSparkline {
-  const sixtyDaysAgo = new Date(now.getTime() - 60 * DAY_MS);
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * DAY_MS);
-
-  let currentPeriodCount = 0;
-  let previousPeriodCount = 0;
-  for (const ts of timestamps) {
-    if (ts >= thirtyDaysAgo && ts < now) currentPeriodCount++;
-    else if (ts >= sixtyDaysAgo && ts < thirtyDaysAgo) previousPeriodCount++;
-  }
-
-  return { ...computeTrendDelta(currentPeriodCount, previousPeriodCount), sparkline: buildSparkline(timestamps, now) };
-}
-
-/** Shared by modules and cases: matches getPublishedContent()'s own
- * org-catalog-or-global filter exactly, so this trend can never disagree
- * with the headline "available" count it describes. */
+/** Shared by modules and cases: matches getPublishedContent()'s
+ * org-catalog-or-global filter (org_id/content_type/status='published')
+ * to decide which items are "available." Uses org_catalog_selections
+ * .created_at (org-scoped) or the content row's own created_at
+ * (individual) as the "became available" timestamp — an approximation,
+ * since neither table has a dedicated publish-transition timestamp, so
+ * this trend can occasionally lag getPublishedContent()'s headline count
+ * for content whose org-selection or creation happened outside the
+ * 60-day window but whose status flipped to 'published' inside it. */
 async function getContentAvailabilityTrend(
   supabase: Awaited<ReturnType<typeof createClient>>,
   table: "modules" | "cases",
@@ -53,8 +41,13 @@ async function getContentAvailabilityTrend(
         .select("content_id, created_at")
         .eq("org_id", orgId)
         .eq("content_type", contentType)
-        .gte("created_at", sixtyDaysAgoIso);
-      if (error) return FLAT_TREND;
+        .gte("created_at", sixtyDaysAgoIso)
+        .order("created_at")
+        .limit(RAW_ROW_LIMIT);
+      if (error) {
+        console.error(`[trends] ${table} availability (org-scoped selections) query failed`, error);
+        return flatTrend();
+      }
       if (!selections || selections.length === 0) return buildTrend([], now);
 
       const { data: published, error: pubError } = await supabase
@@ -65,7 +58,10 @@ async function getContentAvailabilityTrend(
           "id",
           selections.map((s) => s.content_id),
         );
-      if (pubError) return FLAT_TREND;
+      if (pubError) {
+        console.error(`[trends] ${table} availability (published lookup) query failed`, pubError);
+        return flatTrend();
+      }
 
       const publishedIds = new Set((published ?? []).map((p) => p.id));
       const timestamps = selections
@@ -78,14 +74,17 @@ async function getContentAvailabilityTrend(
       .from(table)
       .select("created_at")
       .eq("status", "published")
-      .gte("created_at", sixtyDaysAgoIso);
-    if (error) return FLAT_TREND;
+      .gte("created_at", sixtyDaysAgoIso)
+      .order("created_at")
+      .limit(RAW_ROW_LIMIT);
+    if (error) {
+      console.error(`[trends] ${table} availability query failed`, error);
+      return flatTrend();
+    }
     return buildTrend((data ?? []).map((r) => new Date(r.created_at)), now);
-  } catch {
-    // A thrown exception (network failure, unexpected client error) must
-    // not reject the Promise.all in getDashboardTrends and zero out the
-    // other 3 metrics — this metric alone degrades to flat/zero.
-    return FLAT_TREND;
+  } catch (err) {
+    console.error(`[trends] ${table} availability threw`, err);
+    return flatTrend();
   }
 }
 
@@ -100,11 +99,17 @@ async function getSlidesReviewedTrend(
       .from("slide_views")
       .select("viewed_at")
       .eq("user_id", userId)
-      .gte("viewed_at", sixtyDaysAgoIso);
-    if (error) return FLAT_TREND;
+      .gte("viewed_at", sixtyDaysAgoIso)
+      .order("viewed_at")
+      .limit(RAW_ROW_LIMIT);
+    if (error) {
+      console.error("[trends] slidesReviewed query failed", error);
+      return flatTrend();
+    }
     return buildTrend((data ?? []).map((r) => new Date(r.viewed_at)), now);
-  } catch {
-    return FLAT_TREND;
+  } catch (err) {
+    console.error("[trends] slidesReviewed threw", err);
+    return flatTrend();
   }
 }
 
@@ -119,11 +124,17 @@ async function getCertificatesEarnedTrend(
       .from("certificates")
       .select("issued_at")
       .eq("user_id", userId)
-      .gte("issued_at", sixtyDaysAgoIso);
-    if (error) return FLAT_TREND;
+      .gte("issued_at", sixtyDaysAgoIso)
+      .order("issued_at")
+      .limit(RAW_ROW_LIMIT);
+    if (error) {
+      console.error("[trends] certificatesEarned query failed", error);
+      return flatTrend();
+    }
     return buildTrend((data ?? []).map((r) => new Date(r.issued_at)), now);
-  } catch {
-    return FLAT_TREND;
+  } catch (err) {
+    console.error("[trends] certificatesEarned threw", err);
+    return flatTrend();
   }
 }
 

@@ -202,7 +202,7 @@ git commit -m "Add pure trend-delta and sparkline computation logic"
 - Consumes: `computeTrendDelta`, `buildSparkline`, `TrendDelta`, `Sparkline` from `./trend-math` (Task 1).
 - Produces: `DashboardTrends` type and `getDashboardTrends(supabase, userId, orgId, now): Promise<DashboardTrends>` — for sub-project C to consume later.
 
-This task has no unit test file: it's a thin Supabase-query wrapper with no branching logic of its own beyond what Task 1 already covers (see Step 5 for live verification instead, matching how `get-study-recommendation.ts` has no test file in this codebase either).
+This task has no unit test file: it's a thin Supabase-query wrapper with no branching logic of its own beyond what Task 1 already covers (see Step 3 for live verification instead, matching how `get-study-recommendation.ts` has no test file in this codebase either).
 
 - [ ] **Step 1: Write the implementation**
 
