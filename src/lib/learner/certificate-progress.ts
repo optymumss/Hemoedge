@@ -6,13 +6,15 @@ export type CertificateProgress = {
   percentComplete: number;
   completedModules: number;
   totalModules: number;
+  earnedCpdPoints: number;
+  totalCpdPoints: number;
 };
 
 export type CurriculumForProgress = {
   curriculumId: string;
   title: string;
   certificateAwarded: boolean;
-  modules: { bestScore: number | null; passThreshold: number }[];
+  modules: { bestScore: number | null; passThreshold: number; cpdPoints: number }[];
 };
 
 /**
@@ -21,19 +23,30 @@ export type CurriculumForProgress = {
  * ring always reflects the certificate nearest in reach. Falls back to an
  * unstarted certificate curriculum (0%) if none are in progress yet, so a
  * brand-new learner still sees what they're working toward.
+ *
+ * percentComplete/completedModules/totalModules stay module-completion
+ * based (unweighted) — earnedCpdPoints/totalCpdPoints are the separate,
+ * points-weighted sums the CPD Progress card displays as "N / M CPD
+ * points". A curriculum with unevenly-weighted modules will have these two
+ * views disagree in ratio, which is expected and correct.
  */
 export function pickCertificateProgress(curricula: CurriculumForProgress[]): CertificateProgress | null {
   const scored = curricula
     .filter((c) => c.certificateAwarded && c.modules.length > 0)
     .map((c) => {
-      const completedModules = c.modules.filter((m) => m.bestScore !== null && m.bestScore >= m.passThreshold).length;
+      const passed = c.modules.filter((m) => m.bestScore !== null && m.bestScore >= m.passThreshold);
+      const completedModules = passed.length;
       const percentComplete = Math.round((completedModules / c.modules.length) * 100);
+      const earnedCpdPoints = passed.reduce((sum, m) => sum + m.cpdPoints, 0);
+      const totalCpdPoints = c.modules.reduce((sum, m) => sum + m.cpdPoints, 0);
       return {
         curriculumId: c.curriculumId,
         title: c.title,
         percentComplete,
         completedModules,
         totalModules: c.modules.length,
+        earnedCpdPoints,
+        totalCpdPoints,
       };
     });
 
@@ -90,13 +103,24 @@ export async function getCertificateProgress(
     bestByModule.set(a.module_id, Math.max(bestByModule.get(a.module_id) ?? 0, a.score));
   }
 
+  const { data: modulesData } =
+    moduleIds.length > 0 ? await supabase.from("modules").select("id, cpd_points").in("id", moduleIds) : { data: [] };
+  const cpdPointsByModule = new Map<string, number>();
+  for (const m of modulesData ?? []) {
+    cpdPointsByModule.set(m.id, m.cpd_points ?? 0);
+  }
+
   const input: CurriculumForProgress[] = curricula.map((c) => ({
     curriculumId: c.id,
     title: c.title,
     certificateAwarded: c.certificate_awarded,
     modules: (links ?? [])
       .filter((l) => l.curriculum_id === c.id)
-      .map((l) => ({ bestScore: bestByModule.get(l.module_id) ?? null, passThreshold: c.pass_threshold })),
+      .map((l) => ({
+        bestScore: bestByModule.get(l.module_id) ?? null,
+        passThreshold: c.pass_threshold,
+        cpdPoints: cpdPointsByModule.get(l.module_id) ?? 0,
+      })),
   }));
 
   return pickCertificateProgress(input);
