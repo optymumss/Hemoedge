@@ -77,3 +77,42 @@ export function buildTrend(timestamps: Date[], now: Date): TrendWithSparkline {
 export function flatTrend(): TrendWithSparkline {
   return { ...computeTrendDelta(0, 0), sparkline: { points: new Array<number>(SPARKLINE_DAYS).fill(0) } };
 }
+
+export interface PassRateTrend {
+  currentPassRate: number | null;
+  previousPassRate: number | null;
+  percentagePointChange: number | null;
+  direction: "up" | "down" | "flat";
+  sparkline: Sparkline;
+}
+
+/** Pass rate is a ratio, not a count, so it doesn't fit TrendDelta/buildTrend
+ * — there's no meaningful "up" direction to infer from a null baseline the
+ * way computeTrendDelta infers "up" from a zero-to-N count change, so
+ * direction is "flat" whenever either period has zero attempts (no rate to
+ * compare against), not just when the change is exactly zero. */
+export function computePassRateTrend(
+  currentPassed: number,
+  currentTotal: number,
+  previousPassed: number,
+  previousTotal: number,
+): Omit<PassRateTrend, "sparkline"> {
+  const currentPassRate = currentTotal === 0 ? null : (currentPassed / currentTotal) * 100;
+  const previousPassRate = previousTotal === 0 ? null : (previousPassed / previousTotal) * 100;
+  const percentagePointChange =
+    currentPassRate === null || previousPassRate === null ? null : currentPassRate - previousPassRate;
+  const direction: PassRateTrend["direction"] =
+    percentagePointChange === null ? "flat" : percentagePointChange > 0 ? "up" : percentagePointChange < 0 ? "down" : "flat";
+
+  return { currentPassRate, previousPassRate, percentagePointChange, direction };
+}
+
+export function flatPassRateTrend(): PassRateTrend {
+  return {
+    currentPassRate: null,
+    previousPassRate: null,
+    percentagePointChange: null,
+    direction: "flat",
+    sparkline: { points: new Array<number>(SPARKLINE_DAYS).fill(0) },
+  };
+}
