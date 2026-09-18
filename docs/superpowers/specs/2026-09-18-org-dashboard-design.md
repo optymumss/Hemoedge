@@ -36,8 +36,8 @@ This spec introduces a small number of **new Postgres functions** (`SECURITY DEF
 | `seats_used` | same as `learner_count` (kept as a separate column so the app doesn't have to know they're currently identical) |
 | `seats_total` | `organizations.seats` (nullable — `null` means unlimited) |
 | `pass_rate_current` / `pass_rate_previous` | fraction of `quiz_attempts.passed` true, for org members, in the last 30 days vs. the 30 days before that — same current/previous-window shape `computePassRateTrend` (in `trend-math.ts`) already expects, so the trend arrow/label reuses that pure function and `formatPassRateTrendLabel` unchanged |
-| `cpd_earned` | see CPD definition below |
-| `cpd_available` | see CPD definition below |
+| `cpd_earned` | org-wide earned CPD points, see CPD definition below |
+| `cpd_available` | org-wide available CPD points (`learner_count × per-learner available`), see CPD definition below |
 | `certificates_issued` | `count(*)` of `certificates` for org members |
 
 ### `org_at_risk_learners(p_org_id uuid)` → one row per at-risk learner
@@ -61,8 +61,9 @@ Columns: `plan_id`, `name`, `assigned_count`, `completed_count`. An assignment c
 
 Per your answer: HemoEdge-internal points, not an external/regulatory target, and no org-configurable annual target yet. Concretely:
 
-- **Available** = sum of `cpd_points` across every module belonging to every published, `certificate_awarded = true` curriculum in the org's catalog (`org_catalog_selections`) — one number, the same for every learner in the org, computed once.
-- **Earned** = sum, across all org members, of each member's own earned points against that *same full set* of curricula — i.e. for every module in every one of those curricula, if the member has a passed attempt, add that module's `cpd_points`.
+- **Per-learner available** = sum of `cpd_points` across every module belonging to every published, `certificate_awarded = true` curriculum in the org's catalog (`org_catalog_selections`) — one number, the same for every learner in the org, computed once.
+- **Org-wide available** = `learner_count × per-learner available` — the total points possible across the whole roster if every member passed every module in the org's catalog. This must scale with headcount so it's comparable to org-wide earned (below); a bare per-learner constant would make the "earned / available" ratio meaningless once earned is summed across members.
+- **Org-wide earned** = sum, across all org members, of each member's own earned points against that *same full set* of curricula — i.e. for every module in every one of those curricula, if the member has at least one passed attempt, add that module's `cpd_points` once (not once per passed attempt).
 
 This is intentionally broader than `certificate-progress.ts`'s existing `pickCertificateProgress`, which only reports the *single* curriculum closest to completion (right for one learner's progress ring, wrong for an org-wide compliance total — this dashboard wants the full picture, not one ring's worth).
 
