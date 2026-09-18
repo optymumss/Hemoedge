@@ -2084,8 +2084,55 @@ export type Database = {
         Returns: boolean
       }
       find_profile_id_by_email: { Args: { p_email: string }; Returns: string }
+      is_onboarding_assignment_complete: {
+        Args: { p_assignment_id: string }
+        Returns: boolean
+      }
       is_org_admin: { Args: { target_org: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      org_at_risk_learners: {
+        Args: { p_org_id: string }
+        Returns: {
+          email: string
+          last_activity_at: string
+          name: string
+          reasons: string[]
+          user_id: string
+        }[]
+      }
+      org_dashboard_kpis: {
+        Args: { p_org_id: string }
+        Returns: {
+          attempts_current: number
+          attempts_previous: number
+          certificates_issued: number
+          cpd_available: number
+          cpd_earned: number
+          learner_count: number
+          passed_current: number
+          passed_previous: number
+          seats_total: number
+          seats_used: number
+        }[]
+      }
+      org_onboarding_completion: {
+        Args: { p_org_id: string }
+        Returns: {
+          assigned_count: number
+          completed_count: number
+          name: string
+          plan_id: string
+        }[]
+      }
+      org_weakest_modules: {
+        Args: { p_limit?: number; p_org_id: string }
+        Returns: {
+          attempt_count: number
+          average_score: number
+          module_id: string
+          title: string
+        }[]
+      }
     }
     Enums: {
       app_role: "super_admin" | "content_manager" | "org_admin" | "member"
