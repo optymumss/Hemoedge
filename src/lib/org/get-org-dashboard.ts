@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { computePassRateTrend, type PassRateTrend } from "@/lib/trends/trend-math";
+import { computePassRateTrend, buildTrendFromDailyCounts, flatTrend, type PassRateTrend, type TrendWithSparkline } from "@/lib/trends/trend-math";
 import type { AtRiskReason } from "@/lib/org/format-org-dashboard";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
@@ -114,5 +114,17 @@ export async function getOnboardingCompletion(supabase: SupabaseClient, orgId: s
     }));
   } catch {
     return [];
+  }
+}
+
+export async function getOrgActivityTrend(supabase: SupabaseClient, orgId: string): Promise<TrendWithSparkline> {
+  try {
+    const { data, error } = await supabase.rpc("org_daily_activity_counts", { p_org_id: orgId });
+    if (error || !data) return flatTrend();
+
+    const dailyCounts = [...data].sort((a, b) => a.day_offset - b.day_offset).map((row) => row.event_count);
+    return buildTrendFromDailyCounts(dailyCounts);
+  } catch {
+    return flatTrend();
   }
 }
