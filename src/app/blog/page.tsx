@@ -3,9 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { PublicNav } from "@/components/public-nav";
 import { PublicFooter } from "@/components/public-footer";
 import { PageHeader } from "@/components/page-header";
+import { getSiteSettings } from "@/lib/site-settings/get-site-settings";
 
 export default async function BlogIndexPage() {
   const supabase = await createClient();
+  const siteSettings = await getSiteSettings(supabase);
   const { data: posts } = await supabase
     .from("blog_posts")
     .select("slug, title, excerpt, published_at")
@@ -14,7 +16,7 @@ export default async function BlogIndexPage() {
 
   return (
     <>
-      <PublicNav />
+      <PublicNav siteSettings={siteSettings} />
       <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-16 sm:py-20">
         <PageHeader eyebrow="Blog" title="Notes from the lab" />
 
@@ -35,7 +37,7 @@ export default async function BlogIndexPage() {
           )}
         </div>
       </main>
-      <PublicFooter />
+      <PublicFooter siteSettings={siteSettings} />
     </>
   );
 }

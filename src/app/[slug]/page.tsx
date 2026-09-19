@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PublicNav } from "@/components/public-nav";
 import { PublicFooter } from "@/components/public-footer";
+import { getSiteSettings } from "@/lib/site-settings/get-site-settings";
 
 export default async function CmsPage({
   params,
@@ -10,6 +11,7 @@ export default async function CmsPage({
 }) {
   const { slug } = await params;
   const supabase = await createClient();
+  const siteSettings = await getSiteSettings(supabase);
 
   const { data: page } = await supabase
     .from("pages")
@@ -24,7 +26,7 @@ export default async function CmsPage({
 
   return (
     <>
-      <PublicNav />
+      <PublicNav siteSettings={siteSettings} />
       <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-16 sm:py-20">
         <h1 className="text-3xl font-semibold tracking-tight text-ink">{page.title}</h1>
         {page.content && (
@@ -33,7 +35,7 @@ export default async function CmsPage({
           </p>
         )}
       </main>
-      <PublicFooter />
+      <PublicFooter siteSettings={siteSettings} />
     </>
   );
 }

@@ -4,16 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import type { SiteSettingsData } from "@/lib/site-settings/get-site-settings";
 
-const LINKS = [
-  { href: "/blog", label: "Blog" },
-  { href: "/team", label: "Team" },
-  { href: "/contact", label: "Contact" },
-];
-
-export function PublicNav() {
+export function PublicNav({ siteSettings }: { siteSettings: SiteSettingsData }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { siteName, navLinks } = siteSettings;
 
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-surface/80 backdrop-blur">
@@ -22,10 +18,10 @@ export function PublicNav() {
         className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4"
       >
         <Link href="/" className="text-sm font-semibold tracking-tight">
-          HemoEdge
+          {siteName}
         </Link>
         <div className="flex items-center gap-6 text-sm text-ink-dim">
-          {LINKS.map((link) => (
+          {navLinks.map((link) => (
             <Link key={link.href} href={link.href} className="hidden hover:text-ink sm:inline">
               {link.label}
             </Link>
@@ -59,7 +55,7 @@ export function PublicNav() {
       {open && (
         <div id="public-nav-mobile-menu" className="border-t border-line px-6 py-3 sm:hidden">
           <div className="flex flex-col gap-1">
-            {LINKS.map((link) => (
+            {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
