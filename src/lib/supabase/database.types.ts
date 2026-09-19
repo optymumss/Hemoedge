@@ -1151,6 +1151,50 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          decision: string | null
+          id: string
+          kind: string
+          recipient_id: string | null
+          recipient_role: string | null
+          title: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          decision?: string | null
+          id?: string
+          kind: string
+          recipient_id?: string | null
+          recipient_role?: string | null
+          title: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          decision?: string | null
+          id?: string
+          kind?: string
+          recipient_id?: string | null
+          recipient_role?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       onboarding_assignments: {
         Row: {
           assigned_at: string
@@ -1449,6 +1493,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          notifications_last_viewed_at: string | null
           role: Database["public"]["Enums"]["app_role"]
         }
         Insert: {
@@ -1456,6 +1501,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          notifications_last_viewed_at?: string | null
           role?: Database["public"]["Enums"]["app_role"]
         }
         Update: {
@@ -1463,6 +1509,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          notifications_last_viewed_at?: string | null
           role?: Database["public"]["Enums"]["app_role"]
         }
         Relationships: []
