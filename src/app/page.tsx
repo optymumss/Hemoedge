@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { PublicNav } from "@/components/public-nav";
 import { PublicFooter } from "@/components/public-footer";
+import { getSiteSettings } from "@/lib/site-settings/get-site-settings";
 
 const FEATURES = [
   {
@@ -28,6 +29,7 @@ const FEATURES = [
 
 export default async function Home() {
   const supabase = await createClient();
+  const siteSettings = await getSiteSettings(supabase);
 
   const { data: homepage } = await supabase
     .from("pages")
@@ -46,7 +48,7 @@ export default async function Home() {
 
   return (
     <>
-      <PublicNav />
+      <PublicNav siteSettings={siteSettings} />
       <main className="flex-1">
         <section className="mx-auto flex max-w-3xl flex-col items-center px-6 py-20 text-center sm:py-28">
           <p className="text-xs font-semibold uppercase tracking-wide text-accent">
@@ -122,7 +124,7 @@ export default async function Home() {
           </div>
         </section>
       </main>
-      <PublicFooter />
+      <PublicFooter siteSettings={siteSettings} />
     </>
   );
 }

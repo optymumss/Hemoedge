@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { PublicNav } from "@/components/public-nav";
 import { PublicFooter } from "@/components/public-footer";
+import { getSiteSettings } from "@/lib/site-settings/get-site-settings";
 
 export default async function BlogPostPage({
   params,
@@ -11,6 +12,7 @@ export default async function BlogPostPage({
 }) {
   const { slug } = await params;
   const supabase = await createClient();
+  const siteSettings = await getSiteSettings(supabase);
 
   const { data: post } = await supabase
     .from("blog_posts")
@@ -25,7 +27,7 @@ export default async function BlogPostPage({
 
   return (
     <>
-      <PublicNav />
+      <PublicNav siteSettings={siteSettings} />
       <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-16 sm:py-20">
         <Link href="/blog" className="text-sm text-ink-dim hover:text-ink">
           &larr; Blog
@@ -40,7 +42,7 @@ export default async function BlogPostPage({
           <p className="mt-8 whitespace-pre-line text-base leading-7 text-ink">{post.content}</p>
         )}
       </main>
-      <PublicFooter />
+      <PublicFooter siteSettings={siteSettings} />
     </>
   );
 }

@@ -2,9 +2,11 @@ import { createClient } from "@/lib/supabase/server";
 import { PublicNav } from "@/components/public-nav";
 import { PublicFooter } from "@/components/public-footer";
 import { PageHeader } from "@/components/page-header";
+import { getSiteSettings } from "@/lib/site-settings/get-site-settings";
 
 export default async function TeamPage() {
   const supabase = await createClient();
+  const siteSettings = await getSiteSettings(supabase);
   const { data: associates } = await supabase
     .from("associates")
     .select("id, name, title, bio")
@@ -12,7 +14,7 @@ export default async function TeamPage() {
 
   return (
     <>
-      <PublicNav />
+      <PublicNav siteSettings={siteSettings} />
       <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-16 sm:py-20">
         <PageHeader eyebrow="Team" title="The people behind HemoEdge" />
 
@@ -33,7 +35,7 @@ export default async function TeamPage() {
           )}
         </div>
       </main>
-      <PublicFooter />
+      <PublicFooter siteSettings={siteSettings} />
     </>
   );
 }
