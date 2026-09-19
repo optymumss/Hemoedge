@@ -1,5 +1,6 @@
 import { getGreeting, firstName } from "@/lib/greeting";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { HeaderSearch } from "@/components/header-search";
 
 export function Header({ identity }: { identity: string }) {
   const greeting = getGreeting(new Date(), firstName(identity));
@@ -12,17 +13,7 @@ export function Header({ identity }: { identity: string }) {
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="relative hidden sm:block">
-          <input
-            type="text"
-            placeholder="Search modules, cases, or topics..."
-            aria-label="Search"
-            className="w-64 rounded-md border border-line-strong bg-surface-sunken px-3 py-2 text-sm text-ink placeholder:text-ink-faint"
-          />
-          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-line-strong px-1.5 py-0.5 text-[10px] text-ink-faint">
-            ⌘K
-          </span>
-        </div>
+        <HeaderSearch />
 
         <button
           type="button"
