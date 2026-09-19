@@ -2100,6 +2100,13 @@ export type Database = {
           user_id: string
         }[]
       }
+      org_daily_activity_counts: {
+        Args: { p_org_id: string }
+        Returns: {
+          day_offset: number
+          event_count: number
+        }[]
+      }
       org_dashboard_kpis: {
         Args: { p_org_id: string }
         Returns: {
