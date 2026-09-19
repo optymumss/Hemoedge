@@ -27,6 +27,21 @@ export async function submitForReview(formData: FormData) {
     submitted_by: user.id,
   });
 
+  const { data: submittedContent } = await supabase.from(table).select("title").eq("id", id).single();
+  if (submittedContent) {
+    try {
+      await supabase.from("notifications").insert({
+        recipient_role: "super_admin",
+        kind: "submission_pending",
+        content_type: contentType,
+        content_id: id,
+        title: submittedContent.title,
+      });
+    } catch {
+      // Best-effort: a missed notification never fails the submission itself.
+    }
+  }
+
   revalidatePath(path);
   revalidatePath("/admin/review-queue");
 }
@@ -89,6 +104,20 @@ export async function reviewContent(formData: FormData) {
     if (content && submitter) {
       const { subject, html } = reviewDecisionEmail(content.title, decision, notes);
       await sendEmail(submitter.email, subject, html);
+    }
+    if (content) {
+      try {
+        await supabase.from("notifications").insert({
+          recipient_id: pending.submitted_by,
+          kind: "review_decision",
+          content_type: contentType,
+          content_id: id,
+          title: content.title,
+          decision,
+        });
+      } catch {
+        // Best-effort: a missed notification never fails the review decision itself.
+      }
     }
   }
 
