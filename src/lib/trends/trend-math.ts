@@ -78,6 +78,18 @@ export function flatTrend(): TrendWithSparkline {
   return { ...computeTrendDelta(0, 0), sparkline: { points: new Array<number>(SPARKLINE_DAYS).fill(0) } };
 }
 
+/** Same TrendWithSparkline shape buildTrend() produces from raw timestamps,
+ * but from 60 pre-aggregated daily counts instead — used where the counts
+ * must be computed in SQL rather than fetched as raw rows (see the org
+ * dashboard's daily-activity RPC). dailyCounts[0] is 59 days ago,
+ * dailyCounts[59] is today, ascending — the exact ordering the SQL
+ * function that produces this array already returns. */
+export function buildTrendFromDailyCounts(dailyCounts: number[]): TrendWithSparkline {
+  const previousPeriodCount = dailyCounts.slice(0, 30).reduce((a, b) => a + b, 0);
+  const currentPeriodCount = dailyCounts.slice(30, 60).reduce((a, b) => a + b, 0);
+  return { ...computeTrendDelta(currentPeriodCount, previousPeriodCount), sparkline: { points: dailyCounts.slice(30, 60) } };
+}
+
 export interface PassRateTrend {
   currentPassRate: number | null;
   previousPassRate: number | null;

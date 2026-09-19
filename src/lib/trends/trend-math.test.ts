@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { computeTrendDelta, buildSparkline, buildTrend, DAY_MS, computePassRateTrend, flatPassRateTrend } from "./trend-math";
+import {
+  computeTrendDelta,
+  buildSparkline,
+  buildTrend,
+  buildTrendFromDailyCounts,
+  DAY_MS,
+  computePassRateTrend,
+  flatPassRateTrend,
+} from "./trend-math";
 
 describe("computeTrendDelta", () => {
   it("computes a positive delta when the current period is higher", () => {
@@ -114,6 +122,32 @@ describe("buildTrend", () => {
     const result = buildTrend([today], now);
     expect(result.sparkline.points).toHaveLength(30);
     expect(result.sparkline.points[29]).toBe(1);
+  });
+});
+
+describe("buildTrendFromDailyCounts", () => {
+  it("splits 60 daily counts into previous/current 30-day periods", () => {
+    const previous30 = new Array(30).fill(2); // sum 60
+    const current30 = new Array(30).fill(3); // sum 90
+    const result = buildTrendFromDailyCounts([...previous30, ...current30]);
+    expect(result.previousPeriodCount).toBe(60);
+    expect(result.currentPeriodCount).toBe(90);
+    expect(result.direction).toBe("up");
+  });
+
+  it("builds the sparkline from only the current 30-day half, in order", () => {
+    const previous30 = new Array(30).fill(0);
+    const current30 = Array.from({ length: 30 }, (_, i) => i);
+    const result = buildTrendFromDailyCounts([...previous30, ...current30]);
+    expect(result.sparkline.points).toEqual(current30);
+  });
+
+  it("is flat with a null percentChange when all 60 days are zero", () => {
+    const result = buildTrendFromDailyCounts(new Array(60).fill(0));
+    expect(result.currentPeriodCount).toBe(0);
+    expect(result.previousPeriodCount).toBe(0);
+    expect(result.percentChange).toBeNull();
+    expect(result.direction).toBe("flat");
   });
 });
 
