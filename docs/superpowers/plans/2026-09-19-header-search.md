@@ -526,10 +526,18 @@ async function search(page, query) {
   const input = page.getByLabel("Search");
   await input.click();
   await input.fill(query);
-  await page.waitForTimeout(500); // debounce (250ms) + query round-trip
+  await page.waitForTimeout(1500); // debounce (250ms) + query round-trip through the sandbox proxy
 }
 
-const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
+const browser = await chromium.launch({
+  executablePath: "/opt/pw-browsers/chromium",
+  // This sandbox routes outbound HTTPS through a TLS-intercepting proxy
+  // (see /root/.ccr/README.md); the browser NSS store is pre-configured for
+  // it, but Playwright's ephemeral profile is not, so client-side Supabase
+  // fetches from the search box fail with ERR_CERT_AUTHORITY_INVALID
+  // without this flag.
+  args: ["--ignore-certificate-errors"],
+});
 
 // "Cell Morphology" is the substring shared by "Introduction to Red Blood
 // Cell Morphology" (published) and "Red Cell Morphology: An Introduction"
@@ -584,7 +592,7 @@ const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromi
     throw new Error("FAIL: super admin should see every status");
   }
   await page.getByText("Red Cell Morphology: An Introduction", { exact: true }).click();
-  await page.waitForTimeout(1500); // client-side nav settle (known Playwright/Next timing quirk)
+  await page.waitForTimeout(2500); // client-side nav settle (known Playwright/Next timing quirk)
   if (!page.url().includes("/admin/modules/")) {
     throw new Error(`FAIL: expected /admin/modules/ URL, got ${page.url()}`);
   }
@@ -607,13 +615,15 @@ const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromi
   if (focused !== "Search") throw new Error(`FAIL: ⌘K should focus the search input, focused=${focused}`);
 
   await page.keyboard.type("Anaemia");
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(1500); // debounce (250ms) + query round-trip through the sandbox proxy
   // Flattened order: [module (non-rerun), module (rerun), case (non-rerun), case (rerun)].
   // Start at index 0, ArrowDown x2 -> index 2 -> "Demo Case: Microcytic Anaemia Work-up".
   await page.keyboard.press("ArrowDown");
+  await page.waitForTimeout(150); // let React commit the activeIndex update before the next keystroke
   await page.keyboard.press("ArrowDown");
+  await page.waitForTimeout(150);
   await page.keyboard.press("Enter");
-  await page.waitForTimeout(1500); // client-side nav settle (known Playwright/Next timing quirk)
+  await page.waitForTimeout(2500); // client-side nav settle (known Playwright/Next timing quirk)
   if (!page.url().includes("/app/cases/2b61572f-abc9-4ba0-8922-869228b2769f")) {
     throw new Error(`FAIL: expected Enter to navigate to the 3rd flattened result, got ${page.url()}`);
   }
