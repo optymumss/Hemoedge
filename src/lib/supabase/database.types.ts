@@ -2140,6 +2140,17 @@ export type Database = {
           title: string
         }[]
       }
+      platform_org_summary: {
+        Args: never
+        Returns: {
+          created_at: string
+          member_count: number
+          name: string
+          org_id: string
+          seats: number
+          status: string
+        }[]
+      }
     }
     Enums: {
       app_role: "super_admin" | "content_manager" | "org_admin" | "member"
