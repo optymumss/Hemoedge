@@ -1649,6 +1649,27 @@ export type Database = {
           },
         ]
       }
+      site_settings: {
+        Row: {
+          id: string
+          nav_links: Json
+          site_name: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          nav_links?: Json
+          site_name?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          nav_links?: Json
+          site_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       slide_annotations: {
         Row: {
           body: string | null
