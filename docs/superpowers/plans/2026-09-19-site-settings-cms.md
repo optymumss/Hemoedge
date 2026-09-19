@@ -838,19 +838,33 @@ const browser = await chromium.launch({
   args: ["--ignore-certificate-errors"],
 });
 
-// 1. Non-super-admins see the ComingSoon gate, not the form.
-for (const email of [
-  "demo.contentmanager@optymumss.com",
-  "demo.orgadmin@optymumss.com",
-  "demo.learner@optymumss.com",
-]) {
+// 1a. content_manager can reach /admin/* at all, so it hits our page-level
+// gate and sees the ComingSoon fallback.
+{
+  const page = await browser.newPage();
+  await loginAs(page, "demo.contentmanager@optymumss.com");
+  await page.goto(`${BASE_URL}/admin/site-settings`);
+  const gated = await page.getByText("Super Admin only").isVisible().catch(() => false);
+  if (!gated) throw new Error("FAIL: content_manager should see the Super Admin only gate");
+  await page.close();
+}
+console.log("content_manager gating check passed");
+
+// 1b. org_admin and member can't reach /admin/* at all -- a proxy-level
+// redirect to /unauthorized happens before our page-level gate is ever
+// reached (confirmed live: this is not a bug in this feature, it's the
+// same platform-wide behavior every other /admin/* route already has).
+for (const email of ["demo.orgadmin@optymumss.com", "demo.learner@optymumss.com"]) {
   const page = await browser.newPage();
   await loginAs(page, email);
   await page.goto(`${BASE_URL}/admin/site-settings`);
-  const gated = await page.getByText("Super Admin only").isVisible().catch(() => false);
-  if (!gated) throw new Error(`FAIL: ${email} should see the Super Admin only gate`);
+  await page.waitForLoadState("networkidle");
+  if (!page.url().includes("/unauthorized")) {
+    throw new Error(`FAIL: ${email} should be redirected to /unauthorized, got ${page.url()}`);
+  }
   await page.close();
 }
+console.log("org_admin/member redirect-to-unauthorized checks passed");
 
 // 2. Super admin edits the site name and links.
 {
