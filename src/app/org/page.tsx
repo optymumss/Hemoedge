@@ -7,9 +7,24 @@ import {
   getAtRiskLearners,
   getOrgWeakestModules,
   getOnboardingCompletion,
+  getOrgActivityTrend,
 } from "@/lib/org/get-org-dashboard";
 import { formatPassRateTrendLabel } from "@/lib/learner/format-trend-label";
-import { formatAtRiskReasonLabel, formatSeatsSummary } from "@/lib/org/format-org-dashboard";
+import {
+  formatAtRiskReasonLabel,
+  formatSeatsSummary,
+  formatActivityHeadline,
+  getReasonBadgeClasses,
+  getAtRiskSeverityDotClass,
+  getScoreTierBarClass,
+} from "@/lib/org/format-org-dashboard";
+import { ActivityAreaChart } from "@/components/dashboard/activity-area-chart";
+
+const PASS_RATE_PILL_CLASSES: Record<"up" | "down" | "flat", string> = {
+  up: "bg-success-soft text-success-soft-ink",
+  down: "bg-danger-soft text-danger-soft-ink",
+  flat: "bg-surface-sunken text-ink-faint",
+};
 
 export default async function OrgHome() {
   const org = await getCurrentOrg();
@@ -23,14 +38,17 @@ export default async function OrgHome() {
   }
 
   const supabase = await createClient();
-  const [kpis, atRisk, weakestModules, onboarding] = await Promise.all([
+  const [kpis, atRisk, weakestModules, onboarding, activityTrend] = await Promise.all([
     getOrgDashboardKpis(supabase, org.id),
     getAtRiskLearners(supabase, org.id),
     getOrgWeakestModules(supabase, org.id),
     getOnboardingCompletion(supabase, org.id),
+    getOrgActivityTrend(supabase, org.id),
   ]);
 
   const passRateLabel = formatPassRateTrendLabel({ ...kpis.passRateTrend, sparkline: { points: [] } });
+  const passRatePillClass = PASS_RATE_PILL_CLASSES[kpis.passRateTrend.direction];
+  const activityHeadline = formatActivityHeadline(activityTrend);
 
   return (
     <div>
@@ -39,29 +57,40 @@ export default async function OrgHome() {
         Manage your roster, choose what your learners study from the published catalog, and track team progress.
       </p>
 
+      <div className="mt-6 overflow-hidden rounded-xl border border-line bg-gradient-to-br from-surface-raised to-accent-soft p-6">
+        <p className="text-xs text-ink-dim">Last 30 days vs. previous 30</p>
+        <h2 className="mt-1 max-w-xl text-2xl font-semibold text-ink">{activityHeadline}</h2>
+        <div className="mt-4">
+          <ActivityAreaChart points={activityTrend.sparkline.points} />
+        </div>
+        <Link href="/org/analytics" className="mt-3 inline-block text-xs font-medium text-accent">
+          View Analytics &rarr;
+        </Link>
+      </div>
+
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="rounded-lg border border-line p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
           <p className="text-xs uppercase text-ink-faint">Learners</p>
           <p className="mt-1 text-2xl font-semibold">{kpis.learnerCount}</p>
         </div>
-        <div className="rounded-lg border border-line p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
           <p className="text-xs uppercase text-ink-faint">Avg Quiz Pass Rate</p>
           <p className="mt-1 text-2xl font-semibold">
             {kpis.passRateTrend.currentPassRate === null ? "—" : `${Math.round(kpis.passRateTrend.currentPassRate)}%`}
           </p>
-          <p className="mt-1 text-xs text-ink-dim">{passRateLabel}</p>
+          <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${passRatePillClass}`}>{passRateLabel}</span>
         </div>
-        <div className="rounded-lg border border-line p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
           <p className="text-xs uppercase text-ink-faint">CPD Points</p>
           <p className="mt-1 text-2xl font-semibold">
             {kpis.cpdEarned} / {kpis.cpdAvailable}
           </p>
         </div>
-        <div className="rounded-lg border border-line p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
           <p className="text-xs uppercase text-ink-faint">Certificates Issued</p>
           <p className="mt-1 text-2xl font-semibold">{kpis.certificatesIssued}</p>
         </div>
-        <div className="rounded-lg border border-line p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
           <p className="text-xs uppercase text-ink-faint">Seats</p>
           <p className="mt-1 text-2xl font-semibold">{formatSeatsSummary(kpis.seatsUsed, kpis.seatsTotal)}</p>
         </div>
@@ -86,8 +115,19 @@ export default async function OrgHome() {
               <tbody>
                 {atRisk.top.map((learner) => (
                   <tr key={learner.userId} className="border-t border-line">
-                    <td className="px-4 py-2 font-medium">{learner.name}</td>
-                    <td className="px-4 py-2 text-ink-dim">{learner.reasons.map(formatAtRiskReasonLabel).join(", ")}</td>
+                    <td className="px-4 py-2 font-medium">
+                      <span className={`mr-2 inline-block h-1.5 w-1.5 rounded-full ${getAtRiskSeverityDotClass(learner.reasons)}`} />
+                      {learner.name}
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="flex flex-wrap gap-1">
+                        {learner.reasons.map((reason) => (
+                          <span key={reason} className={`rounded-md px-1.5 py-0.5 text-xs font-medium ${getReasonBadgeClasses(reason)}`}>
+                            {formatAtRiskReasonLabel(reason)}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
                   </tr>
                 ))}
                 {atRisk.top.length === 0 && (
@@ -115,7 +155,7 @@ export default async function OrgHome() {
                 <tr>
                   <th className="px-4 py-2">Module</th>
                   <th className="px-4 py-2">Attempts</th>
-                  <th className="px-4 py-2">Avg Score</th>
+                  <th className="px-4 py-2">Score</th>
                 </tr>
               </thead>
               <tbody>
@@ -123,8 +163,13 @@ export default async function OrgHome() {
                   <tr key={m.moduleId} className="border-t border-line">
                     <td className="px-4 py-2 font-medium">{m.title}</td>
                     <td className="px-4 py-2 text-ink-dim">{m.attemptCount}</td>
-                    <td className={`px-4 py-2 ${m.averageScore < 70 ? "text-warning-soft-ink" : "text-ink-dim"}`}>
-                      {m.averageScore}%
+                    <td className="px-4 py-2">
+                      <div className="flex items-center gap-2">
+                        <div className="h-1.5 w-20 overflow-hidden rounded-full bg-surface-sunken">
+                          <div className={`h-full rounded-full ${getScoreTierBarClass(m.averageScore)}`} style={{ width: `${m.averageScore}%` }} />
+                        </div>
+                        <span className="text-ink-dim">{m.averageScore}%</span>
+                      </div>
                     </td>
                   </tr>
                 ))}
