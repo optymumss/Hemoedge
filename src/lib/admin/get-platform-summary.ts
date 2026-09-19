@@ -1,3 +1,7 @@
+import { createClient } from "@/lib/supabase/server";
+
+type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
+
 const SEAT_LIMIT_THRESHOLD = 0.9;
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -56,4 +60,25 @@ export function summarizePlatformOrgs(rows: PlatformOrgRow[], now: Date): Platfo
     nearSeatLimit: nearLimitAll.slice(0, 5),
     recentlyCreated,
   };
+}
+
+const EMPTY_SUMMARY: PlatformOrgSummary = {
+  totalOrgs: 0,
+  activeOrgs: 0,
+  suspendedOrgs: 0,
+  totalLearners: 0,
+  newLast30Days: 0,
+  nearSeatLimitCount: 0,
+  nearSeatLimit: [],
+  recentlyCreated: [],
+};
+
+export async function getPlatformOrgSummary(supabase: SupabaseClient): Promise<PlatformOrgSummary> {
+  try {
+    const { data, error } = await supabase.rpc("platform_org_summary");
+    if (error || !data) return EMPTY_SUMMARY;
+    return summarizePlatformOrgs(data, new Date());
+  } catch {
+    return EMPTY_SUMMARY;
+  }
 }
