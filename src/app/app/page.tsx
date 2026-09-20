@@ -13,12 +13,13 @@ import { WsiViewerCard } from "@/components/dashboard/wsi-viewer-card";
 import { CertificateProgressRing } from "@/components/dashboard/certificate-progress-ring";
 import { RecentQuizScores } from "@/components/dashboard/recent-quiz-scores";
 import { StatTile } from "@/components/dashboard/stat-tile";
-import { ModuleIcon, CaseIcon, PassRateIcon, SlideIcon } from "@/components/dashboard/stat-icons";
+import { ModuleIcon, CaseIcon, PassRateIcon, SlideIcon, LibraryIcon } from "@/components/dashboard/stat-icons";
+import { IconBadge } from "@/components/dashboard/icon-badge";
 
 const QUICK_LINKS = [
-  { label: "Modules", href: "/app/modules", blurb: "Structured learning content" },
-  { label: "Case Studies", href: "/app/cases", blurb: "Apply skills to real scenarios" },
-  { label: "Library", href: "/app/library", blurb: "Browse the slide collection" },
+  { label: "Modules", href: "/app/modules", blurb: "Structured learning content", icon: <ModuleIcon />, accentColor: "red" as const },
+  { label: "Case Studies", href: "/app/cases", blurb: "Apply skills to real scenarios", icon: <CaseIcon />, accentColor: "orange" as const },
+  { label: "Library", href: "/app/library", blurb: "Browse the slide collection", icon: <LibraryIcon />, accentColor: "purple" as const },
 ];
 
 export default async function LearnerHome() {
@@ -202,9 +203,16 @@ export default async function LearnerHome() {
           <h2 className="text-sm font-semibold uppercase tracking-wider text-ink-faint">Quick access</h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             {QUICK_LINKS.map((link) => (
-              <Link key={link.href} href={link.href} className="rounded-lg border border-line p-4 hover:border-line-strong">
-                <p className="font-medium text-ink">{link.label}</p>
-                <p className="mt-1 text-sm text-ink-dim">{link.blurb}</p>
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex items-center gap-3 rounded-lg border border-line p-4 hover:border-line-strong"
+              >
+                <IconBadge icon={link.icon} accentColor={link.accentColor} />
+                <div>
+                  <p className="font-medium text-ink">{link.label}</p>
+                  <p className="mt-1 text-sm text-ink-dim">{link.blurb}</p>
+                </div>
               </Link>
             ))}
           </div>

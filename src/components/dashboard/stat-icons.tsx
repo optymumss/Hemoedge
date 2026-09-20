@@ -42,3 +42,19 @@ export function SlideIcon() {
     </svg>
   );
 }
+
+export function LibraryIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M2 13.5V3.5a1 1 0 0 1 1-1h1.5a1 1 0 0 1 1 1v10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M7 13.5V3.5a1 1 0 0 1 1-1h1.5a1 1 0 0 1 1 1v10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      <path
+        d="M12 13.5V4.9a1 1 0 0 1 .76-.97l1.5-.375a1 1 0 0 1 1.24.97V13.5"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <path d="M2 13.5h14" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
