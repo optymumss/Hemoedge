@@ -268,7 +268,7 @@ export function WsiViewer({
   return (
     <div className="flex h-full flex-col gap-2">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex gap-1 rounded-md border border-white/20 bg-white/5 p-1" role="group" aria-label="Objective magnification">
+        <div className="flex gap-1 rounded-md border border-line-strong bg-surface-sunken p-1" role="group" aria-label="Objective magnification">
           {PRESETS.map((m) => (
             <button
               key={m}
@@ -278,46 +278,46 @@ export function WsiViewer({
               className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
                 activeMagnification === m
                   ? "bg-accent text-accent-ink"
-                  : "text-white/80 hover:bg-white/10"
+                  : "text-ink-dim hover:bg-surface-raised"
               }`}
             >
               {m}x
             </button>
           ))}
         </div>
-        <div className="h-5 w-px bg-white/20" aria-hidden="true" />
-        <button id="wsi-zoom-in" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
+        <div className="h-5 w-px bg-line" aria-hidden="true" />
+        <button id="wsi-zoom-in" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-ink-dim hover:bg-surface-raised">
           Zoom in
         </button>
-        <button id="wsi-zoom-out" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
+        <button id="wsi-zoom-out" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-ink-dim hover:bg-surface-raised">
           Zoom out
         </button>
-        <button id="wsi-home" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
+        <button id="wsi-home" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-ink-dim hover:bg-surface-raised">
           Reset
         </button>
-        <button id="wsi-rotate-left" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
+        <button id="wsi-rotate-left" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-ink-dim hover:bg-surface-raised">
           Rotate left
         </button>
-        <button id="wsi-rotate-right" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
+        <button id="wsi-rotate-right" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-ink-dim hover:bg-surface-raised">
           Rotate right
         </button>
-        <div className="h-5 w-px bg-white/20" aria-hidden="true" />
-        <button id="wsi-fullscreen" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10">
+        <div className="h-5 w-px bg-line" aria-hidden="true" />
+        <button id="wsi-fullscreen" type="button" className="rounded-md border border-line-strong px-2 py-1 text-xs text-ink-dim hover:bg-surface-raised">
           {isFullPage ? "Exit fullscreen" : "Fullscreen"}
         </button>
-        <div className="h-5 w-px bg-white/20" aria-hidden="true" />
+        <div className="h-5 w-px bg-line" aria-hidden="true" />
         <button
           type="button"
           onClick={handleSave}
           disabled={!ready}
-          className="rounded-md border border-line-strong px-2 py-1 text-xs text-white/80 hover:bg-white/10 disabled:opacity-40"
+          className="rounded-md border border-line-strong px-2 py-1 text-xs text-ink-dim hover:bg-surface-raised disabled:opacity-40"
           title="Download the current view as a PNG"
         >
           Save
         </button>
         {enableWbcCounter && (
           <>
-            <div className="h-5 w-px bg-white/20" aria-hidden="true" />
+            <div className="h-5 w-px bg-line" aria-hidden="true" />
             <button
               type="button"
               onClick={() => setCounterOpen((open) => !open)}
@@ -325,7 +325,7 @@ export function WsiViewer({
               className={`rounded-md border px-2 py-1 text-xs font-medium ${
                 counterOpen
                   ? "border-accent bg-accent text-accent-ink"
-                  : "border-line-strong text-white/80 hover:bg-white/10"
+                  : "border-line-strong text-ink-dim hover:bg-surface-raised"
               }`}
             >
               Manual Diff Counter
