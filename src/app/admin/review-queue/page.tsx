@@ -14,7 +14,7 @@ export default async function ReviewQueuePage() {
     .is("decision", null)
     .order("submitted_at", { ascending: true });
 
-  const rows = await Promise.all(
+  const withTitles = await Promise.all(
     (pending ?? []).map(async (row) => {
       const table = CONTENT_TABLES[row.content_type as ContentType];
       const { data: content } = await supabase
@@ -22,9 +22,20 @@ export default async function ReviewQueuePage() {
         .select("title")
         .eq("id", row.content_id)
         .single();
-      return { ...row, title: content?.title ?? "(deleted)" };
+      if (!content) {
+        // The content this review was for has since been deleted -- nothing
+        // left to review, so the stale row is cleaned up rather than shown
+        // forever with still-live approve/reject actions. Only super admins
+        // can actually delete it (content_reviews RLS), so this silently
+        // no-ops for a content manager viewing their own submissions; the
+        // row disappears the next time a super admin loads the queue.
+        await supabase.from("content_reviews").delete().eq("id", row.id);
+        return null;
+      }
+      return { ...row, title: content.title };
     }),
   );
+  const rows = withTitles.filter((row) => row !== null);
 
   return (
     <div>
