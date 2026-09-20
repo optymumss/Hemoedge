@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/lib/auth/get-profile";
-import { getActiveImpersonation, getEffectiveUserId } from "@/lib/auth/impersonation";
+import { getEffectiveUserId } from "@/lib/auth/impersonation";
 import { getLearnerOrgId } from "@/lib/learner/get-learner-org";
 import { getPublishedContent } from "@/lib/learner/published-content";
 import { getStudyRecommendation } from "@/lib/learner/get-study-recommendation";
@@ -9,44 +8,53 @@ import { getCertificateProgress } from "@/lib/learner/certificate-progress";
 import { computeSlideProgress, type SlideProgress } from "@/lib/learner/module-slide-progress";
 import { getDashboardTrends } from "@/lib/trends/get-dashboard-trends";
 import { formatCountTrendLabel, formatPassRateTrendLabel } from "@/lib/learner/format-trend-label";
+import { getFallbackPreviewSlide } from "@/lib/learner/get-fallback-preview-slide";
+import { getRecentCertificates } from "@/lib/learner/get-recent-certificates";
 import { WsiViewerCard } from "@/components/dashboard/wsi-viewer-card";
 import { CertificateProgressRing } from "@/components/dashboard/certificate-progress-ring";
+import { RecentCertificates } from "@/components/dashboard/recent-certificates";
 import { RecentQuizScores } from "@/components/dashboard/recent-quiz-scores";
 import { StatTile } from "@/components/dashboard/stat-tile";
-import { ModuleIcon, CaseIcon, PassRateIcon, SlideIcon } from "@/components/dashboard/stat-icons";
+import { ModuleIcon, CaseIcon, PassRateIcon, SlideIcon, LibraryIcon } from "@/components/dashboard/stat-icons";
+import { IconBadge } from "@/components/dashboard/icon-badge";
+import { DashboardHeroCard } from "@/components/dashboard/dashboard-hero-card";
 
 const QUICK_LINKS = [
-  { label: "Modules", href: "/app/modules", blurb: "Structured learning content" },
-  { label: "Case Studies", href: "/app/cases", blurb: "Apply skills to real scenarios" },
-  { label: "Library", href: "/app/library", blurb: "Browse the slide collection" },
+  { label: "Modules", href: "/app/modules", blurb: "Structured learning content", icon: <ModuleIcon />, accentColor: "red" as const },
+  { label: "Case Studies", href: "/app/cases", blurb: "Apply skills to real scenarios", icon: <CaseIcon />, accentColor: "orange" as const },
+  { label: "Library", href: "/app/library", blurb: "Browse the slide collection", icon: <LibraryIcon />, accentColor: "purple" as const },
 ];
 
 export default async function LearnerHome() {
   const supabase = await createClient();
-  const profile = await getCurrentProfile();
-  const impersonation = await getActiveImpersonation();
   const userId = await getEffectiveUserId();
-  const displayName = impersonation
-    ? impersonation.target.fullName || impersonation.target.email
-    : profile?.fullName || profile?.email;
   const orgId = await getLearnerOrgId();
   const now = new Date();
 
-  const [modules, cases, certificatesResult, recommendation, certificateProgress, dashboardTrends, recentAttempts] =
-    await Promise.all([
-      getPublishedContent("modules", "module", orgId),
-      getPublishedContent("cases", "case", orgId),
-      supabase.from("certificates").select("id", { count: "exact", head: true }).eq("user_id", userId!),
-      getStudyRecommendation(supabase, userId!, orgId),
-      getCertificateProgress(supabase, userId!, orgId),
-      getDashboardTrends(supabase, userId!, now),
-      supabase
-        .from("quiz_attempts")
-        .select("id, score, passed, created_at, module_id, case_id, modules(title), cases(title)")
-        .eq("user_id", userId!)
-        .order("created_at", { ascending: false })
-        .limit(5),
-    ]);
+  const [
+    modules,
+    cases,
+    certificatesResult,
+    recommendation,
+    certificateProgress,
+    dashboardTrends,
+    recentAttempts,
+    recentCertificates,
+  ] = await Promise.all([
+    getPublishedContent("modules", "module", orgId),
+    getPublishedContent("cases", "case", orgId),
+    supabase.from("certificates").select("id", { count: "exact", head: true }).eq("user_id", userId!),
+    getStudyRecommendation(supabase, userId!, orgId),
+    getCertificateProgress(supabase, userId!, orgId),
+    getDashboardTrends(supabase, userId!, now),
+    supabase
+      .from("quiz_attempts")
+      .select("id, score, passed, created_at, module_id, case_id, modules(title), cases(title)")
+      .eq("user_id", userId!)
+      .order("created_at", { ascending: false })
+      .limit(5),
+    getRecentCertificates(supabase, userId!, 2),
+  ]);
 
   const quizScores = (recentAttempts.data ?? []).map((a) => ({
     id: a.id,
@@ -87,6 +95,11 @@ export default async function LearnerHome() {
   } else if (recommendation.kind === "case") {
     const { data } = await supabase.from("cases").select("slide_id").eq("id", recommendation.id).maybeSingle();
     if (data?.slide_id) previewSlide = { slideId: data.slide_id, title: recommendation.title, href: recommendation.href };
+  }
+
+  if (!previewSlide) {
+    const fallback = await getFallbackPreviewSlide(supabase, orgId);
+    if (fallback) previewSlide = fallback;
   }
 
   const statTiles = [
@@ -130,43 +143,22 @@ export default async function LearnerHome() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">Welcome, {displayName}</h1>
-      <p className="mt-2 max-w-xl text-sm text-ink-dim">
-        {orgId ? "Here's what your organization has assigned." : "Here's what's available to study."}
-      </p>
-
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3">
         {recommendation.kind !== "none" && (
-          <div className="rounded-lg border border-line p-4 lg:col-span-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">
-              {recommendation.reason === "pathway" ? "Continue Learning" : "Study Next"}
-            </p>
-            <p className="mt-2 text-lg font-medium text-ink">{recommendation.title}</p>
-            {"context" in recommendation && recommendation.context && (
-              <p className="mt-1 text-sm text-ink-dim">{recommendation.context}</p>
-            )}
-            {slideProgress && (
-              <div className="mt-3">
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-sunken">
-                  <div className="h-full rounded-full bg-accent" style={{ width: `${slideProgress.percent}%` }} />
-                </div>
-                <p className="mt-1 text-xs text-ink-dim">
-                  {slideProgress.completed} of {slideProgress.total} slides completed &middot; {slideProgress.percent}%
-                </p>
-              </div>
-            )}
-            <Link
-              href={recommendation.href}
-              className="mt-4 inline-block rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-ink"
-            >
-              {recommendation.kind === "module"
+          <DashboardHeroCard
+            label={recommendation.reason === "pathway" ? "Continue Learning" : "Study Next"}
+            title={recommendation.title}
+            context={"context" in recommendation ? recommendation.context : null}
+            slideProgress={slideProgress}
+            ctaHref={recommendation.href}
+            ctaLabel={
+              recommendation.kind === "module"
                 ? recommendation.reason === "pathway"
                   ? "Continue Module"
                   : "Start Module"
-                : "Start now"}{" "}
-              &rarr;
-            </Link>
-          </div>
+                : "Start now"
+            }
+          />
         )}
         <div className={`grid grid-cols-2 gap-3 ${recommendation.kind !== "none" ? "" : "lg:col-span-3"}`}>
           {statTiles.map((tile) => (
@@ -196,15 +188,23 @@ export default async function LearnerHome() {
         {certificateProgress && (
           <div className="lg:col-span-1">
             <CertificateProgressRing progress={certificateProgress} />
+            <RecentCertificates certificates={recentCertificates} />
           </div>
         )}
         <div className={certificateProgress ? "lg:col-span-2" : "lg:col-span-3"}>
           <h2 className="text-sm font-semibold uppercase tracking-wider text-ink-faint">Quick access</h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             {QUICK_LINKS.map((link) => (
-              <Link key={link.href} href={link.href} className="rounded-lg border border-line p-4 hover:border-line-strong">
-                <p className="font-medium text-ink">{link.label}</p>
-                <p className="mt-1 text-sm text-ink-dim">{link.blurb}</p>
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex items-center gap-3 rounded-lg border border-line p-4 hover:border-line-strong"
+              >
+                <IconBadge icon={link.icon} accentColor={link.accentColor} />
+                <div>
+                  <p className="font-medium text-ink">{link.label}</p>
+                  <p className="mt-1 text-sm text-ink-dim">{link.blurb}</p>
+                </div>
               </Link>
             ))}
           </div>

@@ -1,10 +1,12 @@
 import type { Sparkline } from "@/lib/trends/trend-math";
+import { IconBadge } from "./icon-badge";
+import type { AccentColor } from "./accent-colors";
 
-const ACCENT_CLASSES: Record<"red" | "orange" | "green" | "purple", { icon: string; spark: string }> = {
-  red: { icon: "bg-danger-soft text-danger-soft-ink", spark: "stroke-danger" },
-  orange: { icon: "bg-warning-soft text-warning-soft-ink", spark: "stroke-warning" },
-  green: { icon: "bg-success-soft text-success-soft-ink", spark: "stroke-success" },
-  purple: { icon: "bg-accent-soft text-accent-soft-ink", spark: "stroke-accent" },
+const SPARK_CLASSES: Record<AccentColor, string> = {
+  red: "stroke-danger",
+  orange: "stroke-warning",
+  green: "stroke-success",
+  purple: "stroke-accent",
 };
 
 const DIRECTION_TEXT: Record<"up" | "down" | "flat", string> = {
@@ -43,21 +45,18 @@ export function StatTile({
   changeLabel: string;
   direction: "up" | "down" | "flat";
   sparkline: Sparkline;
-  accentColor: "red" | "orange" | "green" | "purple";
+  accentColor: AccentColor;
 }) {
-  const classes = ACCENT_CLASSES[accentColor];
   return (
     <div className="rounded-lg border border-line p-4">
       <div className="flex items-center gap-2">
-        <span className={`flex h-7 w-7 items-center justify-center rounded-md ${classes.icon}`} aria-hidden="true">
-          {icon}
-        </span>
+        <IconBadge icon={icon} accentColor={accentColor} />
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">{label}</p>
       </div>
       <p className="mt-2 text-2xl font-semibold text-ink">{value}</p>
       <p className={`text-xs ${DIRECTION_TEXT[direction]}`}>{changeLabel}</p>
       <div className="mt-2">
-        <SparklinePath points={sparkline.points} className={classes.spark} />
+        <SparklinePath points={sparkline.points} className={SPARK_CLASSES[accentColor]} />
       </div>
     </div>
   );
