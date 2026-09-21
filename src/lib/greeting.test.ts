@@ -1,20 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { getGreeting, firstName } from "./greeting";
+import { getTimeOfDayGreeting, firstName } from "./greeting";
 
-describe("getGreeting", () => {
+describe("getTimeOfDayGreeting", () => {
   it("says good morning before noon", () => {
-    expect(getGreeting(new Date(2026, 0, 1, 0, 0), "Subra")).toBe("Good morning, Subra");
-    expect(getGreeting(new Date(2026, 0, 1, 11, 59), "Subra")).toBe("Good morning, Subra");
+    expect(getTimeOfDayGreeting(new Date(2026, 0, 1, 0, 0))).toBe("Good morning");
+    expect(getTimeOfDayGreeting(new Date(2026, 0, 1, 11, 59))).toBe("Good morning");
   });
 
   it("says good afternoon from noon up to 5pm", () => {
-    expect(getGreeting(new Date(2026, 0, 1, 12, 0), "Subra")).toBe("Good afternoon, Subra");
-    expect(getGreeting(new Date(2026, 0, 1, 16, 59), "Subra")).toBe("Good afternoon, Subra");
+    expect(getTimeOfDayGreeting(new Date(2026, 0, 1, 12, 0))).toBe("Good afternoon");
+    expect(getTimeOfDayGreeting(new Date(2026, 0, 1, 16, 59))).toBe("Good afternoon");
   });
 
   it("says good evening from 5pm onward", () => {
-    expect(getGreeting(new Date(2026, 0, 1, 17, 0), "Subra")).toBe("Good evening, Subra");
-    expect(getGreeting(new Date(2026, 0, 1, 23, 59), "Subra")).toBe("Good evening, Subra");
+    expect(getTimeOfDayGreeting(new Date(2026, 0, 1, 17, 0))).toBe("Good evening");
+    expect(getTimeOfDayGreeting(new Date(2026, 0, 1, 23, 59))).toBe("Good evening");
   });
 });
 

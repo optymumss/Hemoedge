@@ -1,11 +1,11 @@
 /**
- * Time-based greeting shown in the app header, e.g. "Good afternoon, Subra".
+ * Time-based greeting shown in the app header, e.g. "Good afternoon".
  * Boundaries: before 12:00 is morning, 12:00-16:59 is afternoon, 17:00+ is evening.
  */
-export function getGreeting(date: Date, name: string): string {
+export function getTimeOfDayGreeting(date: Date): string {
   const hour = date.getHours();
   const timeOfDay = hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening";
-  return `Good ${timeOfDay}, ${name}`;
+  return `Good ${timeOfDay}`;
 }
 
 /**
