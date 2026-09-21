@@ -17,7 +17,7 @@ export function CertificateProgressRing({ progress }: { progress: CertificatePro
           cy="48"
           r={radius}
           fill="none"
-          stroke="var(--accent)"
+          stroke="var(--success)"
           strokeWidth="8"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
