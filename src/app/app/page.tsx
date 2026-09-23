@@ -143,7 +143,7 @@ export default async function LearnerHome() {
 
   return (
     <div>
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-3 lg:grid-cols-3">
         {recommendation.kind !== "none" && (
           <DashboardHeroCard
             label={recommendation.reason === "pathway" ? "Continue Learning" : "Study Next"}
@@ -168,16 +168,16 @@ export default async function LearnerHome() {
       </div>
 
       {previewSlide && (
-        <div className="mt-6">
+        <div className="mt-4">
           <WsiViewerCard slideId={previewSlide.slideId} slideTitle={previewSlide.title} href={previewSlide.href} />
         </div>
       )}
 
-      <div className="mt-5 grid items-start gap-3 lg:grid-cols-3">
+      <div className="mt-3 grid items-start gap-3 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <RecentQuizScores attempts={quizScores} />
         </div>
-        <div className="rounded-lg border border-line p-4">
+        <div className="rounded-lg border border-line p-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Modules &amp; Cases</p>
           <p className="mt-2 text-sm text-ink-dim">
             {modules.length} modules and {cases.length} case studies available &middot; {certificatesResult.count ?? 0}{" "}
@@ -186,21 +186,21 @@ export default async function LearnerHome() {
         </div>
       </div>
 
-      <div className="mt-5 grid items-start gap-3 lg:grid-cols-3">
+      <div className="mt-3 grid items-start gap-3 lg:grid-cols-3">
         {certificateProgress && (
-          <div className="flex flex-col gap-3 lg:col-span-1">
+          <div className="flex flex-col gap-2 lg:col-span-1">
             <CertificateProgressRing progress={certificateProgress} />
             <RecentCertificates certificates={recentCertificates} />
           </div>
         )}
         <div className={certificateProgress ? "lg:col-span-2" : "lg:col-span-3"}>
           <h2 className="text-sm font-semibold uppercase tracking-wider text-ink-faint">Quick access</h2>
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="mt-2 grid gap-2 sm:grid-cols-3">
             {QUICK_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="flex items-center gap-3 rounded-lg border border-line p-4 hover:border-line-strong"
+                className="flex items-center gap-3 rounded-lg border border-line p-3 hover:border-line-strong"
               >
                 <IconBadge icon={link.icon} accentColor={link.accentColor} />
                 <div>

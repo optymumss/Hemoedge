@@ -48,7 +48,7 @@ export function StatTile({
   accentColor: AccentColor;
 }) {
   return (
-    <div className="rounded-lg border border-line p-4">
+    <div className="rounded-lg border border-line p-3">
       <div className="flex items-center gap-2">
         <IconBadge icon={icon} accentColor={accentColor} />
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">{label}</p>
