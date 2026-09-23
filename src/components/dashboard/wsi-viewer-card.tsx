@@ -36,8 +36,8 @@ export async function WsiViewerCard({
           Open in Viewer &rarr;
         </Link>
       </div>
-      <div className="h-[420px]">
-        <WsiViewer imageUrl={url} dziUrl={dziUrl} enableWbcCounter wbcCounterDefaultOpen />
+      <div className="h-[260px]">
+        <WsiViewer imageUrl={url} dziUrl={dziUrl} enableWbcCounter />
       </div>
     </div>
   );

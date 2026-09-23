@@ -17,7 +17,7 @@ export function DashboardHeroCard({
   ctaLabel: string;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-lg border border-line p-4 lg:col-span-2">
+    <div className="relative overflow-hidden rounded-lg border border-line p-3 lg:col-span-2">
       <svg
         className="pointer-events-none absolute inset-0 h-full w-full text-accent opacity-[0.08]"
         viewBox="0 0 400 200"

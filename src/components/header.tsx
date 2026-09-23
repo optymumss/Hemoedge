@@ -12,7 +12,7 @@ export async function Header({ identity }: { identity: string }) {
   const { notifications, lastViewedAt } = await getNotifications(supabase);
 
   return (
-    <header className="flex items-center justify-between gap-4 border-b border-line bg-surface px-4 py-4 sm:px-8">
+    <header className="flex items-center justify-between gap-4 border-b border-line bg-surface px-4 py-3 sm:px-6">
       <div>
         <p className="text-sm text-ink-dim">{timeOfDayGreeting},</p>
         <p className="text-lg font-semibold text-ink">

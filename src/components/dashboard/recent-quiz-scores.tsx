@@ -4,9 +4,9 @@ export function RecentQuizScores({
   attempts: { id: string; title: string; score: number; passed: boolean }[];
 }) {
   return (
-    <div className="rounded-lg border border-line p-4">
+    <div className="rounded-lg border border-line p-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Recent Quiz Scores</p>
-      <div className="mt-3 flex flex-col gap-3">
+      <div className="mt-2 flex flex-col gap-2">
         {attempts.map((a) => (
           <div key={a.id}>
             <div className="flex items-center justify-between text-sm">

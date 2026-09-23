@@ -41,7 +41,7 @@ export default async function OrgLayout({
         />
         <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
           <Header identity={identity} />
-          <main id="main-content" className="px-4 py-6 sm:px-8 sm:py-8">{children}</main>
+          <main id="main-content" className="px-4 py-4 sm:px-6 sm:py-5">{children}</main>
         </div>
       </div>
     </div>
