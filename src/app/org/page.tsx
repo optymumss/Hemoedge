@@ -57,46 +57,46 @@ export default async function OrgHome() {
         Manage your roster, choose what your learners study from the published catalog, and track team progress.
       </p>
 
-      <div className="mt-6 overflow-hidden rounded-xl border border-line bg-gradient-to-br from-surface-raised to-accent-soft p-6">
+      <div className="mt-4 overflow-hidden rounded-xl border border-line bg-gradient-to-br from-surface-raised to-accent-soft p-4">
         <p className="text-xs text-ink-dim">Last 30 days vs. previous 30</p>
         <h2 className="mt-1 max-w-xl text-2xl font-semibold text-ink">{activityHeadline}</h2>
-        <div className="mt-4">
+        <div className="mt-3">
           <ActivityAreaChart points={activityTrend.sparkline.points} />
         </div>
-        <Link href="/org/analytics" className="mt-3 inline-block text-xs font-medium text-accent">
+        <Link href="/org/analytics" className="mt-2 inline-block text-xs font-medium text-accent">
           View Analytics &rarr;
         </Link>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-3">
           <p className="text-xs uppercase text-ink-faint">Learners</p>
           <p className="mt-1 text-2xl font-semibold">{kpis.learnerCount}</p>
         </div>
-        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-3">
           <p className="text-xs uppercase text-ink-faint">Avg Quiz Pass Rate</p>
           <p className="mt-1 text-2xl font-semibold">
             {kpis.passRateTrend.currentPassRate === null ? "—" : `${Math.round(kpis.passRateTrend.currentPassRate)}%`}
           </p>
           <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${passRatePillClass}`}>{passRateLabel}</span>
         </div>
-        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-3">
           <p className="text-xs uppercase text-ink-faint">CPD Points</p>
           <p className="mt-1 text-2xl font-semibold">
             {kpis.cpdEarned} / {kpis.cpdAvailable}
           </p>
         </div>
-        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-3">
           <p className="text-xs uppercase text-ink-faint">Certificates Issued</p>
           <p className="mt-1 text-2xl font-semibold">{kpis.certificatesIssued}</p>
         </div>
-        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-3">
           <p className="text-xs uppercase text-ink-faint">Seats</p>
           <p className="mt-1 text-2xl font-semibold">{formatSeatsSummary(kpis.seatsUsed, kpis.seatsTotal)}</p>
         </div>
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
         <div>
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-ink">At-Risk Learners ({atRisk.total})</h2>
@@ -187,16 +187,16 @@ export default async function OrgHome() {
       </div>
 
       {onboarding.length > 0 && (
-        <div className="mt-8">
+        <div className="mt-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-ink">Onboarding Completion</h2>
             <Link href="/org/onboarding" className="text-xs font-medium text-accent">
               View all &rarr;
             </Link>
           </div>
-          <div className="mt-2 space-y-3">
+          <div className="mt-2 space-y-2">
             {onboarding.map((plan) => (
-              <div key={plan.planId} className="rounded-lg border border-line p-4">
+              <div key={plan.planId} className="rounded-lg border border-line p-3">
                 <div className="flex items-center justify-between text-sm">
                   <p className="font-medium text-ink">{plan.name}</p>
                   <p className="text-ink-dim">

@@ -29,29 +29,29 @@ export default async function AdminHome() {
         Full platform control: content library, review queue, organizations, tiers, and the site CMS.
       </p>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-3">
           <p className="text-xs uppercase text-ink-faint">Organizations</p>
           <p className="mt-1 text-2xl font-semibold">{summary.totalOrgs}</p>
           <p className="mt-1 text-xs text-ink-dim">
             {summary.activeOrgs} active &middot; {summary.suspendedOrgs} suspended
           </p>
         </div>
-        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-3">
           <p className="text-xs uppercase text-ink-faint">Learners</p>
           <p className="mt-1 text-2xl font-semibold">{summary.totalLearners}</p>
         </div>
-        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-3">
           <p className="text-xs uppercase text-ink-faint">Near/At Seat Limit</p>
           <p className="mt-1 text-2xl font-semibold">{summary.nearSeatLimitCount}</p>
         </div>
-        <div className="rounded-lg border border-line border-l-4 border-l-accent p-4">
+        <div className="rounded-lg border border-line border-l-4 border-l-accent p-3">
           <p className="text-xs uppercase text-ink-faint">New (Last 30 Days)</p>
           <p className="mt-1 text-2xl font-semibold">{summary.newLast30Days}</p>
         </div>
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
         <div>
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-ink">Near/At Seat Limit</h2>
