@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { SlideProgress } from "@/lib/learner/module-slide-progress";
 import { TargetIcon } from "@/components/dashboard/section-icons";
@@ -19,21 +20,13 @@ export function DashboardHeroCard({
 }) {
   return (
     <div className="relative overflow-hidden rounded-lg border border-line p-3 lg:col-span-2">
-      <svg
-        className="pointer-events-none absolute inset-0 h-full w-full text-accent opacity-[0.08]"
-        viewBox="0 0 400 200"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        <circle cx="40" cy="40" r="28" fill="currentColor" />
-        <circle cx="120" cy="90" r="36" fill="currentColor" />
-        <circle cx="90" cy="150" r="20" fill="currentColor" />
-        <circle cx="210" cy="50" r="18" fill="currentColor" />
-        <circle cx="260" cy="120" r="44" fill="currentColor" />
-        <circle cx="330" cy="60" r="24" fill="currentColor" />
-        <circle cx="360" cy="150" r="30" fill="currentColor" />
-        <circle cx="180" cy="170" r="14" fill="currentColor" />
-      </svg>
+      <Image
+        src="/brand/sidebar-bloodcells.webp"
+        alt=""
+        fill
+        className="object-cover opacity-20 mix-blend-luminosity"
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-surface via-surface/60 to-transparent" aria-hidden="true" />
       <div className="absolute inset-0 bg-gradient-to-br from-accent-soft via-transparent to-transparent" aria-hidden="true" />
       <div className="relative">
         <p className="flex items-center gap-1.5 font-display text-xs font-bold uppercase tracking-wide text-accent">
