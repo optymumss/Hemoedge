@@ -1,3 +1,5 @@
+import { TrophyIcon } from "@/components/dashboard/section-icons";
+
 export function RecentQuizScores({
   attempts,
 }: {
@@ -5,7 +7,10 @@ export function RecentQuizScores({
 }) {
   return (
     <div className="rounded-lg border border-line p-3">
-      <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Recent Quiz Scores</p>
+      <p className="flex items-center gap-1.5 font-display text-xs font-bold uppercase tracking-wide text-accent">
+        <TrophyIcon />
+        Recent Quiz Scores
+      </p>
       <div className="mt-2 flex flex-col gap-2">
         {attempts.map((a) => (
           <div key={a.id}>

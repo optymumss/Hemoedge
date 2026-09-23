@@ -1,4 +1,5 @@
 import type { CertificateProgress } from "@/lib/learner/certificate-progress";
+import { RibbonIcon } from "@/components/dashboard/section-icons";
 
 /** A simple SVG ring — no charting library needed for one static value. */
 export function CertificateProgressRing({ progress }: { progress: CertificateProgress }) {
@@ -9,7 +10,10 @@ export function CertificateProgressRing({ progress }: { progress: CertificatePro
 
   return (
     <div className="flex flex-col items-center gap-2 rounded-lg border border-line p-3">
-      <p className="self-start text-xs font-semibold uppercase tracking-wide text-ink-dim">CPD Progress</p>
+      <p className="flex items-center gap-1.5 self-start font-display text-xs font-bold uppercase tracking-wide text-accent">
+        <RibbonIcon />
+        CPD Progress
+      </p>
       <svg width="88" height="88" viewBox="0 0 96 96" className="-rotate-90" aria-hidden="true">
         <circle cx="48" cy="48" r={radius} fill="none" stroke="var(--line)" strokeWidth="8" />
         <circle

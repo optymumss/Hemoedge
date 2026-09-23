@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { SlideProgress } from "@/lib/learner/module-slide-progress";
+import { TargetIcon } from "@/components/dashboard/section-icons";
 
 export function DashboardHeroCard({
   label,
@@ -35,7 +36,10 @@ export function DashboardHeroCard({
       </svg>
       <div className="absolute inset-0 bg-gradient-to-br from-accent-soft via-transparent to-transparent" aria-hidden="true" />
       <div className="relative">
-        <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">{label}</p>
+        <p className="flex items-center gap-1.5 font-display text-xs font-bold uppercase tracking-wide text-accent">
+          <TargetIcon />
+          {label}
+        </p>
         <p className="mt-2 text-lg font-medium text-ink">{title}</p>
         {context && <p className="mt-1 text-sm text-ink-dim">{context}</p>}
         {slideProgress && (

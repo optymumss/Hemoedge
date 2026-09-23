@@ -18,6 +18,7 @@ import { StatTile } from "@/components/dashboard/stat-tile";
 import { ModuleIcon, CaseIcon, PassRateIcon, SlideIcon, LibraryIcon } from "@/components/dashboard/stat-icons";
 import { IconBadge } from "@/components/dashboard/icon-badge";
 import { DashboardHeroCard } from "@/components/dashboard/dashboard-hero-card";
+import { ChainLinkIcon } from "@/components/dashboard/section-icons";
 
 const QUICK_LINKS = [
   { label: "Modules", href: "/app/modules", blurb: "Structured learning content", icon: <ModuleIcon />, accentColor: "red" as const },
@@ -191,7 +192,10 @@ export default async function LearnerHome() {
           </p>
         </div>
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-ink-faint">Quick access</h2>
+          <h2 className="flex items-center gap-1.5 font-display text-xs font-bold uppercase tracking-wide text-ink">
+            <ChainLinkIcon />
+            Quick Access
+          </h2>
           <div className="mt-2 grid grid-cols-2 gap-2">
             {QUICK_LINKS.map((link) => (
               <Link
