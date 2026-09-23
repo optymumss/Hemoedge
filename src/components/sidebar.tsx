@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { NavSection } from "@/lib/nav";
@@ -9,13 +10,10 @@ import { NavIcon } from "@/components/nav-icons";
 function BrandMark({ tagline }: { tagline: string }) {
   return (
     <div className="flex items-center gap-2">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-        <path d="M10 2c3 4 6 7.2 6 10.5a6 6 0 1 1-12 0C4 9.2 7 6 10 2Z" fill="var(--sidebar-accent)" />
-      </svg>
-      <div className="leading-tight">
-        <p className="text-sm font-semibold tracking-tight text-sidebar-ink">HemoEdge</p>
-        <p className="text-[10px] font-medium uppercase tracking-wider text-sidebar-ink-dim">{tagline}</p>
-      </div>
+      <span className="flex shrink-0 items-center rounded-md bg-white px-1.5 py-1">
+        <Image src="/brand/hemoedge-logo.png" alt="HemoEdge" width={480} height={125} className="h-4 w-auto" priority />
+      </span>
+      <p className="text-[10px] font-medium uppercase tracking-wider text-sidebar-ink-dim">{tagline}</p>
     </div>
   );
 }

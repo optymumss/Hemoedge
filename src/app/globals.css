@@ -4,9 +4,10 @@
  * Field Clarity — HemoEdge's design system.
  *
  * One precise accent (a clinical wine/crimson — HemoEdge's brand red), a
- * considered neutral scale with a faint cool-blue bias (not default
- * Tailwind gray), and a slightly more generous radius scale than
- * Tailwind's defaults. The accent is deliberately a deeper, more magenta
+ * light-mode neutral scale tinted to the same warm cream used on the
+ * marketing site (hemoedge.ai) so the app and the site read as one
+ * product, and a slightly more generous radius scale than Tailwind's
+ * defaults. The accent is deliberately a deeper, more magenta
  * red than --danger's brighter alert red, so a "brand" button and an
  * "error" state never read as the same color. Semantic status colors
  * (danger/success/warning) stay separate from the accent — they mean
@@ -23,11 +24,11 @@
   --ink: #14181f;
   --ink-dim: #565d6b;
   --ink-faint: #8a91a0;
-  --surface: #fbfbfc;
+  --surface: #f6f1e7;
   --surface-raised: #ffffff;
-  --surface-sunken: #f2f3f6;
-  --line: #e2e4ea;
-  --line-strong: #c7cad4;
+  --surface-sunken: #f0eadf;
+  --line: #e2dacb;
+  --line-strong: #b9b3a7;
   --accent: #9e2a46;
   --accent-ink: #ffffff;
   --accent-soft: #fbe9ee;
@@ -117,11 +118,11 @@
   --ink: #14181f;
   --ink-dim: #565d6b;
   --ink-faint: #8a91a0;
-  --surface: #fbfbfc;
+  --surface: #f6f1e7;
   --surface-raised: #ffffff;
-  --surface-sunken: #f2f3f6;
-  --line: #e2e4ea;
-  --line-strong: #c7cad4;
+  --surface-sunken: #f0eadf;
+  --line: #e2dacb;
+  --line-strong: #b9b3a7;
   --accent: #9e2a46;
   --accent-ink: #ffffff;
   --accent-soft: #fbe9ee;
