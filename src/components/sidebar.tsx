@@ -76,20 +76,15 @@ export function Sidebar({
         id="app-sidebar"
         className={`${open ? "flex" : "hidden"} fixed inset-y-0 left-0 z-50 w-64 flex-col overflow-y-auto overflow-x-hidden border-r border-sidebar-border bg-sidebar-bg px-4 py-4 md:relative md:z-auto md:flex md:w-64 md:shrink-0`}
       >
-        <svg
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-64 w-full text-white opacity-[0.07]"
-          viewBox="0 0 200 300"
-          preserveAspectRatio="xMidYMax slice"
-          aria-hidden="true"
-        >
-          <circle cx="18" cy="280" r="52" fill="currentColor" />
-          <circle cx="75" cy="245" r="28" fill="currentColor" />
-          <circle cx="38" cy="195" r="16" fill="currentColor" />
-          <circle cx="115" cy="295" r="22" fill="currentColor" />
-          <circle cx="155" cy="255" r="36" fill="currentColor" />
-          <circle cx="182" cy="305" r="15" fill="currentColor" />
-          <circle cx="95" cy="315" r="40" fill="currentColor" />
-        </svg>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-72 w-full overflow-hidden" aria-hidden="true">
+          <Image
+            src="/brand/sidebar-bloodcells.webp"
+            alt=""
+            fill
+            className="object-cover opacity-45 mix-blend-luminosity"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-transparent via-sidebar-bg/60 to-sidebar-bg" />
+        </div>
 
         <div className="relative z-10 flex items-center justify-between px-2">
           <BrandMark tagline={tagline} />
