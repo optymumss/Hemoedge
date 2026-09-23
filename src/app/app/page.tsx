@@ -173,8 +173,10 @@ export default async function LearnerHome() {
         </div>
       )}
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <RecentQuizScores attempts={quizScores} />
+      <div className="mt-5 grid items-start gap-3 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <RecentQuizScores attempts={quizScores} />
+        </div>
         <div className="rounded-lg border border-line p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Modules &amp; Cases</p>
           <p className="mt-2 text-sm text-ink-dim">
@@ -184,9 +186,9 @@ export default async function LearnerHome() {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+      <div className="mt-5 grid items-start gap-3 lg:grid-cols-3">
         {certificateProgress && (
-          <div className="lg:col-span-1">
+          <div className="flex flex-col gap-3 lg:col-span-1">
             <CertificateProgressRing progress={certificateProgress} />
             <RecentCertificates certificates={recentCertificates} />
           </div>

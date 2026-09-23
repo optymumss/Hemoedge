@@ -5,7 +5,7 @@ export function RecentCertificates({ certificates }: { certificates: RecentCerti
   if (certificates.length === 0) return null;
 
   return (
-    <div className="mt-4 rounded-lg border border-line p-4">
+    <div className="rounded-lg border border-line p-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Recently Earned</p>
       <div className="mt-3 flex flex-col gap-3">
         {certificates.map((c) => (
