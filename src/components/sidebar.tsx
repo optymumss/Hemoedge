@@ -74,9 +74,24 @@ export function Sidebar({
 
       <aside
         id="app-sidebar"
-        className={`${open ? "flex" : "hidden"} fixed inset-y-0 left-0 z-50 w-64 flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar-bg px-4 py-4 md:static md:z-auto md:flex md:w-64 md:shrink-0`}
+        className={`${open ? "flex" : "hidden"} fixed inset-y-0 left-0 z-50 w-64 flex-col overflow-y-auto overflow-x-hidden border-r border-sidebar-border bg-sidebar-bg px-4 py-4 md:relative md:z-auto md:flex md:w-64 md:shrink-0`}
       >
-        <div className="flex items-center justify-between px-2">
+        <svg
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-64 w-full text-white opacity-[0.07]"
+          viewBox="0 0 200 300"
+          preserveAspectRatio="xMidYMax slice"
+          aria-hidden="true"
+        >
+          <circle cx="18" cy="280" r="52" fill="currentColor" />
+          <circle cx="75" cy="245" r="28" fill="currentColor" />
+          <circle cx="38" cy="195" r="16" fill="currentColor" />
+          <circle cx="115" cy="295" r="22" fill="currentColor" />
+          <circle cx="155" cy="255" r="36" fill="currentColor" />
+          <circle cx="182" cy="305" r="15" fill="currentColor" />
+          <circle cx="95" cy="315" r="40" fill="currentColor" />
+        </svg>
+
+        <div className="relative z-10 flex items-center justify-between px-2">
           <BrandMark tagline={tagline} />
           <button
             type="button"
@@ -90,7 +105,7 @@ export function Sidebar({
           </button>
         </div>
 
-        <nav className="mt-4 flex flex-1 flex-col gap-3" aria-label="Primary">
+        <nav className="relative z-10 mt-4 flex flex-1 flex-col gap-3" aria-label="Primary">
           {sections.map((section, i) => (
             <div key={section.section || i}>
               {section.section && (
@@ -123,7 +138,7 @@ export function Sidebar({
           ))}
         </nav>
 
-        <div className="mt-4 flex items-center gap-2.5 border-t border-sidebar-border pt-3">
+        <div className="relative z-10 mt-4 flex items-center gap-2.5 border-t border-sidebar-border pt-3">
           <span
             aria-hidden="true"
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent-soft text-xs font-semibold text-sidebar-ink"
