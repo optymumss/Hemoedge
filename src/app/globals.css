@@ -177,6 +177,10 @@
   --color-sidebar-accent-ink: var(--sidebar-accent-ink);
   --color-sidebar-accent-soft: var(--sidebar-accent-soft);
 
+  /* Bold display headings (e.g. dashboard section titles) — matches the
+     marketing site's heading font instead of the body sans stack. */
+  --font-display: var(--font-archivo), system-ui, sans-serif;
+
   /* A touch more generous than Tailwind's defaults — reads calmer at this
      content density than the tighter default scale. */
   --radius-md: 0.5rem;

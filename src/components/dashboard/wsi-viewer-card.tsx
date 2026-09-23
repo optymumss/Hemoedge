@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSlideViewUrl } from "@/lib/slides/get-slide-view-url";
 import { WsiViewer } from "@/components/wsi-viewer";
+import { MicroscopeIcon } from "@/components/dashboard/section-icons";
 
 /**
  * The dashboard's live, interactive Whole Slide Viewer — not a static
@@ -26,7 +27,10 @@ export async function WsiViewerCard({
     <div className="overflow-hidden rounded-lg border border-line">
       <div className="flex items-center justify-between gap-3 border-b border-line bg-surface-sunken px-3 py-2">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Whole Slide Viewer</p>
+          <p className="flex items-center gap-1.5 font-display text-xs font-bold uppercase tracking-wide text-accent">
+            <MicroscopeIcon />
+            Whole Slide Viewer
+          </p>
           <p className="truncate text-sm text-ink">{slideTitle}</p>
         </div>
         <Link

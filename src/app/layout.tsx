@@ -1,6 +1,16 @@
 import type { Metadata } from "next";
+import { Archivo } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+
+// The marketing site (hemoedge.ai) uses Archivo for its bold display
+// headings — matching it here keeps section titles like "Whole Slide
+// Viewer" visually consistent with the site a learner arrives from.
+const archivo = Archivo({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  variable: "--font-archivo",
+});
 
 export const metadata: Metadata = {
   title: "HemoEdge",
@@ -29,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className={`h-full antialiased ${archivo.variable}`}>
       <head>
         <Script id="theme-init" strategy="beforeInteractive">
           {THEME_INIT_SCRIPT}
