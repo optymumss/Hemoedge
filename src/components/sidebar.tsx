@@ -74,7 +74,7 @@ export function Sidebar({
 
       <aside
         id="app-sidebar"
-        className={`${open ? "flex" : "hidden"} fixed inset-y-0 left-0 z-50 w-64 flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar-bg px-4 py-5 md:static md:z-auto md:flex md:w-64 md:shrink-0`}
+        className={`${open ? "flex" : "hidden"} fixed inset-y-0 left-0 z-50 w-64 flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar-bg px-4 py-4 md:static md:z-auto md:flex md:w-64 md:shrink-0`}
       >
         <div className="flex items-center justify-between px-2">
           <BrandMark tagline={tagline} />
@@ -90,7 +90,7 @@ export function Sidebar({
           </button>
         </div>
 
-        <nav className="mt-6 flex flex-1 flex-col gap-5" aria-label="Primary">
+        <nav className="mt-4 flex flex-1 flex-col gap-3" aria-label="Primary">
           {sections.map((section, i) => (
             <div key={section.section || i}>
               {section.section && (
@@ -98,7 +98,7 @@ export function Sidebar({
                   {section.section}
                 </p>
               )}
-              <ul className={`flex flex-col gap-0.5 ${section.section ? "mt-1.5" : ""}`}>
+              <ul className={`flex flex-col gap-0.5 ${section.section ? "mt-1" : ""}`}>
                 {section.items.map((item) => {
                   const active = pathname === item.href;
                   return (
@@ -106,7 +106,7 @@ export function Sidebar({
                       <Link
                         href={item.href}
                         aria-current={active ? "page" : undefined}
-                        className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors ${
+                        className={`flex items-center gap-2.5 rounded-md px-2 py-1 text-sm transition-colors ${
                           active
                             ? "bg-sidebar-accent text-sidebar-accent-ink font-medium"
                             : "text-sidebar-ink hover:bg-sidebar-bg-raised"
@@ -123,7 +123,7 @@ export function Sidebar({
           ))}
         </nav>
 
-        <div className="mt-6 flex items-center gap-2.5 border-t border-sidebar-border pt-4">
+        <div className="mt-4 flex items-center gap-2.5 border-t border-sidebar-border pt-3">
           <span
             aria-hidden="true"
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent-soft text-xs font-semibold text-sidebar-ink"
