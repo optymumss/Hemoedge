@@ -53,8 +53,10 @@ export function StatTile({
         <IconBadge icon={icon} accentColor={accentColor} />
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">{label}</p>
       </div>
-      <p className="mt-2 text-2xl font-semibold text-ink">{value}</p>
-      <p className={`text-xs ${DIRECTION_TEXT[direction]}`}>{changeLabel}</p>
+      <div className="mt-2 flex items-baseline gap-2">
+        <p className="text-2xl font-semibold text-ink">{value}</p>
+        <p className={`truncate text-xs ${DIRECTION_TEXT[direction]}`}>{changeLabel}</p>
+      </div>
       <div className="mt-2">
         <SparklinePath points={sparkline.points} className={SPARK_CLASSES[accentColor]} />
       </div>

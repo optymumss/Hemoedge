@@ -143,40 +143,46 @@ export default async function LearnerHome() {
 
   return (
     <div>
-      <div className="grid gap-3 lg:grid-cols-3">
+      <div className={`grid gap-3 ${recommendation.kind !== "none" ? "lg:grid-cols-6" : "sm:grid-cols-2 lg:grid-cols-4"}`}>
         {recommendation.kind !== "none" && (
-          <DashboardHeroCard
-            label={recommendation.reason === "pathway" ? "Continue Learning" : "Study Next"}
-            title={recommendation.title}
-            context={"context" in recommendation ? recommendation.context : null}
-            slideProgress={slideProgress}
-            ctaHref={recommendation.href}
-            ctaLabel={
-              recommendation.kind === "module"
-                ? recommendation.reason === "pathway"
-                  ? "Continue Module"
-                  : "Start Module"
-                : "Start now"
-            }
-          />
+          <div className="lg:col-span-2">
+            <DashboardHeroCard
+              label={recommendation.reason === "pathway" ? "Continue Learning" : "Study Next"}
+              title={recommendation.title}
+              context={"context" in recommendation ? recommendation.context : null}
+              slideProgress={slideProgress}
+              ctaHref={recommendation.href}
+              ctaLabel={
+                recommendation.kind === "module"
+                  ? recommendation.reason === "pathway"
+                    ? "Continue Module"
+                    : "Start Module"
+                  : "Start now"
+              }
+            />
+          </div>
         )}
-        <div className={`grid grid-cols-2 gap-3 ${recommendation.kind !== "none" ? "" : "lg:col-span-3"}`}>
-          {statTiles.map((tile) => (
-            <StatTile key={tile.label} {...tile} />
-          ))}
-        </div>
+        {statTiles.map((tile) => (
+          <StatTile key={tile.label} {...tile} />
+        ))}
       </div>
 
       {previewSlide && (
-        <div className="mt-4">
-          <WsiViewerCard slideId={previewSlide.slideId} slideTitle={previewSlide.title} href={previewSlide.href} />
+        <div className="mt-3 grid items-start gap-3 lg:grid-cols-3">
+          <div className={certificateProgress ? "lg:col-span-2" : "lg:col-span-3"}>
+            <WsiViewerCard slideId={previewSlide.slideId} slideTitle={previewSlide.title} href={previewSlide.href} />
+          </div>
+          {certificateProgress && (
+            <div className="flex flex-col gap-3 lg:col-span-1">
+              <CertificateProgressRing progress={certificateProgress} />
+              <RecentCertificates certificates={recentCertificates} />
+            </div>
+          )}
         </div>
       )}
 
       <div className="mt-3 grid items-start gap-3 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <RecentQuizScores attempts={quizScores} />
-        </div>
+        <RecentQuizScores attempts={quizScores} />
         <div className="rounded-lg border border-line p-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-dim">Modules &amp; Cases</p>
           <p className="mt-2 text-sm text-ink-dim">
@@ -184,18 +190,9 @@ export default async function LearnerHome() {
             certificates earned
           </p>
         </div>
-      </div>
-
-      <div className="mt-3 grid items-start gap-3 lg:grid-cols-3">
-        {certificateProgress && (
-          <div className="flex flex-col gap-2 lg:col-span-1">
-            <CertificateProgressRing progress={certificateProgress} />
-            <RecentCertificates certificates={recentCertificates} />
-          </div>
-        )}
-        <div className={certificateProgress ? "lg:col-span-2" : "lg:col-span-3"}>
+        <div>
           <h2 className="text-sm font-semibold uppercase tracking-wider text-ink-faint">Quick access</h2>
-          <div className="mt-2 grid gap-2 sm:grid-cols-3">
+          <div className="mt-2 grid grid-cols-2 gap-2">
             {QUICK_LINKS.map((link) => (
               <Link
                 key={link.href}
