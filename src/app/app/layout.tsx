@@ -33,7 +33,7 @@ export default async function LearnerLayout({
       {impersonation && <ImpersonationBanner name={identity} />}
       <div className="flex flex-1 flex-col md:flex-row">
         <Sidebar
-          tagline="BLOOD FILM LEARNING"
+          tagline="LEARNER APP"
           identity={identity}
           role={ROLE_LABELS[effectiveRole]}
           sections={sections}
@@ -42,7 +42,7 @@ export default async function LearnerLayout({
         />
         <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
           <Header identity={identity} />
-          <main id="main-content" className="px-4 py-4 sm:px-6 sm:py-5">{children}</main>
+          <main id="main-content" className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 sm:py-5">{children}</main>
         </div>
         {!impersonation && <TutorWidget />}
       </div>
