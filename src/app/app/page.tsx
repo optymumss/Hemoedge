@@ -18,7 +18,7 @@ import { StatTile } from "@/components/dashboard/stat-tile";
 import { ModuleIcon, CaseIcon, PassRateIcon, SlideIcon, LibraryIcon } from "@/components/dashboard/stat-icons";
 import { IconBadge } from "@/components/dashboard/icon-badge";
 import { DashboardHeroCard } from "@/components/dashboard/dashboard-hero-card";
-import { ChainLinkIcon } from "@/components/dashboard/section-icons";
+import { ChainLinkIcon, RibbonIcon } from "@/components/dashboard/section-icons";
 
 const QUICK_LINKS = [
   { label: "Modules", href: "/app/modules", blurb: "Structured learning content", icon: <ModuleIcon />, accentColor: "red" as const },
@@ -54,7 +54,7 @@ export default async function LearnerHome() {
       .eq("user_id", userId!)
       .order("created_at", { ascending: false })
       .limit(5),
-    getRecentCertificates(supabase, userId!, 2),
+    getRecentCertificates(supabase, userId!, 4),
   ]);
 
   const quizScores = (recentAttempts.data ?? []).map((a) => ({
@@ -176,7 +176,7 @@ export default async function LearnerHome() {
           {certificateProgress && (
             <div className="flex flex-col gap-3 lg:col-span-1">
               <CertificateProgressRing progress={certificateProgress} />
-              <RecentCertificates certificates={recentCertificates} />
+              <RecentCertificates certificates={recentCertificates.slice(0, 2)} />
             </div>
           )}
         </div>
@@ -190,6 +190,24 @@ export default async function LearnerHome() {
             {modules.length} modules and {cases.length} case studies available &middot; {certificatesResult.count ?? 0}{" "}
             certificates earned
           </p>
+          {recentCertificates.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {recentCertificates.map((c) => (
+                <span
+                  key={c.id}
+                  className="inline-flex max-w-[220px] items-center gap-1 truncate rounded-full border border-line bg-surface-sunken px-2 py-1 text-xs text-ink-dim"
+                >
+                  <RibbonIcon />
+                  <span className="truncate">{c.title}</span>
+                </span>
+              ))}
+              {(certificatesResult.count ?? 0) > recentCertificates.length && (
+                <span className="inline-flex items-center rounded-full border border-line bg-surface-sunken px-2 py-1 text-xs text-ink-dim">
+                  +{(certificatesResult.count ?? 0) - recentCertificates.length} more
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <div>
           <h2 className="flex items-center gap-1.5 font-display text-xs font-bold uppercase tracking-wide text-ink">
