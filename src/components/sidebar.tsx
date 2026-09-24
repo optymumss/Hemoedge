@@ -10,8 +10,8 @@ import { NavIcon } from "@/components/nav-icons";
 function BrandMark({ tagline }: { tagline: string }) {
   return (
     <div className="flex flex-col items-start gap-1">
-      <span className="flex shrink-0 items-center rounded-md bg-white px-1.5 py-1">
-        <Image src="/brand/hemoedge-logo.png" alt="HemoEdge" width={480} height={125} className="h-4 w-auto" priority />
+      <span className="flex shrink-0 items-center rounded-md bg-white px-2.5 py-1.5">
+        <Image src="/brand/hemoedge-logo.png" alt="HemoEdge" width={480} height={125} className="h-8 w-auto" priority />
       </span>
       <p className="text-[9px] font-medium uppercase tracking-wider text-sidebar-ink-dim">{tagline}</p>
     </div>
