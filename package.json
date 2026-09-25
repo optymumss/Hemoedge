@@ -9,7 +9,11 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "tiling:prepare-snapshot": "node scripts/prepare-tiling-snapshot.mjs"
+    "tiling:prepare-snapshot": "node scripts/prepare-tiling-snapshot.mjs",
+    "build:cf": "vinext build && next typegen",
+    "preview:cf": "npm run build:cf && wrangler dev --config dist/server/wrangler.json",
+    "deploy:cf": "npm run build:cf && vinext-cloudflare deploy --config dist/server/wrangler.json",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.3",
@@ -18,24 +22,33 @@
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.110.7",
     "@vercel/sandbox": "^3.0.0",
+    "@vinext/cloudflare": "^1.0.0-beta.10",
     "next": "16.2.10",
     "openseadragon": "^6.0.2",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-server-dom-webpack": "^19.3.0",
     "resend": "^6.17.2",
-    "stripe": "^22.3.2"
+    "stripe": "^22.3.2",
+    "vinext": "^1.0.0-beta.12"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.60.2",
     "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.1.1",
+    "@vitejs/plugin-rsc": "^0.5.35",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vite": "^8.3.1",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.10"
-  }
+    "vitest": "^4.1.10",
+    "wrangler": "^4.141.0"
+  },
+  "type": "module"
 }

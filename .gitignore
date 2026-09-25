@@ -39,8 +39,14 @@ yarn-error.log*
 .env*
 !.env.example
 
-# vercel
+# vercel (kept until the Vercel project is decommissioned)
 .vercel
+
+# cloudflare
+/dist/
+.vinext/
+.wrangler/
+.dev.vars*
 
 # typescript
 *.tsbuildinfo

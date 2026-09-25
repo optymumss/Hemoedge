@@ -760,12 +760,12 @@ Known limit: preview (non-`main`) builds run `wrangler versions upload`, which d
 Workers Builds runs a *build command* then a *deploy command*. In `package.json` `scripts` add:
 
 ```json
-"deploy:cf:ci": "wrangler deploy"
+"deploy:cf:ci": "vinext-cloudflare deploy --config dist/server/wrangler.json"
 ```
 
-(the build step has already produced the vinext output, so the deploy command must not rebuild).
+(the build step has already produced the vinext output, so the deploy command must not rebuild; vinext deploys from the Worker config it generates at build time, `dist/server/wrangler.json`, not from `wrangler.jsonc` directly).
 
-Run: `npm run build:cf && npx wrangler deploy --dry-run`
+Run: `npm run build:cf && npx wrangler deploy --config dist/server/wrangler.json --dry-run`
 Expected: dry run lists the `hemoedge` Worker and its assets without errors.
 
 ```bash
