@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe/client";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { extractCheckoutMetadata } from "@/lib/stripe/extract-checkout-metadata";
+import { verifyStripeWebhook } from "@/lib/stripe/verify-webhook";
 
 /**
  * Stripe calls this when a checkout session completes. Applies the tier
@@ -26,10 +27,8 @@ export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
   const rawBody = await request.text();
 
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(rawBody, signature ?? "", webhookSecret);
-  } catch {
+  const event = await verifyStripeWebhook(stripe, rawBody, signature, webhookSecret);
+  if (!event) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
