@@ -6,7 +6,7 @@
 
 **Architecture:** The Next.js 16 app is built for Workers with **vinext** (Cloudflare's recommended Next.js-on-Workers path; it supports Next 16 `proxy.ts`, which the OpenNext adapter does not yet support — see "Adapter decision" below). The only hard Vercel lock-in, the `@vercel/sandbox` tiling pipeline, is replaced by a small separate Worker (`workers/tiler`) that owns a Cloudflare **Container** (Docker image with libvips + OpenSlide + awscli). The app starts a tiling job with an authenticated HTTPS `POST` to the tiler; the container runs the same shell pipeline and reports back to the existing `/api/tiling/callback` route exactly as today. Supabase, R2, Stripe, Resend and Anthropic stay where they are — they are already platform-neutral.
 
-**Tech Stack:** Next.js 16.2 + vinext, Wrangler, Cloudflare Workers (Paid plan — required for Containers and for the >3 MB worker bundle), Cloudflare Containers (`@cloudflare/containers`), R2 (already in use), GitHub Actions, Vitest, Playwright.
+**Tech Stack:** Next.js 16.2 + vinext, Wrangler, Cloudflare Workers (Paid plan — required for Containers and for the >3 MB worker bundle), Cloudflare Containers (`@cloudflare/containers`), R2 (already in use), Workers Builds (CD) + GitHub Actions (CI), Vitest, Playwright.
 
 ## Global Constraints
 
@@ -53,7 +53,7 @@
 | `src/lib/tiling/reconcile-stale-jobs.ts` | Modify | Comment/constant rename only (Vercel Sandbox → container) |
 | `vitest.config.ts` | Modify | Also include `workers/**/*.test.ts` |
 | `.github/workflows/ci.yml` | Modify | Add `build:cf` step |
-| `.github/workflows/deploy.yml` | Create | Deploy tiler + app on `main`; preview version upload on PRs |
+| Workers Builds (dashboard) | Configure | Deploy app + tiler on `main`; preview URLs on PRs (Task 5) |
 | `docs/cloudflare-runbook.md` | Create | Secrets, first deploy, cutover, rollback, decommission checklist |
 
 ---
@@ -741,72 +741,72 @@ git commit -m "Trigger WSI tiling via the Cloudflare tiler instead of Vercel San
 
 ---
 
-### Task 5: Deploy pipeline (GitHub Actions)
+### Task 5: Continuous deployment with Workers Builds
+
+**Decision:** CD runs on Cloudflare **Workers Builds** (Cloudflare's Git integration), not a GitHub Actions deploy workflow. GitHub keeps CI (`ci.yml`). Reasons: it mirrors today's Vercel Git integration (deploy on merge to `main`, a preview URL comment on every PR), needs no Cloudflare API token stored in GitHub, and builds the tiler's Docker image on Cloudflare's builders. Deploys are gated by making the CI checks **required** on `main`, so only CI-green code is ever merged and deployed.
+
+Known limit: preview (non-`main`) builds run `wrangler versions upload`, which does **not** rebuild or roll out the tiler container. Tiler changes are verified with `wrangler dev` locally and go live on merge.
 
 **Files:**
-- Create: `.github/workflows/deploy.yml`
+- Modify: `package.json` (add `deploy:cf:ci` script)
+- Modify: `docs/cloudflare-runbook.md` (created in Task 6 — record the dashboard settings below there)
 
 **Interfaces:**
-- Consumes: `npm run deploy:cf` (Task 1), `workers/tiler` (Task 3).
-- Produces: repo secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (set by the account owner in Task 6); production deploys on `main`, preview versions on PRs.
+- Consumes: `npm run build:cf` / `npm run deploy:cf` (Task 1); `workers/tiler` (Task 3).
+- Produces: two Workers Builds connections (`hemoedge`, `hemoedge-tiler`) on repo `optymumss/Hemoedge`, production branch `main`.
 
-- [ ] **Step 1: Write the workflow**
+- [ ] **Step 1: Add a CI-friendly deploy script**
 
-```yaml
-name: Deploy
+Workers Builds runs a *build command* then a *deploy command*. In `package.json` `scripts` add:
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  NEXT_PUBLIC_SUPABASE_URL: https://uktdipvvnbgzasqlpudl.supabase.co
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ByF8gifdSfyj1Iktr9PrSw_car33S1W
-  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-jobs:
-  deploy:
-    # Forks don't get secrets; skip instead of failing.
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - name: Deploy tiler (production only)
-        if: github.event_name == 'push'
-        working-directory: workers/tiler
-        run: npm ci && npx wrangler deploy
-      - name: Deploy app (production)
-        if: github.event_name == 'push'
-        run: npm run deploy:cf
-      - name: Upload app preview version (PR)
-        if: github.event_name == 'pull_request'
-        run: npm run build:cf && npx wrangler versions upload --preview-alias pr-${{ github.event.pull_request.number }}
+```json
+"deploy:cf:ci": "wrangler deploy"
 ```
 
-- [ ] **Step 2: Lint the workflow and commit**
+(the build step has already produced the vinext output, so the deploy command must not rebuild).
 
-Run: `npx --yes @action-validator/cli .github/workflows/deploy.yml`
-Expected: no errors.
+Run: `npm run build:cf && npx wrangler deploy --dry-run`
+Expected: dry run lists the `hemoedge` Worker and its assets without errors.
 
 ```bash
-git add .github/workflows/deploy.yml
-git commit -m "Deploy app and tiler to Cloudflare from GitHub Actions"
+git add package.json
+git commit -m "Add deploy script for Workers Builds"
 ```
 
-Note: until Task 6 sets `CLOUDFLARE_API_TOKEN`, this job fails on PRs. Merge Task 5 only after Task 6, Step 1 is done.
+- [ ] **Step 2: Connect the app Worker (dashboard, account owner)**
 
----
+Workers & Pages → `hemoedge` → Settings → Builds → Connect → GitHub → `optymumss/Hemoedge`:
+
+| Setting | Value |
+|---|---|
+| Production branch | `main` |
+| Root directory | `/` |
+| Build command | `npm ci && npm run build:cf` |
+| Deploy command | `npm run deploy:cf:ci` |
+| Non-production branch builds | Enabled (deploy command `npx wrangler versions upload`) |
+| Build variables | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (same values as in `ci.yml`) |
+
+- [ ] **Step 3: Connect the tiler Worker**
+
+Workers & Pages → `hemoedge-tiler` → Settings → Builds → Connect → same repo:
+
+| Setting | Value |
+|---|---|
+| Production branch | `main` |
+| Root directory | `workers/tiler` |
+| Build command | `npm ci` |
+| Deploy command | `npx wrangler deploy` |
+| Build watch paths | include `workers/tiler/*` only (so app-only changes don't redeploy the tiler) |
+| Non-production branch builds | Disabled (containers don't update on preview builds anyway) |
+
+- [ ] **Step 4: Make CI a merge gate and turn off Vercel's Git deploys**
+
+1. GitHub → Settings → Branches → rule for `main`: require status checks `Type check, lint, unit tests, build` and `End-to-end tests`.
+2. Vercel → Project → Settings → Git → disconnect the repository (the project itself stays until Task 7 decommission). From now on only Cloudflare posts preview comments.
+
+- [ ] **Step 5: Verify**
+
+Open a trivial PR (e.g. a README typo). Expected: a Cloudflare comment with a branch preview URL (`<branch>-hemoedge.<subdomain>.workers.dev`) that serves the PR's code; merge after CI → a new production version appears under Workers → `hemoedge` → Deployments.
 
 ### Task 6: Provision Cloudflare, configure secrets, first deploy to the `workers.dev` URL
 
@@ -819,7 +819,7 @@ This task is operational (account owner runs it with Wrangler logged in to the H
 - [ ] **Step 1: Account prerequisites**
 
 1. Upgrade the account that already owns the R2 bucket to **Workers Paid** (required for Containers and for app bundles over 3 MB).
-2. Create an API token with *Workers Scripts: Edit*, *Workers Containers: Edit*, *Account Settings: Read* → add as GitHub repo secret `CLOUDFLARE_API_TOKEN`; add the account id as `CLOUDFLARE_ACCOUNT_ID`.
+2. Install the Cloudflare GitHub app on `optymumss/Hemoedge` (Workers Builds, Task 5). No API token is stored in GitHub.
 3. Export the current production env var **names and values** from the Vercel dashboard (Project → Settings → Environment Variables) to a local, gitignored file. Values are needed for Step 3; never commit them.
 
 - [ ] **Step 2: Fill the non-secret `vars`**
@@ -899,7 +899,7 @@ Add to `wrangler.jsonc`:
   "routes": [{ "pattern": "<production-domain>", "custom_domain": true }],
 ```
 
-Set `APP_URL` (both Workers) to `https://<production-domain>`; update the `TILER_URL` secret only if the tiler also gets a custom domain (optional). Deploy both (`deploy.yml` on merge to `main`, or manually). Wrangler replaces the Vercel DNS record with the Worker custom domain.
+Set `APP_URL` (both Workers) to `https://<production-domain>`; update the `TILER_URL` secret only if the tiler also gets a custom domain (optional). Deploy both (Workers Builds on merge to `main`, or manually with `wrangler deploy`). Wrangler replaces the Vercel DNS record with the Worker custom domain.
 
 - [ ] **Step 3: Flip external integrations**
 
@@ -937,6 +937,6 @@ git commit -m "Serve production from Cloudflare and document decommissioning Ver
 
 ## Out of scope
 
-- Moving Supabase Postgres/Auth/Storage to D1/R2 — Supabase is platform-neutral and stays.
+- Moving Supabase Postgres/Auth/Storage to D1/Better Auth/R2 — covered by the follow-up plan `docs/superpowers/plans/2026-09-25-supabase-to-d1-migration.md`, which starts after this plan is complete.
 - Replacing Resend, Stripe, or Anthropic.
 - ISR/`"use cache"` backends — the app uses only `revalidatePath` on dynamic admin pages, which needs no incremental cache store.
