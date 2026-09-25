@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("homepage renders the hero and sign-in link", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "HemoEdge" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "HemoEdge" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Sign in" }).first()).toBeVisible();
 });
 

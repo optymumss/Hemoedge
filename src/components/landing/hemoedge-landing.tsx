@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 
 const FORM_ENDPOINT = "https://formspree.io/f/mdeneawz";
 
@@ -226,7 +227,7 @@ export function HemoedgeLanding() {
       </svg>
 
       {/* ============ NAV ============ */}
-      <nav className="nav">
+      <nav className="nav" aria-label="Primary">
         <div className="nav-in">
           <a className="brand" href="#top" aria-label="HemoEdge home">
             <svg className="logo" viewBox="0 0 566 150" role="img">
@@ -240,6 +241,10 @@ export function HemoedgeLanding() {
             <a href="#tutor">AI tutor</a>
             <a href="#who">Who it&apos;s for</a>
             <a href="#reach">Reach</a>
+            <Link href="/blog">Blog</Link>
+            <Link href="/team">Team</Link>
+            <Link href="/contact">Contact</Link>
+            <Link href="/login">Sign in</Link>
           </div>
           <div className="nav-right">
             <a className="nav-cta" href="#join">
