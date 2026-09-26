@@ -11,7 +11,8 @@
     "test:e2e": "playwright test",
     "build:cf": "vinext build && next typegen",
     "preview:cf": "npm run build:cf && wrangler dev --config dist/server/wrangler.json",
-    "deploy:cf": "npm run build:cf && vinext-cloudflare deploy --config dist/server/wrangler.json",
+    "deploy:cf": "npm run build:cf && npm run deploy:cf:ci",
+    "deploy:cf:ci": "vinext-cloudflare deploy --skip-build --config dist/server/wrangler.json",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {

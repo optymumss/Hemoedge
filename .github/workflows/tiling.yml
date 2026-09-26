@@ -28,7 +28,7 @@ jobs:
     # as failed here before the app gives up on it.
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           sparse-checkout: workers/tiler/run-tiling.sh
           sparse-checkout-cone-mode: false
