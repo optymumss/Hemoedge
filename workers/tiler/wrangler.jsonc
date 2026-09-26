@@ -5,16 +5,24 @@
   "compatibility_date": "2026-09-25",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
-  "containers": [
-    { "class_name": "TilingContainer", "image": "./Dockerfile", "instance_type": "standard-2", "max_instances": 5 }
+  "workers_dev": true,
+  "preview_urls": false,
+  // v1 was the Containers attempt; v2 retires its Durable Object class.
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["TilingContainer"] },
+    { "tag": "v2", "deleted_classes": ["TilingContainer"] }
   ],
-  "durable_objects": { "bindings": [{ "name": "TILING_CONTAINER", "class_name": "TilingContainer" }] },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["TilingContainer"] }],
-  // Non-secret config, filled in when the Worker is provisioned. Secrets
-  // (TILER_SECRET, TILING_CALLBACK_SECRET, R2_*) via `wrangler secret put`.
+  // Tiling itself runs in GitHub Actions (.github/workflows/tiling.yml); this
+  // Worker only dispatches runs and brokers what they need, so it fits the
+  // Workers free plan. Secrets via `wrangler secret put`: TILER_SECRET,
+  // TILING_CALLBACK_SECRET, R2_ACCOUNT_ID, R2_ACCESS_KEY_ID,
+  // R2_SECRET_ACCESS_KEY, GITHUB_DISPATCH_TOKEN.
   "vars": {
     "APP_URL": "https://hemoedge.vercel.app",
     "R2_BUCKET_NAME": "hemoedge-slides",
-    "R2_PUBLIC_URL": "https://pub-880b5a4e70584eb18d3dab258861f957.r2.dev"
+    "R2_PUBLIC_URL": "https://pub-880b5a4e70584eb18d3dab258861f957.r2.dev",
+    "GITHUB_REPO": "optymumss/Hemoedge",
+    "GITHUB_WORKFLOW": "tiling.yml",
+    "GITHUB_REF": "main"
   }
 }

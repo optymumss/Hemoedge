@@ -1,8 +1,9 @@
 /**
  * Hands a tiling job to the hemoedge-tiler Worker (workers/tiler), which
- * starts a Cloudflare Container named after the job and returns
- * immediately; the container reports its own outcome to
- * /api/tiling/callback. Nothing here waits for or polls the result.
+ * dispatches a GitHub Actions run of .github/workflows/tiling.yml and
+ * returns immediately; the run reports its own outcome to
+ * /api/tiling/callback (relayed by the tiler). Nothing here waits for or
+ * polls the result.
  */
 export async function triggerTilingJob(params: {
   jobId: string;
