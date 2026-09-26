@@ -12,5 +12,9 @@
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["TilingContainer"] }],
   // Non-secret config, filled in when the Worker is provisioned. Secrets
   // (TILER_SECRET, TILING_CALLBACK_SECRET, R2_*) via `wrangler secret put`.
-  "vars": { "APP_URL": "", "R2_BUCKET_NAME": "", "R2_PUBLIC_URL": "" }
+  "vars": {
+    "APP_URL": "https://hemoedge.vercel.app",
+    "R2_BUCKET_NAME": "hemoedge-slides",
+    "R2_PUBLIC_URL": "https://pub-880b5a4e70584eb18d3dab258861f957.r2.dev"
+  }
 }
