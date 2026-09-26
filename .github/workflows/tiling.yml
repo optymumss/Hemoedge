@@ -1,0 +1,58 @@
+name: Tile slide
+# Constant run name: the dispatch input is opaque, and nothing about the
+# slide should show up in this public repo's run list.
+run-name: Tile slide
+
+# Dispatched by the hemoedge-tiler Worker (workers/tiler) for each tiling
+# job. The run authenticates back to the Worker with its OIDC token, so this
+# workflow needs no repository secrets.
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Sealed job token from the tiler Worker
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  TILER_URL: https://hemoedge-tiler.consultant-bdd.workers.dev
+
+jobs:
+  tile:
+    runs-on: ubuntu-24.04
+    # Under the app's 45-minute stale-job budget, so a hung run is reported
+    # as failed here before the app gives up on it.
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: workers/tiler/run-tiling.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Install libvips + OpenSlide
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends libvips-tools openslide-tools
+          vips -l | grep -qi openslideload
+
+      - name: Tile and upload
+        # A step timeout fails the step (the script's own report is lost,
+        # but the next step still reports); a job timeout would cancel.
+        timeout-minutes: 35
+        env:
+          JOB_TOKEN: ${{ inputs.job }}
+        run: bash workers/tiler/run-tiling.sh
+
+      # Covers failures before the script could report (e.g. apt), and
+      # timeouts/cancellations. A no-op if the script already reported.
+      - name: Report failure
+        if: failure() || cancelled()
+        env:
+          JOB_TOKEN: ${{ inputs.job }}
+        run: >-
+          bash workers/tiler/run-tiling.sh report-failure
+          "Tiling workflow failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

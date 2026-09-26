@@ -8,6 +8,16 @@
 
 **Tech Stack:** Next.js 16.2 + vinext, Wrangler, Cloudflare Workers (Paid plan — required for Containers and for the >3 MB worker bundle), Cloudflare Containers (`@cloudflare/containers`), R2 (already in use), Workers Builds (CD) + GitHub Actions (CI), Vitest, Playwright.
 
+## Revision 2026-09-26: tiling on GitHub Actions, Workers free plan
+
+The target is **GitHub + Cloudflare only, on free tiers**. Cloudflare Containers need Workers Paid, so Task 3's container is replaced:
+
+- `workers/tiler` is now a plain Worker (no Container, no Durable Object) that fits the free plan. `POST /jobs` (same contract, still answers 202) seals the job with AES-GCM (key derived from `TILER_SECRET`) and dispatches `.github/workflows/tiling.yml` via `workflow_dispatch`, using the `GITHUB_DISPATCH_TOKEN` secret (fine-grained PAT, Actions: read & write on this repo only).
+- The workflow runs `workers/tiler/run-tiling.sh` on `ubuntu-24.04` (libvips + OpenSlide from apt, the runner's AWS CLI). It authenticates back to the tiler with its **GitHub OIDC token** (audience `hemoedge-tiler`, pinned to this repo, `tiling.yml`, `refs/heads/main`, `workflow_dispatch`): `POST /runner/start` returns the slide URL and R2 credentials, and `POST /runner/callback` relays the outcome to `/api/tiling/callback` with `TILING_CALLBACK_SECRET`. The job and slide ids and the manifest URL come from the sealed job, not from the runner.
+- The repo is public, so nothing about a slide goes into workflow inputs or Actions logs. The run name is constant, the input is opaque, and script output goes to a file that only leaves the runner as the error text of a failure callback. GitHub stores **no** secrets.
+- The Container-specific constraints below (instance type, `sleepAfter`, Dockerfile) no longer apply. The job budget is now the workflow's `timeout-minutes` (35 for the tiling step, 40 for the job), still inside the app's 45-minute stale-job window.
+- For Tasks 5 and 6, check that the app Worker fits the free plan's 3 MB (compressed) script limit before assuming Paid.
+
 ## Global Constraints
 
 - **No behavior change.** Every route, server action, auth redirect, and the tiling state machine (`queued → processing → ready|failed`, retry from the Slides admin page) must behave identically before and after.

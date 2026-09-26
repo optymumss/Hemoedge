@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
- * The tiling container POSTs here when it finishes (success or failure) —
- * nothing else is watching the container's own lifetime, so this is the only
- * signal that flips a slide out of "processing". Authenticated by a shared
- * secret rather than a user session, since the caller is a container, not a
- * logged-in request; the admin client is required to write past RLS for
+ * The tiler Worker relays each tiling run's outcome here (success or
+ * failure) — nothing else is watching the run's own lifetime, so this is the
+ * only signal that flips a slide out of "processing". Authenticated by a
+ * shared secret rather than a user session, since the caller is a service,
+ * not a logged-in request; the admin client is required to write past RLS for
  * the same reason.
  */
 function isValidSecret(provided: string | null, expected: string): boolean {
