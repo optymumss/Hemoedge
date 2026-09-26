@@ -11,13 +11,14 @@
   "compatibility_date": "2026-09-25",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
-  // Non-secret config; values are filled in when the Worker is provisioned.
-  // Secrets are set with `wrangler secret put`, never committed.
+  "workers_dev": true,
+  "preview_urls": false,
+  // Non-secret config. Secrets (see docs/cloudflare-runbook.md) are set with
+  // `wrangler secret put` or the dashboard, never committed. A deploy
+  // replaces all plain vars with this list, so none are set in the dashboard.
   "vars": {
-    "EMAIL_FROM": "",
-    "ENQUIRY_NOTIFY_EMAIL": "",
-    "R2_BUCKET_NAME": "",
-    "R2_PUBLIC_URL": "",
-    "APP_URL": ""
+    "R2_BUCKET_NAME": "hemoedge-slides",
+    "R2_PUBLIC_URL": "https://pub-880b5a4e70584eb18d3dab258861f957.r2.dev",
+    "TILER_URL": "https://hemoedge-tiler.consultant-bdd.workers.dev"
   }
 }

@@ -16,7 +16,8 @@ The target is **GitHub + Cloudflare only, on free tiers**. Cloudflare Containers
 - The workflow runs `workers/tiler/run-tiling.sh` on `ubuntu-24.04` (libvips + OpenSlide from apt, the runner's AWS CLI). It authenticates back to the tiler with its **GitHub OIDC token** (audience `hemoedge-tiler`, pinned to this repo, `tiling.yml`, `refs/heads/main`, `workflow_dispatch`): `POST /runner/start` returns the slide URL and R2 credentials, and `POST /runner/callback` relays the outcome to `/api/tiling/callback` with `TILING_CALLBACK_SECRET`. The job and slide ids and the manifest URL come from the sealed job, not from the runner.
 - The repo is public, so nothing about a slide goes into workflow inputs or Actions logs. The run name is constant, the input is opaque, and script output goes to a file that only leaves the runner as the error text of a failure callback. GitHub stores **no** secrets.
 - The Container-specific constraints below (instance type, `sleepAfter`, Dockerfile) no longer apply. The job budget is now the workflow's `timeout-minutes` (35 for the tiling step, 40 for the job), still inside the app's 45-minute stale-job window.
-- For Tasks 5 and 6, check that the app Worker fits the free plan's 3 MB (compressed) script limit before assuming Paid.
+- App Worker size: 858 KiB compressed, under the free plan's 3 MB limit. CPU is the constraint: warm SSR requests use about 21 ms (median) against the free plan's 10 ms, and cold ones 70–170 ms. See `docs/cloudflare-runbook.md`.
+- `vinext-cloudflare deploy` **rebuilds unless passed `--skip-build`**, so `deploy:cf:ci` passes it. Otherwise the deploy step's rebuild drops the `NEXT_PUBLIC_*` build-time values. In Task 5 the tiler's Workers Builds build command is just `npm ci`, since there is no Docker image any more.
 
 ## Global Constraints
 
