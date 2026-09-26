@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hemoedge-tiler",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "containers": [
+    { "class_name": "TilingContainer", "image": "./Dockerfile", "instance_type": "standard-2", "max_instances": 5 }
+  ],
+  "durable_objects": { "bindings": [{ "name": "TILING_CONTAINER", "class_name": "TilingContainer" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["TilingContainer"] }],
+  // Non-secret config, filled in when the Worker is provisioned. Secrets
+  // (TILER_SECRET, TILING_CALLBACK_SECRET, R2_*) via `wrangler secret put`.
+  "vars": { "APP_URL": "", "R2_BUCKET_NAME": "", "R2_PUBLIC_URL": "" }
+}

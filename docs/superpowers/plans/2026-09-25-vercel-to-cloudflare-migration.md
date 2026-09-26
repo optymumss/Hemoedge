@@ -442,7 +442,7 @@ post_callback "{\"job_id\":\"$JOB_ID\",\"slide_id\":\"$SLIDE_ID\",\"status\":\"r
 `workers/tiler/Dockerfile`:
 
 ```dockerfile
-FROM --platform=linux/amd64 ubuntu:24.04
+FROM --platform=linux/amd64 debian:bookworm-slim
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       libvips-tools openslide-tools awscli curl jq ca-certificates \
@@ -456,6 +456,8 @@ ENTRYPOINT ["/app/run-tiling.sh"]
 ```
 
 Verify locally: `docker build -t hemoedge-tiler workers/tiler` → Expected: build succeeds (the `grep` step proves OpenSlide support).
+
+> Implementation note: the base is Debian 12, not Ubuntu 24.04 — Ubuntu 24.04 no longer packages `awscli`, so `apt-get install` fails there. Debian 12 ships `awscli` and a `libvips` built with OpenSlide.
 
 - [ ] **Step 7: Worker + Container class**
 
@@ -570,7 +572,9 @@ In the root `tsconfig.json`, add `"workers"` to `exclude` so `npx tsc --noEmit` 
 
 - [ ] **Step 9: Verify and commit**
 
-Run: `npx tsc --noEmit && (cd workers/tiler && npx tsc --noEmit && npx wrangler deploy --dry-run) && npm run test`
+Run: `npx tsc --noEmit && (cd workers/tiler && npx tsc --noEmit && npx wrangler deploy --config wrangler.jsonc --dry-run) && npm run test`
+
+> Implementation notes: (1) `container.start()` throws if the container has already exited by its first health probe (a job that fails, or finishes, within ~1s). The script has reported through the callback by then, so `src/container-errors.ts` classifies that case and the Worker still answers 202; any other start error returns a JSON 502. (2) Tiler scripts pass `--config wrangler.jsonc` explicitly: after `vinext build`, wrangler would otherwise find the root `.wrangler/deploy/config.json` redirect and refuse to run. (3) CI type-checks the tiler with its own dependencies.
 Expected: all pass; dry-run prints the container + DO bindings.
 
 ```bash
@@ -795,7 +799,7 @@ Workers & Pages → `hemoedge-tiler` → Settings → Builds → Connect → sam
 | Production branch | `main` |
 | Root directory | `workers/tiler` |
 | Build command | `npm ci` |
-| Deploy command | `npx wrangler deploy` |
+| Deploy command | `npm run deploy` |
 | Build watch paths | include `workers/tiler/*` only (so app-only changes don't redeploy the tiler) |
 | Non-production branch builds | Disabled (containers don't update on preview builds anyway) |
 
