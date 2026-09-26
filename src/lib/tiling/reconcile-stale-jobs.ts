@@ -1,14 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
 
-/** Vercel Sandbox instances the tiling pipeline creates are capped at this
- * timeout (see trigger-tiling-job.ts); a job that hasn't heard back well
- * past it is never going to. */
-const SANDBOX_TIMEOUT_MINUTES = 45;
-const STALE_AFTER_MINUTES = SANDBOX_TIMEOUT_MINUTES + 5;
+/** Tiling containers stop themselves after this long without activity (see
+ * TilingContainer.sleepAfter in workers/tiler); a job that hasn't heard back
+ * well past it is never going to. */
+const TILING_TIMEOUT_MINUTES = 45;
+const STALE_AFTER_MINUTES = TILING_TIMEOUT_MINUTES + 5;
 
 /**
- * There's no cron/worker watching tiling jobs independently of the sandbox
- * itself, so a job whose sandbox died without hitting the callback route
+ * There's no cron/worker watching tiling jobs independently of the container
+ * itself, so a job whose container died without hitting the callback route
  * (crash, an actual timeout, transient network failure) is otherwise stuck
  * on "processing" forever with no error and no way to retry — the admin
  * Slides page only offers a Retry action once `tiling_status` is `failed`.
@@ -29,7 +29,7 @@ export async function reconcileStaleTilingJobs(
 
   if (!staleJobs || staleJobs.length === 0) return;
 
-  const error = `Tiling timed out — no response from the sandbox within ${STALE_AFTER_MINUTES} minutes.`;
+  const error = `Tiling timed out — no response from the tiling container within ${STALE_AFTER_MINUTES} minutes.`;
   const now = new Date().toISOString();
 
   await supabase

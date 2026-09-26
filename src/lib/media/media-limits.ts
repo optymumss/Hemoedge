@@ -9,7 +9,7 @@ export const ALLOWED_CONTENT_TYPES: Record<MediaKind, ReadonlySet<string>> = {
 };
 
 // Audio narration clips are short; video demonstrations run longer, hence
-// the higher cap. Both stay well under Vercel Sandbox/serverless limits
+// the higher cap. Neither is bounded by server request-size limits
 // since uploads go straight from the browser to R2 (see createMediaUploadTarget).
 export const MAX_MEDIA_BYTES: Record<MediaKind, number> = {
   audio: 250 * 1024 * 1024,

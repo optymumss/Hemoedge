@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
- * The tiling sandbox POSTs here when it finishes (success or failure) —
- * nothing else is watching the sandbox's own lifetime, so this is the only
+ * The tiling container POSTs here when it finishes (success or failure) —
+ * nothing else is watching the container's own lifetime, so this is the only
  * signal that flips a slide out of "processing". Authenticated by a shared
- * secret rather than a user session, since the caller is a sandbox, not a
+ * secret rather than a user session, since the caller is a container, not a
  * logged-in request; the admin client is required to write past RLS for
  * the same reason.
  */
