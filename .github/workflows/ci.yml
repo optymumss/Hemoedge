@@ -27,6 +27,9 @@ jobs:
       - run: npm run test
       - run: npm run build
       - run: npm run build:cf
+      - name: Type check the tiler Worker
+        working-directory: workers/tiler
+        run: npm ci && npx tsc --noEmit
 
   e2e:
     name: End-to-end tests
